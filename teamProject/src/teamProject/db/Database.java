@@ -1,4 +1,4 @@
-package teamProject.database;
+package teamProject.db;
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -14,6 +14,8 @@ package teamProject.database;
  */
 public class Database {
 
-
+    public void print() {
+        System.out.println("Hello");
+    }
     
 }

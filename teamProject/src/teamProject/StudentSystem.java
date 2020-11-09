@@ -6,13 +6,14 @@ package teamProject;
  * @author Julia Jablonska
  * @author Zbigniew Lisak 
  */
-import teamProject.*;
+import teamProject.db.*;
 
 /** 
  * Main class and starting point of the application
 */
 public class StudentSystem {
     public static void main(String[] args) {
-
+        Database x = new Database();
+        x.print();
     }
 }
