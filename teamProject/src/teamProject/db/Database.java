@@ -9,6 +9,8 @@ package teamProject.db;
  */
 
 import java.sql.*;
+import java.util.*;
+
 import teamProject.Classes.*;
 
 /**
@@ -37,6 +39,73 @@ public class Database implements AutoCloseable {
         con.close();
     }
 
+    private Set<String> getTableNames() {
+        Set<String> tables = null;
+        try (Statement stsm = con.createStatement()) {
+            
+            ResultSet results = stsm.executeQuery(
+                    "SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "+
+                     "WHERE table_schema = (SELECT DATABASE());");
+            tables = new HashSet<String>();
+            while (results.next()) {
+                tables.add(results.getString("TABLE_NAME"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return tables;
+
+    }
+    
+    private Set<String> getColumnNames(String tableName) {
+        Set<String> columns = null;
+        if (getTableNames().contains(tableName)) {
+            try (Statement stsm = con.createStatement()) {
+                ResultSet results = stsm.executeQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+                        + "WHERE table_name = '" + tableName + "';");
+                columns = new HashSet<String>();
+                while (results.next()) {
+                    columns.add(results.getString("COLUMN_NAME"));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return columns;
+    }
+    
+    /**
+     * Checks if given value is already used in a table
+     * @param tableName table to check
+     * @param columnName column to check
+     * @param value value to took for
+     * @return true if value exists in given coulmn or there was an error false otherwise
+     */
+    public boolean valueExists (String tableName, String columnName, String value){
+        if(getTableNames().contains(tableName) && getColumnNames(tableName).contains(columnName)){
+            try(Statement stsm = con.createStatement()){
+            
+                ResultSet results = stsm.executeQuery("SELECT DISTINCT "+columnName+" FROM "+tableName+";");
+            
+                while (results.next()) {
+                    if (results.getString(1) == value) {
+                        return true;
+                    }
+                }
+                return false;
+    
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
+
     //INSERT FUNCTIONS
 
     private void newStudyPeriod(StudyPeriod newPeriod, Student student) throws SQLException {
@@ -56,6 +125,25 @@ public class Database implements AutoCloseable {
         } catch (SQLException e) {
             throw e;
         }
+    }
+
+    /**
+     * Inserts information about new study period into database
+     * @param newPeriod new StudyPeriod object to be assigned to student
+     * @param to Student the study period belongs to
+     * @return true if operation was compleated false if not
+     */
+    public boolean addStudyPeriod(StudyPeriod newPeriod, Student to) {
+        boolean succes = true;
+        try {
+            newStudyPeriod(newPeriod, to);
+        } catch (Exception e) {
+            e.printStackTrace();
+            succes = false;
+        }
+
+        return succes;
+
     }
 
     private void newStudent(Student newStudent) throws SQLException {
@@ -99,7 +187,7 @@ public class Database implements AutoCloseable {
      * @param newUser user to be inserted
      * @return true if user inserted succesfully false if not
      */
-    public boolean newUser(User newUser) {
+    public boolean addUser(User newUser) {
 
         String type = "Basic";
         if (newUser instanceof Student) {
@@ -128,6 +216,29 @@ public class Database implements AutoCloseable {
                     newTeacher((Teacher) newUser);
                     break;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            succes = false;
+        }
+
+        return succes;
+
+    }
+
+    /**
+     * Inserts information about new Department into database
+     * @param newDepartment new Department to be inserted
+     * @return true if the opperation was succesful
+     */
+    public boolean addDepartment(Department newDepartment) {
+        boolean succes = true;
+
+        String insertDep = "INSERT INTO Departments VALUES (?,?);";
+        try (PreparedStatement insert = con.prepareStatement(insertDep)) {
+            insert.clearParameters();
+            insert.setString(1, newDepartment.getDeptCode());
+            insert.setString(2, newDepartment.getFullName());
+
         } catch (Exception e) {
             e.printStackTrace();
             succes = false;
