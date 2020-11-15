@@ -10,7 +10,7 @@ package teamProject.Classes;
 /** 
  * User class extention, Administrator class definition
 */
-public class Administrator extends Users {
+public class Administrator extends User {
 
     public Administrator(String username, String passwordHash, String salt){
         super(username, passwordHash, salt);

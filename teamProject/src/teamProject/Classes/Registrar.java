@@ -10,7 +10,7 @@ package teamProject.Classes;
 /** 
  * User class extention, Registrar class definition
 */
-public class Registrar extends Users {
+public class Registrar extends User {
 
     public Registrar(String username, String passwordHash, String salt){
         super(username, passwordHash, salt);

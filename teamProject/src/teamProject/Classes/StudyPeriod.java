@@ -21,7 +21,7 @@ public class StudyPeriod {
     
 
     StudyPeriod(char label, Date startDate, Date endDate, StudyLevel degreeLvl,
-         Grade[] gradesList){
+            Grade[] gradesList) {
         this.label = label;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -29,4 +29,46 @@ public class StudyPeriod {
         this.gradesList = gradesList;
 
     }
+    
+
+    public char getLabel() {
+        return this.label;
+    }
+
+    public void setLabel(char label) {
+        this.label = label;
+    }
+
+    public Date getStartDate() {
+        return this.startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return this.endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public StudyLevel getDegreeLvl() {
+        return this.degreeLvl;
+    }
+
+    public void setDegreeLvl(StudyLevel degreeLvl) {
+        this.degreeLvl = degreeLvl;
+    }
+
+    public Grade[] getGradesList() {
+        return this.gradesList;
+    }
+
+    public void setGradesList(Grade[] gradesList) {
+        this.gradesList = gradesList;
+    }
+
 }

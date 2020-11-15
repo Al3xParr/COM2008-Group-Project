@@ -10,14 +10,24 @@ package teamProject.Classes;
 /** 
  * User class extention, Teacher class definition
 */
-public class Teacher extends Users {
+public class Teacher extends User {
 
     private String fullName;
 
     public Teacher(String username, String passwordHash, String salt,
-    String fullName){
+            String fullName) {
         super(username, passwordHash, salt);
         this.fullName = fullName;
     }
+
+
+    public String getFullName() {
+        return this.fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+    
 
 }
