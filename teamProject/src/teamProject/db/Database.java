@@ -12,6 +12,7 @@ import java.sql.*;
 import java.util.*;
 
 import teamProject.Classes.*;
+import teamProject.Classes.Module;
 
 /**
  * Class representing and operating database
@@ -42,10 +43,9 @@ public class Database implements AutoCloseable {
     private Set<String> getTableNames() {
         Set<String> tables = null;
         try (Statement stsm = con.createStatement()) {
-            
-            ResultSet results = stsm.executeQuery(
-                    "SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "+
-                     "WHERE table_schema = (SELECT DATABASE());");
+
+            ResultSet results = stsm.executeQuery("SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "
+                    + "WHERE table_schema = (SELECT DATABASE());");
             tables = new HashSet<String>();
             while (results.next()) {
                 tables.add(results.getString("TABLE_NAME"));
@@ -58,7 +58,7 @@ public class Database implements AutoCloseable {
         return tables;
 
     }
-    
+
     private Set<String> getColumnNames(String tableName) {
         Set<String> columns = null;
         if (getTableNames().contains(tableName)) {
@@ -77,7 +77,7 @@ public class Database implements AutoCloseable {
 
         return columns;
     }
-    
+
     /**
      * Checks if given value is already used in a table
      * @param tableName table to check
@@ -85,21 +85,20 @@ public class Database implements AutoCloseable {
      * @param value value to took for
      * @return true if value exists in given coulmn or there was an error false otherwise
      */
-    public boolean valueExists (String tableName, String columnName, String value){
-        if(getTableNames().contains(tableName) && getColumnNames(tableName).contains(columnName)){
-            try(Statement stsm = con.createStatement()){
-            
-                ResultSet results = stsm.executeQuery("SELECT DISTINCT "+columnName+" FROM "+tableName+";");
-            
+    public boolean valueExists(String tableName, String columnName, String value) {
+        if (getTableNames().contains(tableName) && getColumnNames(tableName).contains(columnName)) {
+            try (Statement stsm = con.createStatement()) {
+
+                ResultSet results = stsm.executeQuery("SELECT DISTINCT " + columnName + " FROM " + tableName + ";");
+
                 while (results.next()) {
                     if (results.getString(1) == value) {
                         return true;
                     }
                 }
                 return false;
-    
 
-            }catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -108,7 +107,7 @@ public class Database implements AutoCloseable {
 
     //INSERT FUNCTIONS
 
-    private void newStudyPeriod(StudyPeriod newPeriod, Student student) throws SQLException {
+    private void insertStudyPeriod(StudyPeriod newPeriod, Student student) throws SQLException {
         String insertPeriod = "INSERT INTO StudentsToModules VALUES(?,?,?,?,?,?,?);";
         try (PreparedStatement insert = con.prepareStatement(insertPeriod)) {
             for (Grade g : newPeriod.getGradesList()) {
@@ -136,7 +135,7 @@ public class Database implements AutoCloseable {
     public boolean addStudyPeriod(StudyPeriod newPeriod, Student to) {
         boolean succes = true;
         try {
-            newStudyPeriod(newPeriod, to);
+            insertStudyPeriod(newPeriod, to);
         } catch (Exception e) {
             e.printStackTrace();
             succes = false;
@@ -146,7 +145,7 @@ public class Database implements AutoCloseable {
 
     }
 
-    private void newStudent(Student newStudent) throws SQLException {
+    private void insertStudent(Student newStudent) throws SQLException {
 
         String insertStudent = "INSERT INTO Students VALUES(?,?,?,?,?,?,?,?)";
         try (PreparedStatement insert = con.prepareStatement(insertStudent)) {
@@ -161,14 +160,14 @@ public class Database implements AutoCloseable {
             insert.setString(8, newStudent.getCourse().getCourseCode());
             insert.executeUpdate();
             for (StudyPeriod x : newStudent.getStudyPeriodList()) {
-                newStudyPeriod(x, newStudent);
+                insertStudyPeriod(x, newStudent);
             }
         } catch (SQLException e) {
             throw e;
         }
     }
 
-    private void newTeacher(Teacher newTeacher) throws SQLException {
+    private void insertTeacher(Teacher newTeacher) throws SQLException {
 
         String insertTeacher = "INSERT INTO Teachers VALUES(?,?)";
         try (PreparedStatement insert = con.prepareStatement(insertTeacher)) {
@@ -210,10 +209,10 @@ public class Database implements AutoCloseable {
             insert.executeUpdate();
             switch (type) {
                 case "Student":
-                    newStudent((Student) newUser);
+                    insertStudent((Student) newUser);
                     break;
                 case "Teacher":
-                    newTeacher((Teacher) newUser);
+                    insertTeacher((Teacher) newUser);
                     break;
             }
         } catch (Exception e) {
@@ -238,6 +237,13 @@ public class Database implements AutoCloseable {
             insert.clearParameters();
             insert.setString(1, newDepartment.getDeptCode());
             insert.setString(2, newDepartment.getFullName());
+            insert.executeUpdate();
+            for (Course c : newDepartment.getCourseList()) {
+                insertCourseDepartLink(c, newDepartment);
+            }
+            for (Module m : newDepartment.getModuleList()) {
+                updateModuleSupervision(m, newDepartment);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -246,6 +252,67 @@ public class Database implements AutoCloseable {
 
         return succes;
 
+    }
+
+    private void insertCourseDepartLink(Course c, Department d) throws SQLException{
+        String insertLink = "INSERT INTO CourseToDepartment VALUES(?,?,?);";
+        try (PreparedStatement insert = con.prepareStatement(insertLink)) {
+            insert.clearParameters();
+            insert.setString(1, c.getCourseCode());
+            insert.setString(2, d.getDeptCode());
+            insert.setBoolean(3, c.getMainDep() == d);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Adds course supervision
+     * @param c course to be supervised
+     * @param d supervising department
+     * @return true if operation was succesfull false otherwise
+     */
+    public boolean connectCourseToDepart(Course c, Department d) {
+        boolean succes = false;
+        try {
+            insertCourseDepartLink(c, d);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    //UPDATE QUERIES
+
+    private void updateModuleSupervision(Module m, Department d) throws SQLException{
+        String updateModul = "UPDATE Modules SET departmentCode = ? WHERE moduleCode = ?;";
+        try (PreparedStatement update = con.prepareStatement(updateModul)) {
+            update.clearParameters();
+            update.setString(1, d.getDeptCode());
+            update.setString(2, m.getModuleCode());
+            update.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Updates Supervidion of the module
+     * @param m module in question
+     * @param d new supervising department
+     * @return true if operation was succesfull false otherwise
+     */
+    public boolean changeModuleSupervison(Module m, Department d) {
+        boolean succes = false;
+        try {
+            updateModuleSupervision(m, d);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
     }
 
 }
