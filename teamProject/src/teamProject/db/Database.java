@@ -315,4 +315,22 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
+    public void instantiateTeachers() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM TEACHERS;");
+
+            while (results.next()) {
+                //not sure where the attributes are stored yet, can change later
+                String username = results.getString(1);
+                String passwordHash = results.getString(2);
+                String salt = results.getString(3);
+                String fullName = results.getString(4);
+                Teacher teacher = new Teacher(username, passwordHash, salt, fullName);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
