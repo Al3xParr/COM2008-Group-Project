@@ -315,6 +315,7 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
+    //instantiating the users from the databases
     public void instantiateTeachers() {
         try (Statement stsm = con.createStatement()) {
 
@@ -328,9 +329,43 @@ public class Database implements AutoCloseable {
                 String fullName = results.getString(4);
                 Teacher teacher = new Teacher(username, passwordHash, salt, fullName);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void instantiateRegistrar() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM REGISTRARS;");
+
+            while (results.next()) {
+                //not sure where the attributes are stored yet, can change later
+                String username = results.getString(1);
+                String passwordHash = results.getString(2);
+                String salt = results.getString(3);
+                Registrar registrar = new Registrar(username, passwordHash, salt);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void instantiateAdministrator() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM ADMISTRATOR;");
+
+            while (results.next()) {
+                //not sure where the attributes are stored yet, can change later
+                String username = results.getString(1);
+                String passwordHash = results.getString(2);
+                String salt = results.getString(3);
+                Administrator administrator = new Administrator(username, passwordHash, salt);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
