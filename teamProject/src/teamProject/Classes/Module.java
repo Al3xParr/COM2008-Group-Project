@@ -12,14 +12,13 @@ package teamProject.Classes;
 */
 public class Module {
     private String moduleCode, fullName, timeTaught;
-    private Department departmentCode;
-    private int moduleCredits;
+    private Department department;
 
-    public Module(String moduleCode, Department departmentCode, String fullName, int moduleCredits, String timeTaught) {
+    public Module(String moduleCode, Department department, String fullName, String timeTaught) {
         this.moduleCode = moduleCode;
-        this.departmentCode = departmentCode;
+        this.department = department;
         this.fullName = fullName;
-        this.moduleCredits = moduleCredits;
+
         this.timeTaught = timeTaught;
     }
 
@@ -47,22 +46,12 @@ public class Module {
         this.timeTaught = timeTaught;
     }
 
-    public Department getDepartmentCode() {
-        return this.departmentCode;
+    public Department getDepartment() {
+        return this.department;
     }
 
-    public void setDepartmentCode(Department departmentCode) {
-        this.departmentCode = departmentCode;
+    public void setDepartment(Department departmentCode) {
+        this.department = departmentCode;
     }
-
-    public int getModuleCredits() {
-        return this.moduleCredits;
-    }
-
-    public void setModuleCredits(int moduleCredits) {
-        this.moduleCredits = moduleCredits;
-    }
-    
-    
         
 }
