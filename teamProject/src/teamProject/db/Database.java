@@ -133,14 +133,14 @@ public class Database implements AutoCloseable {
         try {
             con.setAutoCommit(false);
             try {
-            insertStudyPeriod(newPeriod, to);
+                insertStudyPeriod(newPeriod, to);
                 con.commit();
                 succes = true;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
                 con.rollback();
-        }
+            }
             con.setAutoCommit(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,11 +157,11 @@ public class Database implements AutoCloseable {
      * @return true if user inserted succesfully false if not
      */
     public boolean addUser(User newUser) {
-        
+
         boolean succes = false;
         String[] names = { "username" };
         String[] values = { newUser.getUsername() };
-        
+
         if (!ValueSetCheck("Accounts", names, values)) {
             String type = "Basic";
             if (newUser instanceof Student) {
@@ -229,7 +229,7 @@ public class Database implements AutoCloseable {
         if (newDepartment.getModuleList().length == 0 && !ValueSetCheck("Departments", names, values)) {
 
             String insertDep = "INSERT INTO Departments VALUES (?,?);";
-            
+
             try (PreparedStatement insert = con.prepareStatement(insertDep)) {
                 insert.clearParameters();
                 insert.setString(1, newDepartment.getDeptCode());
@@ -318,9 +318,9 @@ public class Database implements AutoCloseable {
     //INSERTS - PRIVATE FUNCTIONS
 
     private void insertStudyPeriod(StudyPeriod newPeriod, Student student) throws SQLException {
-        
+
         String insertPeriod = "INSERT INTO StudentsToModules VALUES(?,?,?,?,?,?,?);";
-        
+
         try (PreparedStatement insert = con.prepareStatement(insertPeriod)) {
             for (Grade g : newPeriod.getGradesList()) {
                 String[] names = { "regNum", "moduleCode", "label" };
@@ -344,10 +344,10 @@ public class Database implements AutoCloseable {
     }
 
     private void insertStudent(Student newStudent) throws SQLException {
-        
+
         String[] names = { "regNum" };
         String[] values = { Integer.toString(newStudent.getRegNum()) };
-        
+
         if (!ValueSetCheck("Students", names, values)) {
             String insertStudent = "INSERT INTO Students VALUES(?,?,?,?,?,?,?,?)";
             try (PreparedStatement insert = con.prepareStatement(insertStudent)) {
@@ -368,10 +368,10 @@ public class Database implements AutoCloseable {
     }
 
     private void insertTeacher(Teacher newTeacher) throws SQLException {
-        
+
         String[] names = { "username" };
         String[] values = { newTeacher.getUsername() };
-        
+
         if (!ValueSetCheck("Students", names, values)) {
             String insertTeacher = "INSERT INTO Teachers VALUES(?,?)";
             try (PreparedStatement insert = con.prepareStatement(insertTeacher)) {
@@ -436,13 +436,13 @@ public class Database implements AutoCloseable {
                 insert.setString(1, master.getCourseCode());
                 insert.setString(2, equiv.getCourseCode());
                 insert.executeUpdate();
-                
+
             } catch (SQLException e) {
                 throw e;
             }
 
         }
-        
+
     }
 
     private void insertModule(Module m) throws SQLException {
@@ -484,35 +484,37 @@ public class Database implements AutoCloseable {
 
     }
 
+    //UPDATES
     /**
-     * Updates Supervision of the module
-     * @param m module in question
-     * @param d new supervising department
-     * @return true if operation was succesfull false otherwise
+     * Changes the grade for given student
+     * @param s student the grade belongs to
+     * @param p study period in wchich the grade was awarded
+     * @param m module the grade is for
+     * @param resit is it resit
+     * @param newGrade the new grade
+     * @return true if operation was succesfull
      */
-    public boolean changeModuleSupervison(Module m, Department d) {
+    public boolean changeGrade(Student s, StudyPeriod p, Module m, boolean resit, double newGrade) {
+
         boolean succes = false;
-        try {
-            updateModuleSupervision(m, d);
+        String updateGrade = "UPDATE StudentsToModules SET " + (resit ? "resitMark" : "mark") + " = ?"
+                + "WHERE regNum = ? AND label = ? AND moduleCode = ?;";
+        try (PreparedStatement update = con.prepareStatement(updateGrade)) {
+
+            update.clearParameters();
+            update.setDouble(1, newGrade);
+            update.setInt(2, s.getRegNum());
+            update.setString(3, "" + p.getLabel());
+            update.setString(4, m.getModuleCode());
+            update.executeUpdate();
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return succes;
     }
 
-    //UPDATES - PRIVATE FUNCTIONS
-
-    private void updateModuleSupervision(Module m, Department d) throws SQLException {
-        String updateModul = "UPDATE Modules SET departmentCode = ? WHERE moduleCode = ?;";
-        try (PreparedStatement update = con.prepareStatement(updateModul)) {
-            update.clearParameters();
-            update.setString(1, d.getDeptCode());
-            update.setString(2, m.getModuleCode());
-            update.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        }
-    }
+    //DELETIONS
 
 }
