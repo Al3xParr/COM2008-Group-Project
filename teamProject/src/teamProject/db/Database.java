@@ -129,12 +129,21 @@ public class Database implements AutoCloseable {
     * @return true if operation was compleated false if not
     */
     public boolean addStudyPeriod(StudyPeriod newPeriod, Student to) {
-        boolean succes = true;
+        boolean succes = false;
         try {
+            con.setAutoCommit(false);
+            try {
             insertStudyPeriod(newPeriod, to);
+                con.commit();
+                succes = true;
+
         } catch (Exception e) {
             e.printStackTrace();
-            succes = false;
+                con.rollback();
+        }
+            con.setAutoCommit(true);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return succes;
@@ -143,12 +152,13 @@ public class Database implements AutoCloseable {
 
     /**
      * Inserting newly created user into database (inserts all relative information)
+     * Students shouldnt have study periods yet
      * @param newUser user to be inserted
      * @return true if user inserted succesfully false if not
      */
     public boolean addUser(User newUser) {
         
-        boolean succes = true;
+        boolean succes = false;
         String[] names = { "username" };
         String[] values = { newUser.getUsername() };
         
@@ -180,9 +190,9 @@ public class Database implements AutoCloseable {
                         insertTeacher((Teacher) newUser);
                         break;
                 }
+                succes = true;
             } catch (Exception e) {
                 e.printStackTrace();
-                succes = false;
             }
         }
 
@@ -208,7 +218,7 @@ public class Database implements AutoCloseable {
     }
 
     /**
-     * Inserts information about new Department into database
+     * Inserts information about new Department into database (the module list should be)
      * @param newDepartment new Department to be inserted
      * @return true if the opperation was succesful
      */
@@ -216,7 +226,7 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         String[] names = { "deptCode" };
         String[] values = { newDepartment.getDeptCode() };
-        if (!ValueSetCheck("Departments", names, values)) {
+        if (newDepartment.getModuleList().length == 0 && !ValueSetCheck("Departments", names, values)) {
 
             String insertDep = "INSERT INTO Departments VALUES (?,?);";
             
@@ -226,17 +236,62 @@ public class Database implements AutoCloseable {
                 insert.setString(2, newDepartment.getFullName());
                 insert.executeUpdate();
                 for (Course c : newDepartment.getCourseList()) {
-                    insertCourse(c);
                     insertCourseDepartLink(c, newDepartment);
-                }
-                for (Module m : newDepartment.getModuleList()) {
-                    updateModuleSupervision(m, newDepartment);
                 }
                 succes = true;
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        return succes;
+
+    }
+
+    /**
+     * Inserts information about new Module into Department
+     * @param newModule Module to be added
+     * @return true if operation was succesfull
+     */
+    public boolean addModule(Module newModule) {
+        boolean succes = false;
+        try {
+            insertModule(newModule);
+            succes = false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return succes;
+    }
+
+    /**
+     * Inserts information about new Study Level into Department
+     * @param newStudyLevel Level to be added
+     * @param owner Course the study Level belongs to
+     * @return true if operation was succesfull
+     */
+    public boolean addStudyLevel(StudyLevel newStudyLevel, Course owner) {
+        boolean succes = false;
+        try {
+            con.setAutoCommit(false);
+            try {
+                for (Module m : newStudyLevel.getCoreModules()) {
+                    insertModuleCourseLink(m, owner, true, newStudyLevel.getDegreeLvl());
+                }
+                for (Module m : newStudyLevel.getOptionalModules()) {
+                    insertModuleCourseLink(m, owner, false, newStudyLevel.getDegreeLvl());
+                }
+                con.commit();
+                succes = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                con.rollback();
+            }
+            con.setAutoCommit(true);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return succes;
@@ -268,9 +323,10 @@ public class Database implements AutoCloseable {
         
         try (PreparedStatement insert = con.prepareStatement(insertPeriod)) {
             for (Grade g : newPeriod.getGradesList()) {
-                String[] names = {"regNum","moduleCode","label"};
-                String[] values = {Integer.toString(student.getRegNum()), g.getModule().getModuleCode(), ""+newPeriod.getLabel()}; 
-                if(!ValueSetCheck("StudentsToModules", names, values)){
+                String[] names = { "regNum", "moduleCode", "label" };
+                String[] values = { Integer.toString(student.getRegNum()), g.getModule().getModuleCode(),
+                        "" + newPeriod.getLabel() };
+                if (!ValueSetCheck("StudentsToModules", names, values)) {
                     insert.clearParameters();
                     insert.setInt(1, student.getRegNum());
                     insert.setString(2, g.getModule().getModuleCode());
@@ -292,7 +348,7 @@ public class Database implements AutoCloseable {
         String[] names = { "regNum" };
         String[] values = { Integer.toString(newStudent.getRegNum()) };
         
-        if(!ValueSetCheck("Students", names, values)){
+        if (!ValueSetCheck("Students", names, values)) {
             String insertStudent = "INSERT INTO Students VALUES(?,?,?,?,?,?,?,?)";
             try (PreparedStatement insert = con.prepareStatement(insertStudent)) {
                 insert.clearParameters();
@@ -305,9 +361,6 @@ public class Database implements AutoCloseable {
                 insert.setString(7, newStudent.getTutor());
                 insert.setString(8, newStudent.getCourse().getCourseCode());
                 insert.executeUpdate();
-                for (StudyPeriod x : newStudent.getStudyPeriodList()) {
-                    insertStudyPeriod(x, newStudent);
-                }
             } catch (SQLException e) {
                 throw e;
             }
@@ -392,7 +445,44 @@ public class Database implements AutoCloseable {
         
     }
 
-    //UPDATES - PUBLIC FUNCTIONS
+    private void insertModule(Module m) throws SQLException {
+        String[] names = { "moduleCode" };
+        String[] values = { m.getModuleCode() };
+        if (!ValueSetCheck("Modules", names, values)) {
+            String insertModule = "INSERT INTO Modules VALUES(?,?,?,?);";
+            try (PreparedStatement insert = con.prepareStatement(insertModule)) {
+                insert.clearParameters();
+                insert.setString(1, m.getModuleCode());
+                insert.setString(2, m.getDepartment().getDeptCode());
+                insert.setString(3, m.getFullName());
+                insert.setString(4, m.getTimeTaught());
+                insert.executeUpdate();
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+
+    }
+
+    private void insertModuleCourseLink(Module m, Course c, Boolean core, int lvl) throws SQLException {
+
+        String[] names = { "moduleCode", "courseCode" };
+        String[] values = { m.getModuleCode(), c.getCourseCode() };
+        if (!ValueSetCheck("ModulesToCourses", names, values)) {
+            String insertLink = "INSERT INTO ModulesToCourse VALUES(?,?,?,?);";
+            try (PreparedStatement insert = con.prepareStatement(insertLink)) {
+                insert.clearParameters();
+                insert.setString(1, m.getModuleCode());
+                insert.setString(2, c.getCourseCode());
+                insert.setBoolean(3, core);
+                insert.setInt(4, lvl);
+                insert.executeUpdate();
+            } catch (SQLException e) {
+                throw e;
+            }
+        }
+
+    }
 
     /**
      * Updates Supervision of the module
