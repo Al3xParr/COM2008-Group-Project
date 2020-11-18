@@ -517,4 +517,122 @@ public class Database implements AutoCloseable {
 
     //DELETIONS
 
+    /**
+     * Delete module and related records from database
+     * @param m module to be deleted
+     * @return true if operation was succesfull
+     */
+    public boolean deleteModule(Module m) {
+        boolean succes = false;
+        String deleteModule = "DELETE FROM Modules WHERE moduleCode = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteModule)) {
+            delete.clearParameters();
+            delete.setString(1, m.getModuleCode());
+            delete.executeUpdate();
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    /**
+     * Delete course and related records from database
+     * @param c course to be deleted
+     * @return true if operation was succesfull
+     */
+    public boolean deleteCourse(Course c) {
+        boolean succes = false;
+        String deleteCourse = "DELETE FROM Courses WHERE courseCode = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteCourse)) {
+            delete.clearParameters();
+            delete.setString(1, c.getCourseCode());
+            delete.executeUpdate();
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    /**
+     * Delete department and related records from database
+     * @param d department to be deleted
+     * @return true if operation was succesfull
+     */
+    public boolean deleteDepartment(Department d) {
+        boolean succes = false;
+        String deleteDepartment = "DELETE FROM Departments WHERE deptCode = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteDepartment)) {
+            delete.clearParameters();
+            delete.setString(1, d.getDeptCode());
+            delete.executeUpdate();
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    /**
+     * Delete study period and related records from database
+     * @param p study period to be deleted
+     * @param s owner of thestudyperiod
+     * @return true if operation was succesfull
+     */
+    public boolean deleteStudyPeriod(StudyPeriod p, Student s) {
+        boolean succes = false;
+        String deleteStudyPeriod = "DELETE FROM StudentsToModules WHERE regNum = ? AND label = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteStudyPeriod)) {
+            delete.clearParameters();
+            delete.setInt(1, s.getRegNum());
+            delete.setString(2, ""+p.getLabel());
+            delete.executeUpdate();
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    /**
+     * Delete study level and related records from database
+     * @param l study level to be deleted
+     * @param c owner of the study level
+     * @return true if operation was succesfull
+     */
+    public boolean deleteStudyLevel(StudyLevel l, Course c) {
+        boolean succes = false;
+        String deleteStudyLevel = "DELETE FROM ModulesToCourses WHERE courseCode = ? AND degreeLvl = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteStudyLevel)) {
+            delete.clearParameters();
+            delete.setString(1, c.getCourseCode());
+            delete.setInt(2, l.getDegreeLvl());
+            delete.executeUpdate();
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    /**
+     * Delete user and related records from database
+     * @param u user to be deleted
+     * @return true if operation was succesfull
+     */
+    public boolean deleteUser(User u) {
+        boolean succes = false;
+        String deleteUser = "DELETE FROM Accounts WHERE username = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteUser)) {
+            delete.clearParameters();
+            delete.setString(1, u.getUsername());
+            delete.executeUpdate();
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
 }
