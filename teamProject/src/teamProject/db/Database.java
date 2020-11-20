@@ -8,9 +8,10 @@ package teamProject.db;
  * @author Zbigniew Lisak 
  */
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+
+import java.nio.file.*;
+import java.io.IOException;
 
 /**
  * Class representing and operating database
@@ -31,6 +32,24 @@ public class Database implements AutoCloseable {
 
     }
 
+    public void createDB() {
+        String createQuery = new String();
+        try {
+        createQuery = new String(Files.readAllBytes(Paths.get("dbSchema.txt")));
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+        }
+        try (Statement statement = con.createStatement()){
+            statement.executeUpdate(createQuery);
+            System.out.println("Database Created");
+            
+        }
+        catch (Exception ex) {
+            System.out.println("Database creation failed");
+            ex.printStackTrace();
+        }
+    }
     //QUERIES AND DATA PROCESSING 
 
     @Override
