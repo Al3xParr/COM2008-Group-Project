@@ -36,8 +36,18 @@ public class Database implements AutoCloseable {
         } catch (Exception ex){
             ex.printStackTrace();
         }
-        System.out.println("Hey code works!");
+        
+    }
 
+    public void resetTable(String tblName){
+        String query = "TRUNCATE TABLE ?;"
+        try (PreparedStatement prepState = con.PreparedStatement(query)){
+            prepState.clearParameters();
+            prepState.setString(1, tblName)
+            prepState.executeUpdate();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public void createDB() {
@@ -45,7 +55,7 @@ public class Database implements AutoCloseable {
 
         try {
         createQuery = new String(Files.readAllBytes(Paths.get("dbSchema.txt")));
-        
+
         } catch (IOException ex){
             ex.printStackTrace();}
 
