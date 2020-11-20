@@ -26,26 +26,34 @@ public class Database implements AutoCloseable {
     }
 
     public void resetDB() {
-        //reset and setup DB
-        //dummy code
+        try (Statement statement = con.createStatement()){
+            String query = "TRUNCATE TABLE 'Teachers'; TRUNCATE TABLE 'Students'; 
+                            TRUNCATE TABLE 'StudentsToModules'; TRUNCATE TABLE 'Modules'; 
+                            TRUNCATE TABLE 'CourseToDepartment'; TRUNCATE TABLE 'Departments'; 
+                            TRUNCATE TABLE 'Course'; TRUNCATE TABLE 'BachEquiv'; 
+                            TRUNCATE TABLE 'ModulesToCourse';"
+            statement.executeUpdate(query);
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
         System.out.println("Hey code works!");
 
     }
 
     public void createDB() {
         String createQuery = new String();
+
         try {
         createQuery = new String(Files.readAllBytes(Paths.get("dbSchema.txt")));
-        }
-        catch (IOException ex){
-            ex.printStackTrace();
-        }
+        
+        } catch (IOException ex){
+            ex.printStackTrace();}
+
         try (Statement statement = con.createStatement()){
             statement.executeUpdate(createQuery);
             System.out.println("Database Created");
             
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             System.out.println("Database creation failed");
             ex.printStackTrace();
         }
