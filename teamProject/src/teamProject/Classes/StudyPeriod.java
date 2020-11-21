@@ -8,6 +8,7 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -17,11 +18,11 @@ public class StudyPeriod {
     private char label;
     private Date startDate, endDate; 
     private StudyLevel degreeLvl;
-    private Grade[] gradesList;
+    private ArrayList<Grade> gradesList;
     
 
     StudyPeriod(char label, Date startDate, Date endDate, StudyLevel degreeLvl,
-            Grade[] gradesList) {
+                ArrayList<Grade> gradesList) {
         this.label = label;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -63,11 +64,11 @@ public class StudyPeriod {
         this.degreeLvl = degreeLvl;
     }
 
-    public Grade[] getGradesList() {
+    public ArrayList<Grade> getGradesList() {
         return this.gradesList;
     }
 
-    public void setGradesList(Grade[] gradesList) {
+    public void setGradesList(ArrayList<Grade> gradesList) {
         this.gradesList = gradesList;
     }
 

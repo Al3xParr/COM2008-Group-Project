@@ -7,14 +7,16 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
-/** 
+import java.util.ArrayList;
+
+/**
  * StudyLevel class definition
 */
 public class StudyLevel {
     private char degreeLvl;  
-    private Module[] coreModules, optionalModules;
+    private ArrayList<Module> coreModules, optionalModules;
 
-    StudyLevel(char degreeLvl, Module[] coreModules, Module[] optionalModules) {
+    StudyLevel(char degreeLvl, ArrayList<Module> coreModules, ArrayList<Module> optionalModules) {
         this.degreeLvl = degreeLvl;
         this.coreModules = coreModules;
         this.optionalModules = optionalModules;
@@ -29,19 +31,19 @@ public class StudyLevel {
         this.degreeLvl = degreeLvl;
     }
 
-    public Module[] getCoreModules() {
+    public ArrayList<Module> getCoreModules() {
         return this.coreModules;
     }
 
-    public void setCoreModules(Module[] coreModules) {
+    public void setCoreModules(ArrayList<Module> coreModules) {
         this.coreModules = coreModules;
     }
 
-    public Module[] getOptionalModules() {
+    public ArrayList<Module> getOptionalModules() {
         return this.optionalModules;
     }
 
-    public void setOptionalModules(Module[] optionalModules) {
+    public void setOptionalModules(ArrayList<Module> optionalModules) {
         this.optionalModules = optionalModules;
     }
     

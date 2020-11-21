@@ -7,15 +7,17 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
-/** 
+import java.util.ArrayList;
+
+/**
  * Department class definition
 */
 public class Department {
     private String deptCode, fullName;
-    private Module[] moduleList;
-    private Course[] courseList;
+    private ArrayList<Module> moduleList;
+    private ArrayList<Course> courseList;
 
-    public Department(String deptCode, String fullName, Module[] moduleList, Course[] courseList) {
+    public Department(String deptCode, String fullName, ArrayList<Module> moduleList, ArrayList<Course> courseList) {
         this.deptCode = deptCode;
         this.fullName = fullName;
         this.moduleList = moduleList;
@@ -38,21 +40,19 @@ public class Department {
         this.fullName = fullName;
     }
 
-    public Module[] getModuleList() {
+    public ArrayList<Module> getModuleList() {
         return this.moduleList;
     }
 
-    public void setModuleList(Module[] moduleList) {
+    public void setModuleList(ArrayList<Module> moduleList) {
         this.moduleList = moduleList;
     }
 
-    public Course[] getCourseList() {
+    public ArrayList<Course> getCourseList() {
         return this.courseList;
     }
 
-    public void setCourseList(Course[] courseList) {
-        this.courseList = courseList;
-    }
+    public void setCourseList(ArrayList<Course> courseList) { this.courseList = courseList; }
 
     
 }

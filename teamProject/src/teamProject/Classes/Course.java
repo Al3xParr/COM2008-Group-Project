@@ -7,7 +7,9 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
-/** 
+import java.util.ArrayList;
+
+/**
  * Course class definition
 */
 public class Course {
@@ -16,11 +18,11 @@ public class Course {
     private Course bachEquiv;
     private Boolean yearInIndustry;
     private Department mainDep;
-    private Department[] departmentList;
-    private StudyLevel[] degreeLvlList;
+    private ArrayList<Department> departmentList;
+    private ArrayList<StudyLevel> degreeLvlList;
 
     public Course(String courseCode, String fullName, Boolean yearInIndustry, Course bachEquiv, Department mainDep,
-            Department[] departmentList, StudyLevel[] degreeLvlList) {
+                  ArrayList<Department> departmentList, ArrayList<StudyLevel> degreeLvlList) {
         this.courseCode = courseCode;
         this.fullName = fullName;
         this.yearInIndustry = yearInIndustry;
@@ -74,19 +76,19 @@ public class Course {
         this.mainDep = mainDep;
     }
 
-    public Department[] getDepartmentList() {
+    public ArrayList<Department> getDepartmentList() {
         return this.departmentList;
     }
 
-    public void setDepartmentList(Department[] departmentList) {
+    public void setDepartmentList(ArrayList<Department> departmentList) {
         this.departmentList = departmentList;
     }
 
-    public StudyLevel[] getDegreeLvlList() {
+    public ArrayList<StudyLevel> getDegreeLvlList() {
         return this.degreeLvlList;
     }
 
-    public void setDegreeLvlList(StudyLevel[] degreeLvlList) {
+    public void setDegreeLvlList(ArrayList<StudyLevel> degreeLvlList) {
         this.degreeLvlList = degreeLvlList;
     }
 

@@ -20,6 +20,14 @@ import teamProject.Classes.Module;
 public class Database implements AutoCloseable {
 
     Connection con = null;
+    HashMap<String, Module> modules = new HashMap<>();
+    HashMap<String, Course> courses = new HashMap<>();
+    HashMap<String, Department> departments = new HashMap<>();
+    HashMap<Integer, Student> students = new HashMap<>();
+    HashMap<String, Administrator> administrators = new HashMap<>();
+    HashMap<String, Registrar> registrars = new HashMap<>();
+    HashMap<String, Teacher> teachers = new HashMap<>();
+
 
     public Database(String url, String user, String password) throws SQLException {
         String str = "jdbc:mysql:" + url + "?user=" + user + "&password=" + password;
@@ -315,6 +323,80 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
+    public void instantiateUsers() {
+        instantiateModule();
+        instantiateCourse();
+        instantiateAdministrator();
+        instantiateRegistrar();
+        instantiateTeachers();
+        instantiateStudent();
+    }
+
+
+    public void instantiateModule() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM MODULE;");
+
+            while (results.next()) {
+                //not sure where the attributes are stored yet, can change later
+                String moduleCode = results.getString(1);
+                String departmentCode = results.getString(2);
+                String fullName = results.getString(3);
+                int moduleCredits = results.getInt(4);
+                String timeTaught = results.getString(5);
+                Module module = new Module(moduleCode, departmentCode, fullName, moduleCredits, timeTaught);
+                modules.put(moduleCode, module);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void instantiateCourse() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM COURSE;");
+
+            while (results.next()) {
+                //not sure where the attributes are stored yet, can change later
+                String courseCode = results.getString(1);
+                String fullName = results.getString(2);
+                Boolean yearInIndustry = results.getBoolean(3);
+                Course bachEquiv = (Course) results.getObject(4);
+                Department mainDep = (Department) results.getObject(5);
+                Course course = new Course(courseCode, fullName, yearInIndustry, bachEquiv, mainDep);
+                courses.put(courseCode, course);
+            }
+            ResultSet results2 = stsm.executeQuery("SELECT * FROM BACHEQUIV WHERE ;");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void instantiateDepartment() {
+        try (Statement stsm = con.createStatement()) {
+            ArrayList<Course> coursesList = new ArrayList<Course>();
+            ResultSet results = stsm.executeQuery("SELECT * FROM Departments;");
+
+            while (results.next()) {
+                //not sure where the attributes are stored yet, can change later
+                String deptCode = results.getString(1);
+                String fullName = results.getString(2);
+                Department department = new Department(deptCode, fullName, null, null);
+                ResultSet coursesResults = stsm.executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = "
+                        + deptCode +";");
+                coursesList.clear();
+                while (coursesResults.next()) {
+                    coursesList.add(courses.get(results.getString(1)));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //instantiating the users from the databases
     public void instantiateTeachers() {
         try (Statement stsm = con.createStatement()) {
@@ -328,6 +410,7 @@ public class Database implements AutoCloseable {
                 String salt = results.getString(3);
                 String fullName = results.getString(4);
                 Teacher teacher = new Teacher(username, passwordHash, salt, fullName);
+                teachers.put(username, teacher);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -337,7 +420,7 @@ public class Database implements AutoCloseable {
     public void instantiateRegistrar() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM REGISTRARS;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -345,6 +428,7 @@ public class Database implements AutoCloseable {
                 String passwordHash = results.getString(2);
                 String salt = results.getString(3);
                 Registrar registrar = new Registrar(username, passwordHash, salt);
+                registrars.put(username, registrar);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -354,7 +438,7 @@ public class Database implements AutoCloseable {
     public void instantiateAdministrator() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM ADMISTRATOR;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -362,10 +446,38 @@ public class Database implements AutoCloseable {
                 String passwordHash = results.getString(2);
                 String salt = results.getString(3);
                 Administrator administrator = new Administrator(username, passwordHash, salt);
+                administrators.put(username, administrator);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void instantiateStudent() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM Students;");
+
+            while (results.next()) {
+                //not sure where the attributes are stored yet, can change later
+                String username = results.getString(1);
+                String passwordHash = results.getString(2);
+                String salt = results.getString(3);
+                int regNumber = results.getInt(4);
+                String title = results.getString(5);
+                String surname = results.getString(6);
+                String fornames = results.getString(7);
+                String email = results.getString(8);
+                String tutor = results.getString(9);
+                Course course = (Course) results.getObject(10);
+                StudyPeriod[] studyPeriodList = results.getObject(11);
+
+                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, fornames, email,
+                        tutor, course, studyPeriodList);
+                students.put(regNumber, student);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
