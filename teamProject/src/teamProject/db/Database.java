@@ -341,7 +341,7 @@ public class Database implements AutoCloseable {
     public void instantiateModule() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM MODULE;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Modules;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -361,7 +361,7 @@ public class Database implements AutoCloseable {
     public void instantiateCourse() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM COURSE;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Course;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -475,7 +475,7 @@ public class Database implements AutoCloseable {
         try (Statement stsm = con.createStatement()) {
 
             ArrayList<Department> otherDepartments = new ArrayList<Department>();
-            ResultSet results = stsm.executeQuery("SELECT * FROM COURSE;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Course;");
 
             while (results.next()) {
                 String courseCode = results.getString(1);
@@ -504,14 +504,16 @@ public class Database implements AutoCloseable {
     public void instantiateTeachers() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM TEACHERS;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 3;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String username = results.getString(1);
+                ResultSet resultsTeachers = stsm.executeQuery("SELECT fullName FROM Teacher WHERE username = " +
+                        username + ";");
+                String fullName = resultsTeachers.getString(1);
                 String passwordHash = results.getString(2);
                 String salt = results.getString(3);
-                String fullName = results.getString(4);
                 Teacher teacher = new Teacher(username, passwordHash, salt, fullName);
                 teachers.put(username, teacher);
             }
@@ -523,7 +525,7 @@ public class Database implements AutoCloseable {
     public void instantiateRegistrar() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 2;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -541,7 +543,7 @@ public class Database implements AutoCloseable {
     public void instantiateAdministrator() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 1;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -578,6 +580,7 @@ public class Database implements AutoCloseable {
                 Student student = new Student(username, passwordHash, salt, regNumber, title, surname, fornames, email,
                         tutor, course, null);
 
+                /*
                 ResultSet studyPeriodResults = stsm.executeQuery("SELECT * FROM Modules WHERE deptCode = "
                         + deptCode +";");
                 studyPeriodList.clear();
@@ -586,6 +589,8 @@ public class Database implements AutoCloseable {
                 }
                 student.setStudyPeriodList(studyPeriodList);
                 students.put(regNumber, student);
+
+                 */
             }
         } catch (Exception e) {
             e.printStackTrace();

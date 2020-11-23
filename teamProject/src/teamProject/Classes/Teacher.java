@@ -14,8 +14,7 @@ public class Teacher extends User {
 
     private String fullName;
 
-    public Teacher(String username, String passwordHash, String salt,
-            String fullName) {
+    public Teacher(String username, String passwordHash, String salt, String fullName) {
         super(username, passwordHash, salt);
         this.fullName = fullName;
     }
