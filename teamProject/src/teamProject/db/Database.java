@@ -27,6 +27,7 @@ public class Database implements AutoCloseable {
     HashMap<String, Administrator> administrators = new HashMap<>();
     HashMap<String, Registrar> registrars = new HashMap<>();
     HashMap<String, Teacher> teachers = new HashMap<>();
+    HashMap<String, StudyLevel> studyLevels = new HashMap<>();
 
 
     public Database(String url, String user, String password) throws SQLException {
@@ -326,6 +327,10 @@ public class Database implements AutoCloseable {
     public void instantiateUsers() {
         instantiateModule();
         instantiateCourse();
+        addBachEquiv();
+        instantiateDepartment();
+        instantiateStudyLevel();
+        addCourseInformation();
         instantiateAdministrator();
         instantiateRegistrar();
         instantiateTeachers();
@@ -363,21 +368,41 @@ public class Database implements AutoCloseable {
                 String courseCode = results.getString(1);
                 String fullName = results.getString(2);
                 Boolean yearInIndustry = results.getBoolean(3);
-                Course bachEquiv = (Course) results.getObject(4);
-                Department mainDep = (Department) results.getObject(5);
-                Course course = new Course(courseCode, fullName, yearInIndustry, bachEquiv, mainDep);
+                Course course = new Course(courseCode, fullName, yearInIndustry, null, null,
+                        null, null);
                 courses.put(courseCode, course);
             }
-            ResultSet results2 = stsm.executeQuery("SELECT * FROM BACHEQUIV WHERE ;");
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    //adding the bachEquiv for all the relevant courses for which it applies
+    public void addBachEquiv() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM Course;");
+
+            while (results.next()) {
+                String courseCode = results.getString(1);
+                ResultSet bachResult = stsm.executeQuery("SELECT * FROM BachEquiv WHERE courseCode = "
+                        + courseCode + ";");
+                if (bachResult.next()) {
+                    Course bachEquiv =  courses.get(bachResult.getString(2));
+                    Course course = courses.get(courseCode);
+                    course.setBachEquiv(bachEquiv);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //instantiating the departments
     public void instantiateDepartment() {
         try (Statement stsm = con.createStatement()) {
             ArrayList<Course> coursesList = new ArrayList<Course>();
+            ArrayList<Module> modulesList = new ArrayList<Module>();
             ResultSet results = stsm.executeQuery("SELECT * FROM Departments;");
 
             while (results.next()) {
@@ -385,12 +410,90 @@ public class Database implements AutoCloseable {
                 String deptCode = results.getString(1);
                 String fullName = results.getString(2);
                 Department department = new Department(deptCode, fullName, null, null);
+                //finding the courses from that department
                 ResultSet coursesResults = stsm.executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = "
                         + deptCode +";");
                 coursesList.clear();
                 while (coursesResults.next()) {
                     coursesList.add(courses.get(results.getString(1)));
                 }
+                department.setCourseList(coursesList);
+                //finding the modules within that department
+                ResultSet modulesResults = stsm.executeQuery("SELECT * FROM Modules WHERE deptCode = "
+                        + deptCode +";");
+                modulesList.clear();
+                while (modulesResults.next()) {
+                    modulesList.add(modules.get(results.getString(3)));
+                }
+                department.setModuleList(modulesList);
+                departments.put(deptCode, department);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //instantiating each of the study levels
+    public void instantiateStudyLevel() {
+        try (Statement stsm = con.createStatement()) {
+
+            //result sets for finding the courses and the degree levels
+            ResultSet results = stsm.executeQuery("SELECT DISTINCT degreeLvl FROM ModulesToCourse;");
+            ResultSet courseResults = stsm.executeQuery("SELECT courseCode FROM Course;");
+            ArrayList<Module> coreModules = new ArrayList<Module>();
+            ArrayList<Module> optionalModules = new ArrayList<Module>();
+            while (courseResults.next()) {
+                while (results.next()) {
+                    String degreeLvl = results.getString(1);
+                    String courseCode = courseResults.getString(1);
+                    ResultSet coreModuleList = stsm.executeQuery("SELECT moduleCode FROM ModulesToCourse WHERE " +
+                            "degreeLvl = " + degreeLvl + " AND courseCode = " + courseCode + " AND core = True;");
+                    while (coreModuleList.next()) {
+                        String moduleCode = coreModuleList.getString(1);
+                        coreModules.add(modules.get(moduleCode));
+                    }
+                    ResultSet optionalModuleList = stsm.executeQuery("SELECT moduleCode FROM ModulesToCourse " +
+                            "WHERE degreeLvl = " + degreeLvl + " AND core = False;");
+                    while (optionalModuleList.next()) {
+                        String moduleCode = optionalModuleList.getString(1);
+                        optionalModules.add(modules.get(moduleCode));
+                    }
+                    if (!coreModules.isEmpty()) {
+                        StudyLevel studyLevel = new StudyLevel(degreeLvl, courseCode, coreModules, optionalModules);
+                        //have to include both of the degree and the course code within the key string
+                        studyLevels.put(degreeLvl + courseCode, studyLevel);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //adding the departmentList, the degreeLvlList, mainDept
+    public void addCourseInformation() {
+        try (Statement stsm = con.createStatement()) {
+
+            ArrayList<Department> otherDepartments = new ArrayList<Department>();
+            ResultSet results = stsm.executeQuery("SELECT * FROM COURSE;");
+
+            while (results.next()) {
+                String courseCode = results.getString(1);
+                Course course = courses.get(courseCode);
+                //setting the main department
+                ResultSet mainDeptResult = stsm.executeQuery("SELECT * FROM CourseToDepartment WHERE courseCode = "
+                        + courseCode + " AND mainDept = True;");
+                Department mainDept = departments.get(mainDeptResult.getString(2));
+                course.setMainDep(mainDept);
+                //setting the other departments
+                ResultSet deptResult = stsm.executeQuery("SELECT * FROM CourseToDepartment WHERE courseCode = "
+                        + courseCode + ";");
+                otherDepartments.clear();
+                while (deptResult.next()) {
+                    otherDepartments.add(departments.get(deptResult.getString(2)));
+                }
+                course.setDepartmentList(otherDepartments);
+                //setting the degree level list
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -456,6 +559,7 @@ public class Database implements AutoCloseable {
     public void instantiateStudent() {
         try (Statement stsm = con.createStatement()) {
 
+            ArrayList<StudyPeriod> studyPeriodList = new ArrayList<StudyPeriod>();
             ResultSet results = stsm.executeQuery("SELECT * FROM Students;");
 
             while (results.next()) {
@@ -470,10 +574,17 @@ public class Database implements AutoCloseable {
                 String email = results.getString(8);
                 String tutor = results.getString(9);
                 Course course = (Course) results.getObject(10);
-                StudyPeriod[] studyPeriodList = results.getObject(11);
 
                 Student student = new Student(username, passwordHash, salt, regNumber, title, surname, fornames, email,
-                        tutor, course, studyPeriodList);
+                        tutor, course, null);
+
+                ResultSet studyPeriodResults = stsm.executeQuery("SELECT * FROM Modules WHERE deptCode = "
+                        + deptCode +";");
+                studyPeriodList.clear();
+                while (studyPeriodResults.next()) {
+                    studyPeriodList.add(modules.get(results.getString(3)));
+                }
+                student.setStudyPeriodList(studyPeriodList);
                 students.put(regNumber, student);
             }
         } catch (Exception e) {

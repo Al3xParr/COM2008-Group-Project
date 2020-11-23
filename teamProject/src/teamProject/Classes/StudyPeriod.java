@@ -27,8 +27,7 @@ public class StudyPeriod {
         this.startDate = startDate;
         this.endDate = endDate;
         this.degreeLvl = degreeLvl;
-        this.gradesList = gradesList;
-
+        this.gradesList = null;
     }
     
 

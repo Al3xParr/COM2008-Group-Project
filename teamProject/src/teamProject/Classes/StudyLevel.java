@@ -13,23 +13,28 @@ import java.util.ArrayList;
  * StudyLevel class definition
 */
 public class StudyLevel {
-    private char degreeLvl;  
+    private String degreeLvl, courseCode;
     private ArrayList<Module> coreModules, optionalModules;
 
-    StudyLevel(char degreeLvl, ArrayList<Module> coreModules, ArrayList<Module> optionalModules) {
+    public StudyLevel(String degreeLvl, String courseCode, ArrayList<Module> coreModules, ArrayList<Module> optionalModules) {
         this.degreeLvl = degreeLvl;
+        this.courseCode = courseCode;
         this.coreModules = coreModules;
         this.optionalModules = optionalModules;
     }
 
 
-    public char getDegreeLvl() {
+    public String getDegreeLvl() {
         return this.degreeLvl;
     }
 
-    public void setDegreeLvl(char degreeLvl) {
+    public void setDegreeLvl(String degreeLvl) {
         this.degreeLvl = degreeLvl;
     }
+
+    public String getCourseCode() { return this.courseCode; }
+
+    public void setCourseCode(String courseCode) { this.courseCode = courseCode; }
 
     public ArrayList<Module> getCoreModules() {
         return this.coreModules;
