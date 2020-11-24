@@ -11,6 +11,7 @@ package teamProject.db;
 import java.sql.*;
 import java.util.*;
 
+import jdk.jshell.spi.ExecutionControl.ExecutionControlException;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
 
@@ -526,12 +527,19 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         String deleteModule = "DELETE FROM Modules WHERE moduleCode = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteModule)) {
+            con.setAutoCommit(false);
             delete.clearParameters();
             delete.setString(1, m.getModuleCode());
             delete.executeUpdate();
+            con.setAutoCommit(true);
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
         }
         return succes;
     }
@@ -545,12 +553,19 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         String deleteCourse = "DELETE FROM Courses WHERE courseCode = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteCourse)) {
+            con.setAutoCommit(false);
             delete.clearParameters();
             delete.setString(1, c.getCourseCode());
             delete.executeUpdate();
+            con.setAutoCommit(true);
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
+            try{
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
         }
         return succes;
     }
@@ -564,12 +579,19 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         String deleteDepartment = "DELETE FROM Departments WHERE deptCode = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteDepartment)) {
+            con.setAutoCommit(false);
             delete.clearParameters();
             delete.setString(1, d.getDeptCode());
             delete.executeUpdate();
+            con.setAutoCommit(true);
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
         }
         return succes;
     }
@@ -584,13 +606,20 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         String deleteStudyPeriod = "DELETE FROM StudentsToModules WHERE regNum = ? AND label = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteStudyPeriod)) {
+            con.setAutoCommit(false);
             delete.clearParameters();
             delete.setInt(1, s.getRegNum());
             delete.setString(2, ""+p.getLabel());
             delete.executeUpdate();
+            con.setAutoCommit(true);
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
         }
         return succes;
     }
@@ -605,13 +634,20 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         String deleteStudyLevel = "DELETE FROM ModulesToCourses WHERE courseCode = ? AND degreeLvl = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteStudyLevel)) {
+            con.setAutoCommit(false);
             delete.clearParameters();
             delete.setString(1, c.getCourseCode());
             delete.setInt(2, l.getDegreeLvl());
             delete.executeUpdate();
+            con.setAutoCommit(true);
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
         }
         return succes;
     }
@@ -625,12 +661,19 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         String deleteUser = "DELETE FROM Accounts WHERE username = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteUser)) {
+            con.setAutoCommit(false);
             delete.clearParameters();
             delete.setString(1, u.getUsername());
             delete.executeUpdate();
+            con.setAutoCommit(true);
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
         }
         return succes;
     }
