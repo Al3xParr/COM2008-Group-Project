@@ -9,11 +9,13 @@ package teamProject.db;
  */
 
 import java.sql.*;
+import java.nio.file.*;
+import java.io.IOException;
 import java.util.*;
-
 import jdk.jshell.spi.ExecutionControl.ExecutionControlException;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
+
 
 /**
  * Class representing and operating database
@@ -28,10 +30,47 @@ public class Database implements AutoCloseable {
     }
 
     public void resetDB() {
-        //reset and setup DB
-        //dummy code
-        System.out.println("Hey code works!");
+        try (Statement statement = con.createStatement()){
+            String query = "TRUNCATE TABLE 'Teachers'; TRUNCATE TABLE 'Students'; 
+                            TRUNCATE TABLE 'StudentsToModules'; TRUNCATE TABLE 'Modules'; 
+                            TRUNCATE TABLE 'CourseToDepartment'; TRUNCATE TABLE 'Departments'; 
+                            TRUNCATE TABLE 'Course'; TRUNCATE TABLE 'BachEquiv'; 
+                            TRUNCATE TABLE 'ModulesToCourse';"
+            statement.executeUpdate(query);
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        
+    }
 
+    public void resetTable(String tblName){
+        String query = "TRUNCATE TABLE ?;"
+        try (PreparedStatement prepState = con.PreparedStatement(query)){
+            prepState.clearParameters();
+            prepState.setString(1, tblName)
+            prepState.executeUpdate();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public void createDB() {
+        String createQuery = new String();
+
+        try {
+        createQuery = new String(Files.readAllBytes(Paths.get("dbSchema.txt")));
+
+        } catch (IOException ex){
+            ex.printStackTrace();}
+
+        try (Statement statement = con.createStatement()){
+            statement.executeUpdate(createQuery);
+            System.out.println("Database Created");
+            
+        } catch (Exception ex) {
+            System.out.println("Database creation failed");
+            ex.printStackTrace();
+        }
     }
 
     @Override
