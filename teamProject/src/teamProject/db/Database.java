@@ -31,11 +31,11 @@ public class Database implements AutoCloseable {
 
     public void resetDB() {
         try (Statement statement = con.createStatement()){
-            String query = "TRUNCATE TABLE 'Teachers'; TRUNCATE TABLE 'Students'; 
-                            TRUNCATE TABLE 'StudentsToModules'; TRUNCATE TABLE 'Modules'; 
-                            TRUNCATE TABLE 'CourseToDepartment'; TRUNCATE TABLE 'Departments'; 
-                            TRUNCATE TABLE 'Course'; TRUNCATE TABLE 'BachEquiv'; 
-                            TRUNCATE TABLE 'ModulesToCourse';"
+            String query = "TRUNCATE TABLE 'Teachers'; TRUNCATE TABLE 'Students';" +
+                           "TRUNCATE TABLE 'StudentsToModules'; TRUNCATE TABLE 'Modules';" +  
+                           "TRUNCATE TABLE 'CourseToDepartment'; TRUNCATE TABLE 'Departments';" + 
+                           "TRUNCATE TABLE 'Course'; TRUNCATE TABLE 'BachEquiv';" + 
+                           "TRUNCATE TABLE 'ModulesToCourse';";
             statement.executeUpdate(query);
         } catch (Exception ex){
             ex.printStackTrace();
@@ -44,10 +44,10 @@ public class Database implements AutoCloseable {
     }
 
     public void resetTable(String tblName){
-        String query = "TRUNCATE TABLE ?;"
-        try (PreparedStatement prepState = con.PreparedStatement(query)){
+        String query = "TRUNCATE TABLE ?;";
+        try (PreparedStatement prepState = con.prepareStatement(query)){
             prepState.clearParameters();
-            prepState.setString(1, tblName)
+            prepState.setString(1, tblName);
             prepState.executeUpdate();
         } catch (Exception ex){
             ex.printStackTrace();
