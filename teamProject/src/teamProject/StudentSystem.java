@@ -27,8 +27,8 @@ public class StudentSystem {
 
             //DO STUFF HERE
 
-            db.createDB();
-            db.close();
+            db.resetDB();
+            
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,25 +25,27 @@ public class Database implements AutoCloseable {
     Connection con = null;
 
     public Database(String url, String user, String password) throws SQLException {
-        String str = "jdbc:mysql:" + url + "?user=" + user + "&password=" + password;
+        String str = "jdbc:mysql:" + url + "?user=" + user + "&password=" + password+"&allowMultiQueries=true";
         con = DriverManager.getConnection(str);
     }
 
+    /*
     public void resetDB() {
         try (Statement statement = con.createStatement()){
-            String query = "TRUNCATE TABLE 'Teachers'; TRUNCATE TABLE 'Students';" +
-                           "TRUNCATE TABLE 'StudentsToModules'; TRUNCATE TABLE 'Modules';" +  
-                           "TRUNCATE TABLE 'CourseToDepartment'; TRUNCATE TABLE 'Departments';" + 
-                           "TRUNCATE TABLE 'Course'; TRUNCATE TABLE 'BachEquiv';" + 
-                           "TRUNCATE TABLE 'ModulesToCourse';";
+            String query = "TRUNCATE TABLE Teacher; TRUNCATE TABLE Students;" +
+                           "TRUNCATE TABLE StudentsToModules; TRUNCATE TABLE Modules;" +  
+                           "TRUNCATE TABLE CourseToDepartment; TRUNCATE TABLE Departments;" + 
+                           "TRUNCATE TABLE Course; TRUNCATE TABLE BachEquiv;" + 
+                           "TRUNCATE TABLE ModulesToCourse;";
             statement.executeUpdate(query);
         } catch (Exception ex){
             ex.printStackTrace();
         }
         
     }
+    */
 
-    public void resetTable(String tblName){
+    /*public void resetTable(String tblName){
         String query = "TRUNCATE TABLE ?;";
         try (PreparedStatement prepState = con.prepareStatement(query)){
             prepState.clearParameters();
@@ -52,13 +54,13 @@ public class Database implements AutoCloseable {
         } catch (Exception ex){
             ex.printStackTrace();
         }
-    }
+    }*/
 
-    public void createDB() {
+    public void resetDB() {
         String createQuery = new String();
 
         try {
-        createQuery = new String(Files.readAllBytes(Paths.get("dbSchema.txt")));
+        createQuery = new String(Files.readAllBytes(Paths.get("./src/teamProject/db/dbSchema.sql")));
 
         } catch (IOException ex){
             ex.printStackTrace();}
@@ -72,6 +74,8 @@ public class Database implements AutoCloseable {
             ex.printStackTrace();
         }
     }
+
+    
 
     @Override
     public void close() throws Exception {
