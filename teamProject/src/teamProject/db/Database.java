@@ -75,6 +75,25 @@ public class Database implements AutoCloseable {
         }
     }
 
+    public void populateDB() {
+        String populateQuery = new String();
+
+        try {
+        populateQuery = new String(Files.readAllBytes(Paths.get("./src/teamProject/db/dbTestData.sql")));
+
+        } catch (IOException ex){
+            ex.printStackTrace();}
+
+        try (Statement statement = con.createStatement()){
+            statement.executeUpdate(populateQuery);
+            System.out.println("Database Populated");
+            
+        } catch (Exception ex) {
+            System.out.println("Database population failed");
+            ex.printStackTrace();
+        }
+    }
+
     
 
     @Override

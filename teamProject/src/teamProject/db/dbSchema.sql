@@ -84,12 +84,12 @@ CREATE TABLE CourseToDepartment(
 CREATE TABLE StudentsToModules(
     regNum INT NOT NULL,
     moduleCode CHAR(7) NOT NULL,
-    mark DECIMAL(5,4),
-    resitMark DECIMAL(5,4),
+    mark DECIMAL(5,2),
+    resitMark DECIMAL(5,2),
     label CHAR(1) NOT NULL,
     courseCode CHAR(6) NOT NULL,
     degreeLvl TINYINT NOT NULL,
-    CONSTRAINT id PRIMARY KEY (regNum, moduleCode),
+    CONSTRAINT id PRIMARY KEY (regNum, moduleCode, label),
     FOREIGN KEY (regNum) REFERENCES Students(regNum) ON DELETE CASCADE,
     FOREIGN KEY (moduleCode) REFERENCES Modules(moduleCode) ON DELETE CASCADE
 );

@@ -28,6 +28,7 @@ public class StudentSystem {
             //DO STUFF HERE
 
             db.resetDB();
+            db.populateDB();
             
 
         } catch (Exception e) {
