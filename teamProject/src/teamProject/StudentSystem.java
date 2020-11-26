@@ -26,10 +26,14 @@ public class StudentSystem {
         try (Database db = new Database(url, user, pass)) {
 
             //DO STUFF HERE
+
             db.resetDB();
+            db.populateDB();
+            
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 }
