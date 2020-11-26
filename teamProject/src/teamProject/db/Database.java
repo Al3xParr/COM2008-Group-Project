@@ -348,9 +348,8 @@ public class Database implements AutoCloseable {
                 String moduleCode = results.getString(1);
                 String departmentCode = results.getString(2);
                 String fullName = results.getString(3);
-                int moduleCredits = results.getInt(4);
-                String timeTaught = results.getString(5);
-                Module module = new Module(moduleCode, departmentCode, fullName, moduleCredits, timeTaught);
+                String timeTaught = results.getString(4);
+                Module module = new Module(moduleCode, departmentCode, fullName, timeTaught);
                 modules.put(moduleCode, module);
             }
         } catch (Exception e) {
@@ -481,19 +480,19 @@ public class Database implements AutoCloseable {
                 String courseCode = results.getString(1);
                 Course course = courses.get(courseCode);
                 //setting the main department
-                ResultSet mainDeptResult = stsm.executeQuery("SELECT * FROM CourseToDepartment WHERE courseCode = "
+                ResultSet mainDeptResult = stsm.executeQuery("SELECT deptCode FROM CourseToDepartment WHERE courseCode = "
                         + courseCode + " AND mainDept = True;");
-                Department mainDept = departments.get(mainDeptResult.getString(2));
+                Department mainDept = departments.get(mainDeptResult.getString(1));
                 course.setMainDep(mainDept);
                 //setting the other departments
-                ResultSet deptResult = stsm.executeQuery("SELECT * FROM CourseToDepartment WHERE courseCode = "
+                ResultSet deptResult = stsm.executeQuery("SELECT deptCode FROM CourseToDepartment WHERE courseCode = "
                         + courseCode + ";");
                 otherDepartments.clear();
                 while (deptResult.next()) {
-                    otherDepartments.add(departments.get(deptResult.getString(2)));
+                    otherDepartments.add(departments.get(deptResult.getString(1)));
                 }
                 course.setDepartmentList(otherDepartments);
-                //setting the degree level list
+                //TO-DO: setting the degree level list
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -504,7 +503,7 @@ public class Database implements AutoCloseable {
     public void instantiateTeachers() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 3;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 1;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -543,7 +542,7 @@ public class Database implements AutoCloseable {
     public void instantiateAdministrator() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 1;");
+            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 3;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
@@ -563,21 +562,22 @@ public class Database implements AutoCloseable {
 
             ArrayList<StudyPeriod> studyPeriodList = new ArrayList<StudyPeriod>();
             ResultSet results = stsm.executeQuery("SELECT * FROM Students;");
+            ResultSet resultsAccount = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 0;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
-                String username = results.getString(1);
-                String passwordHash = results.getString(2);
-                String salt = results.getString(3);
-                int regNumber = results.getInt(4);
-                String title = results.getString(5);
-                String surname = results.getString(6);
-                String fornames = results.getString(7);
-                String email = results.getString(8);
-                String tutor = results.getString(9);
-                Course course = (Course) results.getObject(10);
+                String username = resultsAccount.getString(1);
+                String passwordHash = resultsAccount.getString(2);
+                String salt = resultsAccount.getString(3);
+                int regNumber = results.getInt(1);
+                String title = results.getString(2);
+                String surname = results.getString(3);
+                String forenames = results.getString(4);
+                String email = results.getString(5);
+                String tutor = results.getString(7);
+                Course course = courses.get(results.getObject(8));
 
-                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, fornames, email,
+                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email,
                         tutor, course, null);
 
                 /*
