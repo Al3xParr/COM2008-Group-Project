@@ -7,41 +7,48 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
-/** 
+import java.util.ArrayList;
+
+/**
  * StudyLevel class definition
 */
 public class StudyLevel {
-    private char degreeLvl;  
-    private Module[] coreModules, optionalModules;
+    private String degreeLvl, courseCode;
+    private ArrayList<Module> coreModules, optionalModules;
 
-    StudyLevel(char degreeLvl, Module[] coreModules, Module[] optionalModules) {
+    public StudyLevel(String degreeLvl, String courseCode, ArrayList<Module> coreModules, ArrayList<Module> optionalModules) {
         this.degreeLvl = degreeLvl;
+        this.courseCode = courseCode;
         this.coreModules = coreModules;
         this.optionalModules = optionalModules;
     }
 
 
-    public char getDegreeLvl() {
+    public String getDegreeLvl() {
         return this.degreeLvl;
     }
 
-    public void setDegreeLvl(char degreeLvl) {
+    public void setDegreeLvl(String degreeLvl) {
         this.degreeLvl = degreeLvl;
     }
 
-    public Module[] getCoreModules() {
+    public String getCourseCode() { return this.courseCode; }
+
+    public void setCourseCode(String courseCode) { this.courseCode = courseCode; }
+
+    public ArrayList<Module> getCoreModules() {
         return this.coreModules;
     }
 
-    public void setCoreModules(Module[] coreModules) {
+    public void setCoreModules(ArrayList<Module> coreModules) {
         this.coreModules = coreModules;
     }
 
-    public Module[] getOptionalModules() {
+    public ArrayList<Module> getOptionalModules() {
         return this.optionalModules;
     }
 
-    public void setOptionalModules(Module[] optionalModules) {
+    public void setOptionalModules(ArrayList<Module> optionalModules) {
         this.optionalModules = optionalModules;
     }
     

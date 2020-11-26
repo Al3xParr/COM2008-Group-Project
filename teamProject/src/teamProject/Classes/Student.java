@@ -7,7 +7,9 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
-/** 
+import java.util.ArrayList;
+
+/**
  * User class extention, Student class definition
 */
 public class Student extends User {
@@ -15,10 +17,10 @@ public class Student extends User {
     private int regNum;
     private String title, surname, forenames, email, tutor;
     private Course course;
-    private StudyPeriod[] studyPeriodList;
+    private ArrayList<StudyPeriod> studyPeriodList;
 
     public Student(String username, String passwordHash, String salt, int regNum, String title, String surname,
-            String forenames, String email, String tutor, Course course, StudyPeriod[] studyPeriodList) {
+            String forenames, String email, String tutor, Course course, ArrayList<StudyPeriod> studyPeriodList) {
 
         super(username, passwordHash, salt);
 
@@ -87,11 +89,11 @@ public class Student extends User {
         this.course = course;
     }
 
-    public StudyPeriod[] getStudyPeriodList() {
+    public ArrayList<StudyPeriod> getStudyPeriodList() {
         return this.studyPeriodList;
     }
 
-    public void setStudyPeriodList(StudyPeriod[] studyPeriodList) {
+    public void setStudyPeriodList(ArrayList<StudyPeriod> studyPeriodList) {
         this.studyPeriodList = studyPeriodList;
     }
     

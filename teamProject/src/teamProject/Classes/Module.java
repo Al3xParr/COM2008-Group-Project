@@ -11,14 +11,12 @@ package teamProject.Classes;
  * Module class definition
 */
 public class Module {
-    private String moduleCode, fullName, timeTaught;
-    private Department department;
+    private String moduleCode, fullName, timeTaught, departmentCode;
 
-    public Module(String moduleCode, Department department, String fullName, String timeTaught) {
+    public Module(String moduleCode, String departmentCode, String fullName, String timeTaught) {
         this.moduleCode = moduleCode;
         this.department = department;
         this.fullName = fullName;
-
         this.timeTaught = timeTaught;
     }
 
@@ -46,12 +44,11 @@ public class Module {
         this.timeTaught = timeTaught;
     }
 
-    public Department getDepartment() {
-        return this.department;
-    }
+    public String getDepartmentCode() { return this.departmentCode; }
 
-    public void setDepartment(Department departmentCode) {
-        this.department = departmentCode;
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
     }
-        
+    
+
 }
