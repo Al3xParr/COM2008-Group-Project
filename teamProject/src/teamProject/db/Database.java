@@ -226,15 +226,15 @@ public class Database implements AutoCloseable {
         String[] values = { newUser.getUsername() };
 
         if (!ValueSetCheck("Accounts", names, values)) {
-            String type = "Basic";
+            int type = -1;
             if (newUser instanceof Student) {
-                type = "Student";
+                type = 0;
             } else if (newUser instanceof Teacher) {
-                type = "Teacher";
-            } else if (newUser instanceof Administrator) {
-                type = "Administrator";
+                type = 1;
             } else if (newUser instanceof Registrar) {
-                type = "Registrar";
+                type = 2;
+            } else if (newUser instanceof Administrator) {
+                type = 3;
             }
 
             String insertUser = "INSERT INTO Account VALUES(?,?,?,?);";
@@ -243,13 +243,13 @@ public class Database implements AutoCloseable {
                 insert.setString(1, newUser.getUsername());
                 insert.setString(2, newUser.getPasswordHash());
                 insert.setString(3, newUser.getSalt());
-                insert.setString(4, type);
+                insert.setInt(4, type);
                 insert.executeUpdate();
                 switch (type) {
-                    case "Student":
+                    case 0:
                         insertStudent((Student) newUser);
                         break;
-                    case "Teacher":
+                    case 1:
                         insertTeacher((Teacher) newUser);
                         break;
                 }
