@@ -1,4 +1,5 @@
-DROP TABLE IF EXISTS StudentsToModules;
+DROP TABLE IF EXISTS Grades;
+DROP TABLE IF EXISTS StudyPeriods;
 DROP TABLE IF EXISTS ModulesToCourse;
 DROP TABLE IF EXISTS CourseToDepartment;
 DROP TABLE IF EXISTS Teacher;
@@ -81,16 +82,25 @@ CREATE TABLE CourseToDepartment(
     FOREIGN KEY (deptCode) REFERENCES Departments(deptCode) ON DELETE CASCADE
 );
 
-CREATE TABLE StudentsToModules(
+CREATE TABLE StudyPeriods(
     regNum INT NOT NULL,
-    moduleCode CHAR(7) NOT NULL,
-    mark DECIMAL(5,2),
-    resitMark DECIMAL(5,2),
     label CHAR(1) NOT NULL,
     courseCode CHAR(6) NOT NULL,
     degreeLvl TINYINT NOT NULL,
+    startDate DATE NOT NULL,
+    endDate DATE NOT NULL,
+    PRIMARY KEY(regNum,label),
+    FOREIGN KEY (regNum) REFERENCES Students(regNum) ON DELETE CASCADE
+);
+
+CREATE TABLE Grades(
+    regNum INT NOT NULL,
+    label CHAR(1) NOT NULL,
+    moduleCode CHAR(7) NOT NULL,
+    mark DECIMAL(5,2),
+    resitMark DECIMAL(5,2),
     CONSTRAINT id PRIMARY KEY (regNum, moduleCode, label),
-    FOREIGN KEY (regNum) REFERENCES Students(regNum) ON DELETE CASCADE,
+    FOREIGN KEY (regNum,label) REFERENCES StudyPeriods(regNum,label) ON DELETE CASCADE,
     FOREIGN KEY (moduleCode) REFERENCES Modules(moduleCode) ON DELETE CASCADE
 );
 

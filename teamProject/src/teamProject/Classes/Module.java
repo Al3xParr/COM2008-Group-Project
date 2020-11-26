@@ -15,7 +15,7 @@ public class Module {
 
     public Module(String moduleCode, String departmentCode, String fullName, String timeTaught) {
         this.moduleCode = moduleCode;
-        this.department = department;
+        this.departmentCode = departmentCode;
         this.fullName = fullName;
         this.timeTaught = timeTaught;
     }
