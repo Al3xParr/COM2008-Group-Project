@@ -68,7 +68,7 @@ public class Database implements AutoCloseable {
         String createQuery = new String();
 
         try {
-            createQuery = new String(Files.readAllBytes(Paths.get("./src/teamProject/db/dbSchema.sql")));
+            createQuery = new String(Files.readAllBytes(Paths.get("teamProject/db/dbSchema.sql")));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -88,7 +88,7 @@ public class Database implements AutoCloseable {
         String populateQuery = new String();
 
         try {
-            populateQuery = new String(Files.readAllBytes(Paths.get("./src/teamProject/db/dbTestData.sql")));
+            populateQuery = new String(Files.readAllBytes(Paths.get("teamProject/db/dbTestData.sql")));
 
         } catch (IOException ex) {
             ex.printStackTrace();
