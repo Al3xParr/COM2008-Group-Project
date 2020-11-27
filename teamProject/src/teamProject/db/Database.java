@@ -1036,4 +1036,18 @@ public class Database implements AutoCloseable {
             e.printStackTrace();
         }
     }
+
+    public void changePriv(String username, int lvl){
+        String query = "UPDATE Accounts SET accessLvl = ? WHERE username = ?;"
+        try (PreparedStatement prepstat = con.prepareStatement(query)) {
+            prepstat.clearParameters();
+            prepstat.setString(1, lvl);
+            prepstat.setString(2, username);
+            prepstat.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
