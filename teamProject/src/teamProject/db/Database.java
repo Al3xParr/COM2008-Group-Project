@@ -68,7 +68,7 @@ public class Database implements AutoCloseable {
         String createQuery = new String();
 
         try {
-            createQuery = new String(Files.readAllBytes(Paths.get("./src/teamProject/db/dbSchema.sql")));
+            createQuery = new String(Files.readAllBytes(Paths.get("teamProject/db/dbSchema.sql")));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -88,7 +88,7 @@ public class Database implements AutoCloseable {
         String populateQuery = new String();
 
         try {
-            populateQuery = new String(Files.readAllBytes(Paths.get("./src/teamProject/db/dbTestData.sql")));
+            populateQuery = new String(Files.readAllBytes(Paths.get("teamProject/db/dbTestData.sql")));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -189,6 +189,26 @@ public class Database implements AutoCloseable {
         }
         return succes;
 
+    }
+
+    public ArrayList<String> getLoginData(String username){
+        ArrayList<String> ans= new ArrayList<String>();
+        String loginQuery = "SELECT passwordHash, salt, accessLvl FROM Accounts WHERE username = ?;";
+        try(PreparedStatement query = con.prepareStatement(loginQuery)){
+            query.clearParameters();
+            query.setString(1,username);
+            ResultSet result = query.executeQuery();
+            if(result.next()){
+                ans.add(result.getString(1));
+                ans.add(result.getString(2));
+                ans.add(Integer.toString(result.getInt(3)));
+            }
+            result.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ans;
     }
 
     //INSERTS - PUBLIC FUNCTIONS

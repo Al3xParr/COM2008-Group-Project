@@ -20,19 +20,27 @@ public class StudentSystem {
     final static String url = "//stusql.dcs.shef.ac.uk/team044";
     final static String user = "team044";
     final static String pass = "872345c0";
-
+    public static Database db = null;
     public static void main(String[] args) {
 
-        try (Database db = new Database(url, user, pass)) {
+        try{
 
             //DO STUFF HERE
-
+            db = new Database(url, user, pass);
             db.resetDB();
-            //db.populateDB();
+            db.populateDB();
             
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try{
+                if(db != null){
+                    db.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
