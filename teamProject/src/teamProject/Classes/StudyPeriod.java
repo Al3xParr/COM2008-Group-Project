@@ -15,27 +15,27 @@ import java.util.Date;
  * StudyPeriod class definition
  */
 public class StudyPeriod {
-    private char label;
+    private String label;
     private Date startDate, endDate; 
     private StudyLevel degreeLvl;
     private ArrayList<Grade> gradesList;
     
 
-    StudyPeriod(char label, Date startDate, Date endDate, StudyLevel degreeLvl,
+    public StudyPeriod(String label, Date startDate, Date endDate, StudyLevel degreeLvl,
                 ArrayList<Grade> gradesList) {
         this.label = label;
         this.startDate = startDate;
         this.endDate = endDate;
         this.degreeLvl = degreeLvl;
-        this.gradesList = null;
+        this.gradesList = gradesList;
     }
     
 
-    public char getLabel() {
+    public String getLabel() {
         return this.label;
     }
 
-    public void setLabel(char label) {
+    public void setLabel(String label) {
         this.label = label;
     }
 

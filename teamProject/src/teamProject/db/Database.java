@@ -30,6 +30,7 @@ public class Database implements AutoCloseable {
     HashMap<String, Registrar> registrars = new HashMap<>();
     HashMap<String, Teacher> teachers = new HashMap<>();
     HashMap<String, StudyLevel> studyLevels = new HashMap<>();
+    HashMap<String, StudyPeriod> studyPeriods = new HashMap<>();
 
     public Database(String url, String user, String password) throws SQLException {
         String str = "jdbc:mysql:" + url + "?user=" + user + "&password=" + password + "&allowMultiQueries=true";
@@ -907,6 +908,29 @@ public class Database implements AutoCloseable {
         }
     }
 
+    //instantiating each of the study periods
+    public void instantiateStudyPeriod() {
+        try (Statement stsm = con.createStatement()) {
+            
+            ResultSet results = stsm.executeQuery("SELECT * FROM StudyPeriods;");
+
+            while (results.next()) {
+                int regNum = results.getInt(1);
+                String label = results.getString(2);
+                String courseCose = results.getString(3);
+                String degreeLvl = results.getString(4);
+                Date startDate = results.getDate(5);
+                Date endDate = results.getDate(6);
+                StudyPeriod studyPeriod = new StudyPeriod(label, startDate, endDate, studyLevels.get(degreeLvl+courseCose), null);
+                studyPeriods.put(regNum + label, studyPeriod);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     //adding the departmentList, the degreeLvlList, mainDept
     public void addCourseInformation() {
         try (Statement stsm = con.createStatement()) {
@@ -1015,21 +1039,20 @@ public class Database implements AutoCloseable {
                 String email = results.getString(5);
                 String tutor = results.getString(7);
                 Course course = courses.get(results.getObject(8));
-
-                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email,
-                        tutor, course, null);
-
-                /*
-                ResultSet studyPeriodResults = stsm.executeQuery("SELECT * FROM Modules WHERE deptCode = "
-                        + deptCode +";");
-                studyPeriodList.clear();
-                while (studyPeriodResults.next()) {
-                    studyPeriodList.add(modules.get(results.getString(3)));
-                }
-                student.setStudyPeriodList(studyPeriodList);
-                students.put(regNumber, student);
                 
-                 */
+                ResultSet resultsStudyPeriods = stsm.executeQuery("SELECT label FROM StudyPeriods WHERE regNum = " + regNumber +
+                ";");
+                //resetting the arrayList
+                studyPeriodList.clear();
+                while (resultsStudyPeriods.next()) {
+                    String label = resultsStudyPeriods.getString(1);
+                    studyPeriodList.add(studyPeriods.get(regNumber+label));
+                }
+                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email,
+                        tutor, course, studyPeriodList);
+
+                students.put(regNumber, student);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
