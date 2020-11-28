@@ -15,7 +15,7 @@ import teamProject.db.*;
 */
 public class StudentSystem {
 
-	final static String url = "//stusql.dcs.shef.ac.uk/team044";
+    final static String url = "//stusql.dcs.shef.ac.uk/team044";
     final static String user = "team044";
     final static String pass = "872345c0";
 
@@ -27,12 +27,11 @@ public class StudentSystem {
 
             db.resetDB();
             db.populateDB();
-            db.instantiateUsers();
-            
+            //db.instantiateUsers();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
     }
 }

@@ -866,7 +866,7 @@ public class Database implements AutoCloseable {
                             .executeQuery("SELECT * FROM Modules WHERE deptCode = '" + deptCode + "';");
                     modulesList.clear();
                     while (modulesResults.next()) {
-                        modulesList.add(Module.getInstance(results.getString(3)));
+                        modulesList.add(Module.getInstance(modulesResults.getString(3)));
                     }
                     new Department(deptCode, fullName, modulesList, coursesList);
                 } catch (Exception e) {
@@ -904,7 +904,7 @@ public class Database implements AutoCloseable {
                                 coreModules.add(Module.getInstance(moduleCode));
                             }
 
-                            ResultSet optionalModuleList = stsm
+                            ResultSet optionalModuleList = stsm3
                                     .executeQuery("SELECT moduleCode FROM ModulesToCourse WHERE degreeLvl = '"
                                             + degreeLvl + "' AND courseCode = '" + courseCode + "' AND core = False;");
                             while (optionalModuleList.next()) {
@@ -979,7 +979,10 @@ public class Database implements AutoCloseable {
                     ResultSet mainDeptResult = stsm2
                             .executeQuery("SELECT deptCode FROM CourseToDepartment WHERE courseCode = '" + courseCode
                                     + "' AND mainDept = True;");
-                    Department mainDept = Department.getInstance(mainDeptResult.getString(1));
+                    Department mainDept = null;
+                    if (mainDeptResult.next()) {
+                        mainDept = Department.getInstance(mainDeptResult.getString(1));
+                    }
                     course.setMainDep(mainDept);
                     //setting the other departments
                     ResultSet deptResult = stsm2.executeQuery(
@@ -1082,8 +1085,8 @@ public class Database implements AutoCloseable {
                         String label = resultsStudyPeriods.getString(1);
                         studyPeriodList.add(StudyPeriod.getInstance(regNumber + label));
                     }
-                    new Student(username, passwordHash, salt, regNumber, title, surname, forenames,
-                            email, tutor, course, studyPeriodList);
+                    new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email, tutor,
+                            course, studyPeriodList);
 
                 } catch (Exception e) {
                     e.printStackTrace();
