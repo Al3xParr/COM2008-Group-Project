@@ -182,6 +182,26 @@ public class Database implements AutoCloseable {
 
     }
 
+    public ArrayList<String> getLoginData(String username){
+        ArrayList<String> ans= new ArrayList<String>();
+        String loginQuery = "SELECT passwordHash, salt, accessLvl FROM Accounts WHERE username = ?;";
+        try(PreparedStatement query = con.prepareStatement(loginQuery)){
+            query.clearParameters();
+            query.setString(1,username);
+            ResultSet result = query.executeQuery();
+            if(result.next()){
+                ans.add(result.getString(1));
+                ans.add(result.getString(2));
+                ans.add(Integer.toString(result.getInt(3)));
+            }
+            result.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ans;
+    }
+
     //INSERTS - PUBLIC FUNCTIONS
 
     /**
