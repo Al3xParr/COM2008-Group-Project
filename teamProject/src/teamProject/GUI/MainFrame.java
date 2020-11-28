@@ -1,9 +1,12 @@
 package teamProject.GUI;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
-/**
+import teamProject.SystemSecurity;
+
+/** 
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
  * @author Alex Parr
@@ -11,9 +14,10 @@ import javax.swing.*;
  * @author Zbigniew Lisak 
  */
 
-public class MainFrame extends JFrame{
+public class MainFrame extends JFrame implements ActionListener{
 
     public static final long serialVersionUID = 1L;
+    LogInPanel logInPanel=null;
     
     public MainFrame() {
         super("University of COM2008");
@@ -25,8 +29,8 @@ public class MainFrame extends JFrame{
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        setContentPane(new LogInPanel(this));
+        logInPanel = new LogInPanel(this);
+        setContentPane(logInPanel);
 
         setVisible(true);
 
@@ -35,6 +39,24 @@ public class MainFrame extends JFrame{
     public void showMenu() {
         System.out.println("Yey we did it");
         setContentPane(new MenuPanel(this));
+        revalidate();
+        repaint();
+    }
+
+    public void actionPerformed(ActionEvent event) {
+        
+        if (event.getActionCommand().equals("Log in")) {
+            String username = logInPanel.usernameField.getText();
+            String pass = new String(logInPanel.passwordField.getPassword());
+            if (SystemSecurity.login(username, pass)) {
+                logInPanel.passwordField.setText(null);
+                showMenu();
+            }else{
+                JOptionPane.showMessageDialog(null, "Incorrect username or password", "Invalid login",
+                        JOptionPane.WARNING_MESSAGE);
+                
+            }
+        }
     }
     
 }

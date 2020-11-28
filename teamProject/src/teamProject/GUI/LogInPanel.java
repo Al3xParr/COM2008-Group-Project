@@ -1,17 +1,16 @@
 package teamProject.GUI;
 
 import javax.swing.*;
-import java.awt.event.*;
 import java.awt.*;
-import teamProject.*;
 
-public class LogInPanel extends JPanel implements ActionListener {
+
+public class LogInPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     MainFrame parent = null;
-    JTextField usernameField = null;
-    JPasswordField passwordField = null;
+    public JTextField usernameField = null;
+    public JPasswordField passwordField = null;
     JButton confirmButton = null;
 
     public LogInPanel(MainFrame parent) {
@@ -55,27 +54,12 @@ public class LogInPanel extends JPanel implements ActionListener {
         confirmButton.setActionCommand("Log in");
         confirmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         confirmButton.setMaximumSize(new Dimension(75, 70));
-        confirmButton.addActionListener(this);
+        confirmButton.addActionListener(parent);
         add(confirmButton);
 
         add(Box.createVerticalGlue());
 
     }
     
-    public void actionPerformed(ActionEvent event) {
-        
-        if (event.getActionCommand().equals("Log in")) {
-            String username = usernameField.getText();
-            String pass = new String(passwordField.getPassword());
-            if (SystemSecurity.login(username, pass)) {
-                passwordField.setText(null);
-                parent.showMenu();
-            }else{
-                JOptionPane.showMessageDialog(null, "Incorrect username or password", "Invalid login",
-                        JOptionPane.WARNING_MESSAGE);
-                
-            }
-        }
-    }
 
 }
