@@ -101,17 +101,16 @@ public class SystemSecurity {
     private static void getAccessibleData(String username, int lvl) {
         try (Database db = StudentSystem.connect()) {
             if (lvl > 0) {
-                //TODO uncomment lines below whan geting instances from map is done 
                 db.instantiateUsers();
                 switch (lvl) {
                     case 1:
-                        //currentUser = Teacher.getInstance(username);
+                        currentUser = Teacher.getInstance(username);
                         break;
                     case 2:
-                        //currentUser = Registrar.getInstance(username);
+                        currentUser = Registrar.getInstance(username);
                         break;
                     case 3:
-                        //currentUser = Administrator.getInstance(username);
+                        currentUser = Administrator.getInstance(username);
                         break;
                 }
             } else {

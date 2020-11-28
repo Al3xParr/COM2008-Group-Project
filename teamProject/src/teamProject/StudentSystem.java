@@ -22,9 +22,9 @@ public class StudentSystem {
 
     public static Database connect() {
         Database db = null;
-        try{
+        try {
             db = new Database(url, user, pass);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return db;
@@ -32,16 +32,16 @@ public class StudentSystem {
 
     public static void main(String[] args) {
 
-        try(Database db = connect()){
+        try (Database db = connect()) {
             //DO STUFF HERE
-            
-            ///db.resetDB();
-            //db.populateDB();
+
+            db.resetDB();
+            db.populateDB();
             new MainFrame();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
 }
