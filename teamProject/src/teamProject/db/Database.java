@@ -1040,21 +1040,20 @@ public class Database implements AutoCloseable {
                 String email = results.getString(5);
                 String tutor = results.getString(7);
                 Course course = courses.get(results.getObject(8));
-
-                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email,
-                        tutor, course, null);
-
-                /*
-                ResultSet studyPeriodResults = stsm.executeQuery("SELECT * FROM Modules WHERE deptCode = "
-                        + deptCode +";");
-                studyPeriodList.clear();
-                while (studyPeriodResults.next()) {
-                    studyPeriodList.add(modules.get(results.getString(3)));
-                }
-                student.setStudyPeriodList(studyPeriodList);
-                students.put(regNumber, student);
                 
-                 */
+                ResultSet resultsStudyPeriods = stsm.executeQuery("SELECT label FROM StudyPeriods WHERE regNum = " + regNumber +
+                ";");
+                //resetting the arrayList
+                studyPeriodList.clear();
+                while (resultsStudyPeriods.next()) {
+                    String label = resultsStudyPeriods.getString(1);
+                    studyPeriodList.add(studyPeriods.get(regNumber+label));
+                }
+                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email,
+                        tutor, course, studyPeriodList);
+
+                students.put(regNumber, student);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
