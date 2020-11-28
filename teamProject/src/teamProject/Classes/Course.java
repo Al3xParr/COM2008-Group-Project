@@ -1,4 +1,7 @@
 package teamProject.Classes;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -7,12 +10,14 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
-import java.util.ArrayList;
+
 
 /**
  * Course class definition
 */
 public class Course {
+
+    static HashMap<String, Course> instances = new HashMap<>();
 
     private String courseCode, fullName;
     private Course bachEquiv;
@@ -22,7 +27,7 @@ public class Course {
     private ArrayList<StudyLevel> degreeLvlList;
 
     public Course(String courseCode, String fullName, Boolean yearInIndustry, Course bachEquiv, Department mainDep,
-                  ArrayList<Department> departmentList, ArrayList<StudyLevel> degreeLvlList) {
+            ArrayList<Department> departmentList, ArrayList<StudyLevel> degreeLvlList) {
         this.courseCode = courseCode;
         this.fullName = fullName;
         this.yearInIndustry = yearInIndustry;
@@ -30,6 +35,15 @@ public class Course {
         this.mainDep = mainDep;
         this.departmentList = departmentList;
         this.degreeLvlList = degreeLvlList;
+        instances.put(courseCode, this);
+    }
+
+    public static Course getInstance(String key) {
+        return instances.get(key);
+    }
+    
+    public static void clearInstances() {
+        instances.clear();
     }
 
     public String getCourseCode() {

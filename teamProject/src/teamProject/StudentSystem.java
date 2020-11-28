@@ -1,7 +1,5 @@
 package teamProject;
 
-import java.util.*;
-import java.sql.*;
 import teamProject.db.*;
 
 /**
@@ -28,7 +26,8 @@ public class StudentSystem {
             //DO STUFF HERE
 
             db.resetDB();
-            //db.populateDB();
+            db.populateDB();
+            db.instantiateUsers();
             
 
         } catch (Exception e) {

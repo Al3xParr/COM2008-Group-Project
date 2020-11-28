@@ -1,4 +1,5 @@
 package teamProject.Classes;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -7,17 +8,31 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
+import java.util.HashMap;
+
 /** 
  * Module class definition
 */
 public class Module {
     private String moduleCode, fullName, timeTaught, departmentCode;
 
+    static HashMap<String, Module> instances = new HashMap<>();
+    
     public Module(String moduleCode, String departmentCode, String fullName, String timeTaught) {
         this.moduleCode = moduleCode;
         this.departmentCode = departmentCode;
         this.fullName = fullName;
         this.timeTaught = timeTaught;
+        instances.put(moduleCode, this);
+
+    }
+
+    public static Module getInstance(String key) {
+        return instances.get(key);
+    }
+
+    public static void clearInstances() {
+        instances.clear();
     }
 
     public String getModuleCode() {
