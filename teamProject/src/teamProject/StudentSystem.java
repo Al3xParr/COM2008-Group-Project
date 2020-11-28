@@ -17,7 +17,7 @@ import teamProject.db.*;
 */
 public class StudentSystem {
 
-    final static String url = "//stusql.dcs.shef.ac.uk/team044";
+	final static String url = "//stusql.dcs.shef.ac.uk/team044";
     final static String user = "team044";
     final static String pass = "872345c0";
 
