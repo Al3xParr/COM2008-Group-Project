@@ -31,6 +31,7 @@ public class Database implements AutoCloseable {
     HashMap<String, Registrar> registrars = new HashMap<>();
     HashMap<String, Teacher> teachers = new HashMap<>();
     HashMap<String, StudyLevel> studyLevels = new HashMap<>();
+    HashMap<String, StudyPeriod> studyPeriods = new HashMap<>();
 
     public Database(String url, String user, String password) throws SQLException {
         String str = "jdbc:mysql:" + url + "?user=" + user + "&password=" + password + "&allowMultiQueries=true";
@@ -907,6 +908,29 @@ public class Database implements AutoCloseable {
             e.printStackTrace();
         }
     }
+
+    //instantiating each of the study periods
+    public void instantiateStudyPeriod() {
+        try (Statement stsm = con.createStatement()) {
+            
+            ResultSet results = stsm.executeQuery("SELECT * FROM StudyPeriods;");
+
+            while (results.next()) {
+                int regNum = results.getInt(1);
+                String label = results.getString(2);
+                String courseCose = results.getString(3);
+                String degreeLvl = results.getString(4);
+                Date startDate = results.getDate(5);
+                Date endDate = results.getDate(6);
+                StudyPeriod studyPeriod = new StudyPeriod(label, startDate, endDate, studyLevels.get(degreeLvl+courseCose), null);
+                studyPeriods.put(regNum + label, studyPeriod);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     //adding the departmentList, the degreeLvlList, mainDept
     public void addCourseInformation() {
