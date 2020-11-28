@@ -38,6 +38,3 @@ INSERT INTO Grades VALUES("002","B","DEP1003",67.0,null);
 INSERT INTO Grades VALUES("002","C","DEP1004",null,null);
 
 
-
-
-

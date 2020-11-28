@@ -1,4 +1,5 @@
 package teamProject.Classes;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -8,6 +9,7 @@ package teamProject.Classes;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * User class extention, Student class definition
@@ -19,6 +21,8 @@ public class Student extends User {
     private Course course;
     private ArrayList<StudyPeriod> studyPeriodList;
 
+    static HashMap<Integer, Student> instances = new HashMap<>();
+    
     public Student(String username, String passwordHash, String salt, int regNum, String title, String surname,
             String forenames, String email, String tutor, Course course, ArrayList<StudyPeriod> studyPeriodList) {
 
@@ -31,6 +35,16 @@ public class Student extends User {
         this.tutor = tutor;
         this.course = course;
         this.studyPeriodList = studyPeriodList;
+        instances.put(regNum, this);
+
+    }
+    
+    public static Student getInstance(Integer key) {
+        return instances.get(key);
+    }
+
+    public static void clearInstances() {
+        instances.clear();
     }
 
     public int getRegNum() {
