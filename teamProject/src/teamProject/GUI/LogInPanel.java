@@ -67,11 +67,13 @@ public class LogInPanel extends JPanel implements ActionListener {
         if (event.getActionCommand().equals("Log in")) {
             String username = usernameField.getText();
             String pass = new String(passwordField.getPassword());
-            if(SystemSecurity.login(username,pass)){
+            if (SystemSecurity.login(username, pass)) {
+                passwordField.setText(null);
                 parent.showMenu();
             }else{
                 JOptionPane.showMessageDialog(null, "Incorrect username or password", "Invalid login",
                         JOptionPane.WARNING_MESSAGE);
+                
             }
         }
     }

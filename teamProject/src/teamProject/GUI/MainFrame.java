@@ -34,6 +34,7 @@ public class MainFrame extends JFrame{
     
     public void showMenu() {
         System.out.println("Yey we did it");
+        setContentPane(new MenuPanel(this));
     }
     
 }
