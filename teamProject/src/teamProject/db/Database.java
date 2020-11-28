@@ -771,6 +771,7 @@ public class Database implements AutoCloseable {
         addBachEquiv();
         instantiateDepartment();
         instantiateStudyLevel();
+        instantiateStudyPeriod();
         addCourseInformation();
         instantiateAdministrator();
         instantiateRegistrar();
