@@ -1,12 +1,11 @@
 package teamProject;
 
-import teamProject.db.*;
-
 import java.nio.charset.Charset;
 import java.security.*;
 import java.util.*;
 
 import teamProject.Classes.*;
+import teamProject.db.Database;
 
 /**
  * Team Project COM2008 year 20/21
@@ -38,7 +37,7 @@ public class SystemSecurity {
         return byteAToString(salt);
     }
 
-    public static String hashString(String s, String salt) {
+    private static String hashString(String s, String salt) {
         String result = null;
 
         try {
@@ -82,8 +81,8 @@ public class SystemSecurity {
      * @return true if log in succesfull false otherwise
      */
     public static boolean login(String username, String password) {
-        if (StudentSystem.db != null) {
-            ArrayList<String> temp = StudentSystem.db.getLoginData(username);
+        try(Database db = StudentSystem.connect()){
+            ArrayList<String> temp = db.getLoginData(username);
             if (!temp.isEmpty()) {
                 String trueHash = temp.get(0);
                 String salt = temp.get(1);
@@ -93,27 +92,33 @@ public class SystemSecurity {
                     return true;
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }
 
     private static void getAccessibleData(String username, int lvl) {
-        if (lvl > 0) {
-            //TODO uncomment lines below whan geting instances from map is done 
-            StudentSystem.db.instantiateUsers();
-            switch (lvl) {
-                case 1:
-                    //currentUser = Teacher.getInstance(username);
-                    break;
-                case 2:
-                    //currentUser = Registrar.getInstance(username);
-                    break;
-                case 3:
-                    //currentUser = Administrator.getInstance(username);
-                    break;  
+        try (Database db = StudentSystem.connect()) {
+            if (lvl > 0) {
+                //TODO uncomment lines below whan geting instances from map is done 
+                db.instantiateUsers();
+                switch (lvl) {
+                    case 1:
+                        //currentUser = Teacher.getInstance(username);
+                        break;
+                    case 2:
+                        //currentUser = Registrar.getInstance(username);
+                        break;
+                    case 3:
+                        //currentUser = Administrator.getInstance(username);
+                        break;
+                }
+            } else {
+                //TODO initialisation for students
             }
-        } else {
-            //TODO initialisation for students
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
