@@ -41,15 +41,8 @@ public class ViewStudents extends JPanel implements ActionListener {
         viewMenu.add(new JMenuItem("Courses"));
         viewMenu.add(new JMenuItem("Modules"));
 
-        JMenu accountMenu = new JMenu("Accounts");
-        accountMenu.add(new JMenuItem("Login"));
-        accountMenu.addSeparator();
-        accountMenu.add(new JMenuItem("Register"));
-
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(viewMenu);
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(accountMenu);
         parent.setJMenuBar(menuBar);
 
         JLabel header = new JLabel(
@@ -59,7 +52,7 @@ public class ViewStudents extends JPanel implements ActionListener {
         add(header);
 
         final JTable table = setColumnWidth(new JTable(allStudents, colNames));
-        table.setPreferredScrollableViewportSize(new Dimension(500, 200));
+        table.setPreferredScrollableViewportSize(new Dimension(700, 200));
         table.setFillsViewportHeight(true);
         JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
@@ -67,13 +60,14 @@ public class ViewStudents extends JPanel implements ActionListener {
     }
 
     public JTable setColumnWidth(JTable table) {
-        table.getColumnModel().getColumn(1).setPreferredWidth(60);
+        table.getColumnModel().getColumn(1).setPreferredWidth(120);
         table.getColumnModel().getColumn(2).setPreferredWidth(50);
-        table.getColumnModel().getColumn(3).setPreferredWidth(90);
-        table.getColumnModel().getColumn(4).setPreferredWidth(40);
-        table.getColumnModel().getColumn(5).setPreferredWidth(110);
-        table.getColumnModel().getColumn(7).setPreferredWidth(100);
-        table.getColumnModel().getColumn(8).setPreferredWidth(45);
+        table.getColumnModel().getColumn(3).setPreferredWidth(130);
+        table.getColumnModel().getColumn(4).setPreferredWidth(75);
+        table.getColumnModel().getColumn(5).setPreferredWidth(130);
+        table.getColumnModel().getColumn(6).setPreferredWidth(90);
+        table.getColumnModel().getColumn(7).setPreferredWidth(110);
+        table.getColumnModel().getColumn(8).setPreferredWidth(60);
         return table;
     }
 
