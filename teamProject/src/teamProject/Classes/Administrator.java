@@ -1,7 +1,4 @@
 package teamProject.Classes;
-
-import java.util.*;
-
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -15,18 +12,7 @@ import java.util.*;
 */
 public class Administrator extends User {
 
-    public static HashMap<String, Administrator> instances = new HashMap<>();
-
-    public Administrator(String username, String passwordHash, String salt) {
+    public Administrator(String username, String passwordHash, String salt){
         super(username, passwordHash, salt);
-        instances.put(username, this);
-    }
-
-    public static Administrator getInstance(String key) {
-        return instances.get(key);
-    }
-
-    public static void clearInstances() {
-        instances.clear();
     }
 }
