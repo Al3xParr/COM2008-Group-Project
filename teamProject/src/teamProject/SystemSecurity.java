@@ -125,6 +125,12 @@ public class SystemSecurity {
         }
     }
 
+    public static void logout() {
+        StudentSystem.clearHashMaps();
+        privilages = -1;
+        currentUser = null;
+    }
+
     public static User getCurrentUser() {
         return currentUser;
     }

@@ -160,6 +160,10 @@ public class MenuPanel extends JPanel implements ActionListener {
             users.addAll(Administrator.instances.values());
             //TODO Open new Student Browser for Teachers
         }
+        if (command.equals("LogOut")) {
+            SystemSecurity.logout();
+            parent.changeLogIn();
+        }
         
 
     }
