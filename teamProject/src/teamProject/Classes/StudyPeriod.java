@@ -17,12 +17,12 @@ import java.util.HashMap;
  */
 public class StudyPeriod {
     private String label;
-    private Date startDate, endDate; 
+    private Date startDate, endDate;
     private StudyLevel degreeLvl;
     private ArrayList<Grade> gradesList;
 
-    static HashMap<String, StudyPeriod> instances = new HashMap<>();
-    
+    public static HashMap<String, StudyPeriod> instances = new HashMap<>();
+
     public StudyPeriod(int regNum, String label, Date startDate, Date endDate, StudyLevel degreeLvl,
             ArrayList<Grade> gradesList) {
         this.label = label;
@@ -33,7 +33,7 @@ public class StudyPeriod {
         instances.put(regNum + label, this);
 
     }
-    
+
     /**
      * 
      * @param key is regNum + Label
@@ -46,7 +46,6 @@ public class StudyPeriod {
     public static void clearInstances() {
         instances.clear();
     }
-    
 
     public String getLabel() {
         return this.label;

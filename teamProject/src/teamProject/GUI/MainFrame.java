@@ -32,12 +32,15 @@ public class MainFrame extends JFrame implements ActionListener{
         logInPanel = new LogInPanel(this);
         setContentPane(logInPanel);
 
+        SystemSecurity.login("user2", "passwordHash");
+        setContentPane(new MenuPanel(this));
+        //setContentPane(new LogInPanel(this));
+
         setVisible(true);
 
     }
     
     public void showMenu() {
-        System.out.println("Yey we did it");
         setContentPane(new MenuPanel(this));
         revalidate();
         repaint();

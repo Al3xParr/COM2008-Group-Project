@@ -16,8 +16,8 @@ import java.util.HashMap;
 public class Module {
     private String moduleCode, fullName, timeTaught, departmentCode;
 
-    static HashMap<String, Module> instances = new HashMap<>();
-    
+    public static HashMap<String, Module> instances = new HashMap<>();
+
     public Module(String moduleCode, String departmentCode, String fullName, String timeTaught) {
         this.moduleCode = moduleCode;
         this.departmentCode = departmentCode;
@@ -59,11 +59,12 @@ public class Module {
         this.timeTaught = timeTaught;
     }
 
-    public String getDepartmentCode() { return this.departmentCode; }
+    public String getDepartmentCode() {
+        return this.departmentCode;
+    }
 
     public void setDepartmentCode(String departmentCode) {
         this.departmentCode = departmentCode;
     }
-    
 
 }
