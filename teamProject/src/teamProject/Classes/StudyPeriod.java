@@ -10,32 +10,48 @@ package teamProject.Classes;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * StudyPeriod class definition
  */
 public class StudyPeriod {
-    private char label;
-    private Date startDate, endDate; 
+    private String label;
+    private Date startDate, endDate;
     private StudyLevel degreeLvl;
     private ArrayList<Grade> gradesList;
-    
 
-    StudyPeriod(char label, Date startDate, Date endDate, StudyLevel degreeLvl,
-                ArrayList<Grade> gradesList) {
+    public static HashMap<String, StudyPeriod> instances = new HashMap<>();
+
+    public StudyPeriod(int regNum, String label, Date startDate, Date endDate, StudyLevel degreeLvl,
+            ArrayList<Grade> gradesList) {
         this.label = label;
         this.startDate = startDate;
         this.endDate = endDate;
         this.degreeLvl = degreeLvl;
-        this.gradesList = null;
-    }
-    
+        this.gradesList = gradesList;
+        instances.put(regNum + label, this);
 
-    public char getLabel() {
+    }
+
+    /**
+     * 
+     * @param key is regNum + Label
+     * @return
+     */
+    public static StudyPeriod getInstance(String key) {
+        return instances.get(key);
+    }
+
+    public static void clearInstances() {
+        instances.clear();
+    }
+
+    public String getLabel() {
         return this.label;
     }
 
-    public void setLabel(char label) {
+    public void setLabel(String label) {
         this.label = label;
     }
 
