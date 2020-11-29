@@ -2,6 +2,8 @@ package teamProject;
 
 import teamProject.db.*;
 import teamProject.GUI.*;
+import teamProject.Classes.*;
+import teamProject.Classes.Module;
 
 /**
  * Team Project COM2008 year 20/21
@@ -20,6 +22,18 @@ public class StudentSystem {
     final static String user = "team044";
     final static String pass = "872345c0";
 
+    public static void clearHashMaps() {
+        Administrator.clearInstances();
+        Course.clearInstances();
+        Department.clearInstances();
+        Module.clearInstances();
+        Registrar.clearInstances();
+        Student.clearInstances();
+        StudyLevel.clearInstances();
+        StudyPeriod.clearInstances();
+        Teacher.clearInstances();
+    }
+
     public static Database connect() {
         Database db = null;
         try {
@@ -35,8 +49,8 @@ public class StudentSystem {
         try (Database db = connect()) {
             //DO STUFF HERE
 
-            db.resetDB();
-            db.populateDB();
+            ///db.resetDB();
+            //db.populateDB();
             new MainFrame();
 
         } catch (Exception e) {

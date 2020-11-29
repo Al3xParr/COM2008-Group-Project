@@ -18,9 +18,9 @@ public class Department {
     private String deptCode, fullName;
     private ArrayList<Module> moduleList;
     private ArrayList<Course> courseList;
-    
-    static HashMap<String, Department> instances = new HashMap<>();
-    
+
+    public static HashMap<String, Department> instances = new HashMap<>();
+
     public Department(String deptCode, String fullName, ArrayList<Module> moduleList, ArrayList<Course> courseList) {
         this.deptCode = deptCode;
         this.fullName = fullName;
@@ -28,7 +28,7 @@ public class Department {
         this.courseList = courseList;
         instances.put(deptCode, this);
     }
-    
+
     public static Department getInstance(String key) {
         return instances.get(key);
     }
@@ -65,7 +65,8 @@ public class Department {
         return this.courseList;
     }
 
-    public void setCourseList(ArrayList<Course> courseList) { this.courseList = courseList; }
+    public void setCourseList(ArrayList<Course> courseList) {
+        this.courseList = courseList;
+    }
 
-    
 }

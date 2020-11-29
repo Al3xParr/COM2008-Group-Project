@@ -14,11 +14,11 @@ import teamProject.SystemSecurity;
  * @author Zbigniew Lisak 
  */
 
-public class MainFrame extends JFrame implements ActionListener{
+public class MainFrame extends JFrame implements ActionListener {
 
     public static final long serialVersionUID = 1L;
-    LogInPanel logInPanel=null;
-    
+    LogInPanel logInPanel = null;
+
     public MainFrame() {
         super("University of COM2008");
 
@@ -35,28 +35,34 @@ public class MainFrame extends JFrame implements ActionListener{
         setVisible(true);
 
     }
-    
+
     public void showMenu() {
-        System.out.println("Yey we did it");
         setContentPane(new MenuPanel(this));
         revalidate();
         repaint();
     }
 
+    public void changeLogIn() {
+        logInPanel = new LogInPanel(this);
+        setContentPane(logInPanel);
+        revalidate();
+        repaint();
+    }
+
     public void actionPerformed(ActionEvent event) {
-        
+
         if (event.getActionCommand().equals("Log in")) {
             String username = logInPanel.usernameField.getText();
             String pass = new String(logInPanel.passwordField.getPassword());
             if (SystemSecurity.login(username, pass)) {
                 logInPanel.passwordField.setText(null);
                 showMenu();
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(null, "Incorrect username or password", "Invalid login",
                         JOptionPane.WARNING_MESSAGE);
-                
+
             }
         }
     }
-    
+
 }

@@ -15,7 +15,7 @@ import java.util.*;
 */
 public class Administrator extends User {
 
-    static HashMap<String, Administrator> instances = new HashMap<>();
+    public static HashMap<String, Administrator> instances = new HashMap<>();
 
     public Administrator(String username, String passwordHash, String salt) {
         super(username, passwordHash, salt);
