@@ -14,6 +14,8 @@ public class ViewStudents extends JPanel implements ActionListener {
 
     public ViewStudents(MainFrame parent, Collection<Student> students) {
         this.parent = parent;
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
         int numStudents = students.size();
         String[] colNames = {"RegNum", "Username", "Title", "First names", "Surname", "Email", "Tutor", "Course", "View"};
         Object[][] allStudents = new Object[numStudents][9];
