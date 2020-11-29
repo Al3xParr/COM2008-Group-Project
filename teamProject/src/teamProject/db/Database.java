@@ -13,7 +13,6 @@ import java.nio.file.*;
 import java.io.IOException;
 import java.util.*;
 import java.sql.Date;
-import jdk.jshell.spi.ExecutionControl.ExecutionControlException;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
 
@@ -23,14 +22,6 @@ import teamProject.Classes.Module;
 public class Database implements AutoCloseable {
 
     Connection con = null;
-    HashMap<String, Module> modules = new HashMap<>();
-    HashMap<String, Course> courses = new HashMap<>();
-    HashMap<String, Department> departments = new HashMap<>();
-    HashMap<Integer, Student> students = new HashMap<>();
-    HashMap<String, Administrator> administrators = new HashMap<>();
-    HashMap<String, Registrar> registrars = new HashMap<>();
-    HashMap<String, Teacher> teachers = new HashMap<>();
-    HashMap<String, StudyLevel> studyLevels = new HashMap<>();
 
     public Database(String url, String user, String password) throws SQLException {
         String str = "jdbc:mysql:" + url + "?user=" + user + "&password=" + password + "&allowMultiQueries=true";
@@ -189,6 +180,26 @@ public class Database implements AutoCloseable {
         }
         return succes;
 
+    }
+
+    public ArrayList<String> getLoginData(String username){
+        ArrayList<String> ans= new ArrayList<String>();
+        String loginQuery = "SELECT passwordHash, salt, accessLvl FROM Accounts WHERE username = ?;";
+        try(PreparedStatement query = con.prepareStatement(loginQuery)){
+            query.clearParameters();
+            query.setString(1,username);
+            ResultSet result = query.executeQuery();
+            if(result.next()){
+                ans.add(result.getString(1));
+                ans.add(result.getString(2));
+                ans.add(Integer.toString(result.getInt(3)));
+            }
+            result.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ans;
     }
 
     //INSERTS - PUBLIC FUNCTIONS
@@ -419,8 +430,7 @@ public class Database implements AutoCloseable {
                             insert.setDouble(4, g.getMark());
                             insert.setDouble(5, g.getResitMark());
                             insert.executeUpdate();
-                        } 
-                        catch(SQLException e){
+                        } catch (SQLException e) {
                             throw e;
                         }
                     }
@@ -766,16 +776,30 @@ public class Database implements AutoCloseable {
     }
 
     public void instantiateUsers() {
+        clearHashMaps();
         instantiateModule();
         instantiateCourse();
         addBachEquiv();
         instantiateDepartment();
         instantiateStudyLevel();
+        instantiateStudyPeriod();
         addCourseInformation();
         instantiateAdministrator();
         instantiateRegistrar();
         instantiateTeachers();
         instantiateStudent();
+    }
+
+    private void clearHashMaps() {
+        Administrator.clearInstances();
+        Course.clearInstances();
+        Department.clearInstances();
+        Module.clearInstances();
+        Registrar.clearInstances();
+        Student.clearInstances();
+        StudyLevel.clearInstances();
+        StudyPeriod.clearInstances();
+        Teacher.clearInstances();
     }
 
     public void instantiateModule() {
@@ -789,8 +813,7 @@ public class Database implements AutoCloseable {
                 String departmentCode = results.getString(2);
                 String fullName = results.getString(3);
                 String timeTaught = results.getString(4);
-                Module module = new Module(moduleCode, departmentCode, fullName, timeTaught);
-                modules.put(moduleCode, module);
+                new Module(moduleCode, departmentCode, fullName, timeTaught);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -807,8 +830,7 @@ public class Database implements AutoCloseable {
                 String courseCode = results.getString(1);
                 String fullName = results.getString(2);
                 Boolean yearInIndustry = results.getBoolean(3);
-                Course course = new Course(courseCode, fullName, yearInIndustry, null, null, null, null);
-                courses.put(courseCode, course);
+                new Course(courseCode, fullName, yearInIndustry, null, null, null, null);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -823,12 +845,16 @@ public class Database implements AutoCloseable {
 
             while (results.next()) {
                 String courseCode = results.getString(1);
-                ResultSet bachResult = stsm
-                        .executeQuery("SELECT * FROM BachEquiv WHERE courseCode = " + courseCode + ";");
-                if (bachResult.next()) {
-                    Course bachEquiv = courses.get(bachResult.getString(2));
-                    Course course = courses.get(courseCode);
-                    course.setBachEquiv(bachEquiv);
+                try (Statement stsm2 = con.createStatement()) {
+                    ResultSet bachResult = stsm2
+                            .executeQuery("SELECT * FROM BachEquiv WHERE courseCode = '" + courseCode + "';");
+                    if (bachResult.next()) {
+                        Course bachEquiv = Course.getInstance(bachResult.getString(2));
+                        Course course = Course.getInstance(courseCode);
+                        course.setBachEquiv(bachEquiv);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
@@ -847,24 +873,25 @@ public class Database implements AutoCloseable {
                 //not sure where the attributes are stored yet, can change later
                 String deptCode = results.getString(1);
                 String fullName = results.getString(2);
-                Department department = new Department(deptCode, fullName, null, null);
-                //finding the courses from that department
-                ResultSet coursesResults = stsm
-                        .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = " + deptCode + ";");
-                coursesList.clear();
-                while (coursesResults.next()) {
-                    coursesList.add(courses.get(results.getString(1)));
+                try (Statement stsm2 = con.createStatement()) {
+                    //finding the courses from that department
+                    ResultSet coursesResults = stsm2
+                            .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = '" + deptCode + "';");
+                    coursesList.clear();
+                    while (coursesResults.next()) {
+                        coursesList.add(Course.getInstance(results.getString(1)));
+                    }
+                    //finding the modules within that department
+                    ResultSet modulesResults = stsm2
+                            .executeQuery("SELECT * FROM Modules WHERE deptCode = '" + deptCode + "';");
+                    modulesList.clear();
+                    while (modulesResults.next()) {
+                        modulesList.add(Module.getInstance(modulesResults.getString(3)));
+                    }
+                    new Department(deptCode, fullName, modulesList, coursesList);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                department.setCourseList(coursesList);
-                //finding the modules within that department
-                ResultSet modulesResults = stsm
-                        .executeQuery("SELECT * FROM Modules WHERE deptCode = " + deptCode + ";");
-                modulesList.clear();
-                while (modulesResults.next()) {
-                    modulesList.add(modules.get(results.getString(3)));
-                }
-                department.setModuleList(modulesList);
-                departments.put(deptCode, department);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -876,33 +903,82 @@ public class Database implements AutoCloseable {
         try (Statement stsm = con.createStatement()) {
 
             //result sets for finding the courses and the degree levels
-            ResultSet results = stsm.executeQuery("SELECT DISTINCT degreeLvl FROM ModulesToCourse;");
-            ResultSet courseResults = stsm.executeQuery("SELECT courseCode FROM Course;");
-            ArrayList<Module> coreModules = new ArrayList<Module>();
-            ArrayList<Module> optionalModules = new ArrayList<Module>();
+            ResultSet courseResults = stsm.executeQuery("SELECT DISTINCT courseCode FROM ModulesToCourse;");
+
             while (courseResults.next()) {
-                while (results.next()) {
-                    String degreeLvl = results.getString(1);
+                try (Statement stsm2 = con.createStatement()) {
                     String courseCode = courseResults.getString(1);
-                    ResultSet coreModuleList = stsm.executeQuery("SELECT moduleCode FROM ModulesToCourse WHERE "
-                            + "degreeLvl = " + degreeLvl + " AND courseCode = " + courseCode + " AND core = True;");
-                    while (coreModuleList.next()) {
-                        String moduleCode = coreModuleList.getString(1);
-                        coreModules.add(modules.get(moduleCode));
+                    ResultSet lvlResults = stsm2.executeQuery(
+                            "SELECT DISTINCT degreeLvl FROM ModulesToCourse WHERE courseCode = '" + courseCode + "';");
+                    while (lvlResults.next()) {
+                        try (Statement stsm3 = con.createStatement()) {
+                            String degreeLvl = lvlResults.getString(1);
+                            ArrayList<Module> coreModules = new ArrayList<Module>();
+                            ArrayList<Module> optionalModules = new ArrayList<Module>();
+
+                            ResultSet coreModuleList = stsm3
+                                    .executeQuery("SELECT moduleCode FROM ModulesToCourse WHERE degreeLvl = '"
+                                            + degreeLvl + "' AND courseCode = '" + courseCode + "' AND core = True;");
+                            while (coreModuleList.next()) {
+                                String moduleCode = coreModuleList.getString(1);
+                                coreModules.add(Module.getInstance(moduleCode));
+                            }
+
+                            ResultSet optionalModuleList = stsm3
+                                    .executeQuery("SELECT moduleCode FROM ModulesToCourse WHERE degreeLvl = '"
+                                            + degreeLvl + "' AND courseCode = '" + courseCode + "' AND core = False;");
+                            while (optionalModuleList.next()) {
+                                String moduleCode = optionalModuleList.getString(1);
+                                optionalModules.add(Module.getInstance(moduleCode));
+                            }
+
+                            new StudyLevel(degreeLvl, courseCode, coreModules, optionalModules);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                    ResultSet optionalModuleList = stsm.executeQuery("SELECT moduleCode FROM ModulesToCourse "
-                            + "WHERE degreeLvl = " + degreeLvl + " AND core = False;");
-                    while (optionalModuleList.next()) {
-                        String moduleCode = optionalModuleList.getString(1);
-                        optionalModules.add(modules.get(moduleCode));
-                    }
-                    if (!coreModules.isEmpty()) {
-                        StudyLevel studyLevel = new StudyLevel(degreeLvl, courseCode, coreModules, optionalModules);
-                        //have to include both of the degree and the course code within the key string
-                        studyLevels.put(degreeLvl + courseCode, studyLevel);
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //instantiating each of the study periods
+    public void instantiateStudyPeriod() {
+        try (Statement stsm = con.createStatement()) {
+
+            ResultSet results = stsm.executeQuery("SELECT * FROM StudyPeriods;");
+
+            while (results.next()) {
+                int regNum = results.getInt(1);
+                String label = results.getString(2);
+                String courseCode = results.getString(3);
+                String degreeLvl = results.getString(4);
+                Date startDate = results.getDate(5);
+                Date endDate = results.getDate(6);
+                String gradeQuery = "SELECT moduleCode, mark, resitMark FROM Grades WHERE regNum = ? AND label = ?;";
+                try (PreparedStatement stsm2 = con.prepareStatement(gradeQuery)) {
+                    stsm2.clearParameters();
+                    stsm2.setInt(1, regNum);
+                    stsm2.setString(2, label);
+                    ResultSet gradesResult = stsm2.executeQuery();
+                    ArrayList<Grade> gradesList = new ArrayList<>();
+                    while (gradesResult.next()) {
+                        Grade g = new Grade(Module.getInstance(gradesResult.getString(1)), gradesResult.getDouble(2),
+                                gradesResult.getDouble(3));
+                        gradesList.add(g);
+                    }
+                    new StudyPeriod(regNum, label, startDate, endDate, StudyLevel.getInstance(degreeLvl + courseCode),
+                            gradesList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -913,26 +989,33 @@ public class Database implements AutoCloseable {
         try (Statement stsm = con.createStatement()) {
 
             ArrayList<Department> otherDepartments = new ArrayList<Department>();
-            ResultSet results = stsm.executeQuery("SELECT * FROM Course;");
+            ResultSet results = stsm.executeQuery("SELECT courseCode FROM Course;");
 
             while (results.next()) {
                 String courseCode = results.getString(1);
-                Course course = courses.get(courseCode);
-                //setting the main department
-                ResultSet mainDeptResult = stsm
-                        .executeQuery("SELECT deptCode FROM CourseToDepartment WHERE courseCode = " + courseCode
-                                + " AND mainDept = True;");
-                Department mainDept = departments.get(mainDeptResult.getString(1));
-                course.setMainDep(mainDept);
-                //setting the other departments
-                ResultSet deptResult = stsm
-                        .executeQuery("SELECT deptCode FROM CourseToDepartment WHERE courseCode = " + courseCode + ";");
-                otherDepartments.clear();
-                while (deptResult.next()) {
-                    otherDepartments.add(departments.get(deptResult.getString(1)));
+                Course course = Course.getInstance(courseCode);
+                try (Statement stsm2 = con.createStatement()) {
+                    //setting the main department
+                    ResultSet mainDeptResult = stsm2
+                            .executeQuery("SELECT deptCode FROM CourseToDepartment WHERE courseCode = '" + courseCode
+                                    + "' AND mainDept = True;");
+                    Department mainDept = null;
+                    if (mainDeptResult.next()) {
+                        mainDept = Department.getInstance(mainDeptResult.getString(1));
+                    }
+                    course.setMainDep(mainDept);
+                    //setting the other departments
+                    ResultSet deptResult = stsm2.executeQuery(
+                            "SELECT deptCode FROM CourseToDepartment WHERE courseCode = '" + courseCode + "';");
+                    otherDepartments.clear();
+                    while (deptResult.next()) {
+                        otherDepartments.add(Department.getInstance(deptResult.getString(1)));
+                    }
+                    course.setDepartmentList(otherDepartments);
+                    //TO-DO: setting the degree level list
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                course.setDepartmentList(otherDepartments);
-                //TO-DO: setting the degree level list
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -943,18 +1026,16 @@ public class Database implements AutoCloseable {
     public void instantiateTeachers() {
         try (Statement stsm = con.createStatement()) {
 
-            ResultSet results = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 1;");
+            ResultSet results = stsm.executeQuery("SELECT Accounts.username,passwordHash,salt,fullName"
+                    + " FROM Accounts JOIN Teacher ON Accounts.username = Teacher.username WHERE accessLvl = 1;");
 
             while (results.next()) {
-                //not sure where the attributes are stored yet, can change later
                 String username = results.getString(1);
-                ResultSet resultsTeachers = stsm
-                        .executeQuery("SELECT fullName FROM Teacher WHERE username = " + username + ";");
-                String fullName = resultsTeachers.getString(1);
                 String passwordHash = results.getString(2);
                 String salt = results.getString(3);
-                Teacher teacher = new Teacher(username, passwordHash, salt, fullName);
-                teachers.put(username, teacher);
+                String fullName = results.getString(4);
+                new Teacher(username, passwordHash, salt, fullName);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -971,8 +1052,8 @@ public class Database implements AutoCloseable {
                 String username = results.getString(1);
                 String passwordHash = results.getString(2);
                 String salt = results.getString(3);
-                Registrar registrar = new Registrar(username, passwordHash, salt);
-                registrars.put(username, registrar);
+                new Registrar(username, passwordHash, salt);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -989,8 +1070,7 @@ public class Database implements AutoCloseable {
                 String username = results.getString(1);
                 String passwordHash = results.getString(2);
                 String salt = results.getString(3);
-                Administrator administrator = new Administrator(username, passwordHash, salt);
-                administrators.put(username, administrator);
+                new Administrator(username, passwordHash, salt);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1000,51 +1080,38 @@ public class Database implements AutoCloseable {
     public void instantiateStudent() {
         try (Statement stsm = con.createStatement()) {
 
-            ArrayList<StudyPeriod> studyPeriodList = new ArrayList<StudyPeriod>();
-            ResultSet results = stsm.executeQuery("SELECT * FROM Students;");
-            ResultSet resultsAccount = stsm.executeQuery("SELECT * FROM Accounts WHERE accessLvl = 0;");
+            ResultSet results = stsm.executeQuery("SELECT regNum, title, surname, forenames, email, Students.username, "
+                    + "tutor, courseCode, degreeLvl, passwordHash, salt FROM "
+                    + "Students INNER JOIN Accounts ON Students.username = Accounts.username;");
 
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
-                String username = resultsAccount.getString(1);
-                String passwordHash = resultsAccount.getString(2);
-                String salt = resultsAccount.getString(3);
+                String username = results.getString(6);
+                String passwordHash = results.getString(9);
+                String salt = results.getString(10);
                 int regNumber = results.getInt(1);
                 String title = results.getString(2);
                 String surname = results.getString(3);
                 String forenames = results.getString(4);
                 String email = results.getString(5);
                 String tutor = results.getString(7);
-                Course course = courses.get(results.getObject(8));
+                Course course = Course.getInstance(results.getString(8));
+                ArrayList<StudyPeriod> studyPeriodList = new ArrayList<StudyPeriod>();
+                try (Statement stsm2 = con.createStatement()) {
+                    ResultSet resultsStudyPeriods = stsm2
+                            .executeQuery("SELECT label FROM StudyPeriods WHERE regNum = '" + regNumber + "';");
 
-                Student student = new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email,
-                        tutor, course, null);
+                    while (resultsStudyPeriods.next()) {
+                        String label = resultsStudyPeriods.getString(1);
+                        studyPeriodList.add(StudyPeriod.getInstance(regNumber + label));
+                    }
+                    new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email, tutor,
+                            course, studyPeriodList);
 
-                /*
-                ResultSet studyPeriodResults = stsm.executeQuery("SELECT * FROM Modules WHERE deptCode = "
-                        + deptCode +";");
-                studyPeriodList.clear();
-                while (studyPeriodResults.next()) {
-                    studyPeriodList.add(modules.get(results.getString(3)));
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                student.setStudyPeriodList(studyPeriodList);
-                students.put(regNumber, student);
-                
-                 */
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void changePriv(String username, int lvl){
-        String query = "UPDATE Accounts SET accessLvl = ? WHERE username = ?;"
-        try (PreparedStatement prepstat = con.prepareStatement(query)) {
-            prepstat.clearParameters();
-            prepstat.setString(1, lvl);
-            prepstat.setString(2, username);
-            prepstat.executeUpdate();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
