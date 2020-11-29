@@ -37,8 +37,14 @@ public class MainFrame extends JFrame implements ActionListener{
     }
     
     public void showMenu() {
-        System.out.println("Yey we did it");
         setContentPane(new MenuPanel(this));
+        revalidate();
+        repaint();
+    }
+
+    public void changeLogIn() {
+        logInPanel = new LogInPanel(this);
+        setContentPane(logInPanel);
         revalidate();
         repaint();
     }

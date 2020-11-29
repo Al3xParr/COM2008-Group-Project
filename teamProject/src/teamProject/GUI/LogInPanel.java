@@ -55,6 +55,7 @@ public class LogInPanel extends JPanel {
         confirmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         confirmButton.setMaximumSize(new Dimension(75, 70));
         confirmButton.addActionListener(parent);
+        confirmButton.setFocusable(false);
         add(confirmButton);
 
         add(Box.createVerticalGlue());
