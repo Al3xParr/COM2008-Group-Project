@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS Accounts;
 CREATE TABLE Accounts(
     username VARCHAR(50) NOT NULL,
     passwordHash CHAR(64) NOT NULL,
-    salt CHAR(32) NOT NULL,
+    salt CHAR(16) NOT NULL,
     accessLvl TINYINT NOT NULL,
     PRIMARY KEY (username)    
 );
