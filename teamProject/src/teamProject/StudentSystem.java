@@ -37,6 +37,7 @@ public class StudentSystem {
 
             db.resetDB();
             db.populateDB();
+            db.instantiateUsers();
             new MainFrame();
 
         } catch (Exception e) {

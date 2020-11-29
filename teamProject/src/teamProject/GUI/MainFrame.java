@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import teamProject.SystemSecurity;
+import teamProject.Classes.Student;
 
 /** 
  * Team Project COM2008 year 20/21
@@ -30,8 +31,9 @@ public class MainFrame extends JFrame implements ActionListener{
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         logInPanel = new LogInPanel(this);
-        setContentPane(logInPanel);
-
+        ViewStudents studentPanel = new ViewStudents(this, Student.allInstances());
+        //setContentPane(logInPanel);
+        setContentPane(studentPanel);
         setVisible(true);
 
     }
