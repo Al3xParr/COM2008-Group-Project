@@ -8,6 +8,9 @@ package teamProject.Classes;
  * @author Zbigniew Lisak 
  */
 
+import teamProject.db.Database;
+import teamProject.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,6 +44,14 @@ public class StudyLevel {
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public void delete() {
+        try (Database db = StudentSystem.connect()) {
+            db.deleteStudyLevel(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getDegreeLvl() {

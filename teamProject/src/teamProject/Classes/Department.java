@@ -11,6 +11,9 @@ package teamProject.Classes;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import teamProject.db.Database;
+import teamProject.*;
+
 /**
  * Department class definition
 */
@@ -35,6 +38,14 @@ public class Department {
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public void delete() {
+        try (Database db = StudentSystem.connect()) {
+            db.deleteDepartment(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getDeptCode() {

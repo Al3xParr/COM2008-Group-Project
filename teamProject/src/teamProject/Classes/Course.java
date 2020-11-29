@@ -3,6 +3,9 @@ package teamProject.Classes;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import teamProject.db.Database;
+import teamProject.*;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -43,6 +46,14 @@ public class Course {
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public void delete() {
+        try (Database db = StudentSystem.connect()) {
+            db.deleteCourse(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getCourseCode() {

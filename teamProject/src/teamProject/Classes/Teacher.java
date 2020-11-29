@@ -1,5 +1,10 @@
 package teamProject.Classes;
 
+import java.util.ArrayList;
+
+import teamProject.*;
+import teamProject.db.Database;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -23,6 +28,19 @@ public class Teacher extends User {
         this.fullName = fullName;
         instances.put(username, this);
 
+    }
+
+    public static Teacher createNew(String username, String password, String fullName) {
+        ArrayList<String> temp = SystemSecurity.getHashAndSalt(password);
+        String hash = temp.get(0);
+        String salt = temp.get(1);
+        Teacher news = new Teacher(username, hash, salt, fullName);
+        try (Database db = StudentSystem.connect()) {
+            db.addUser(news);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return news;
     }
 
     public static Teacher getInstance(String key) {

@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import teamProject.db.Database;
+import teamProject.*;
+
 /**
  * StudyPeriod class definition
  */
@@ -20,6 +23,7 @@ public class StudyPeriod {
     private Date startDate, endDate;
     private StudyLevel degreeLvl;
     private ArrayList<Grade> gradesList;
+    private int regNum;
 
     public static HashMap<String, StudyPeriod> instances = new HashMap<>();
 
@@ -30,6 +34,7 @@ public class StudyPeriod {
         this.endDate = endDate;
         this.degreeLvl = degreeLvl;
         this.gradesList = gradesList;
+        this.regNum = regNum;
         instances.put(regNum + label, this);
 
     }
@@ -45,6 +50,22 @@ public class StudyPeriod {
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public void delete() {
+      try (Database db = StudentSystem.connect()) {
+        db.deleteStudyPeriod(this);
+      }catch(Exception e){
+          e.printStackTrace();
+      }
+    }
+
+    public void unregisterModule(Module m) {
+        try (Database db = StudentSystem.connect()) {
+            db.deleteGrade(this , m);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getLabel() {
@@ -85,6 +106,14 @@ public class StudyPeriod {
 
     public void setGradesList(ArrayList<Grade> gradesList) {
         this.gradesList = gradesList;
+    }
+
+    public int getRegNum() {
+        return this.regNum;
+    }
+
+    public void setregNum(int regNum) {
+        this.regNum = regNum;
     }
 
 }

@@ -26,7 +26,7 @@ CREATE TABLE Course(
 );
 
 CREATE TABLE Students(
-    regNum INT NOT NULL,
+    regNum INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(3),
     surname VARCHAR(25),
     forenames VARCHAR(25),

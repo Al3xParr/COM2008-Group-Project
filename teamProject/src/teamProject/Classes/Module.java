@@ -10,6 +10,9 @@ package teamProject.Classes;
 
 import java.util.HashMap;
 
+import teamProject.db.Database;
+import teamProject.*;
+
 /** 
  * Module class definition
 */
@@ -33,6 +36,14 @@ public class Module {
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public void delete() {
+        try (Database db = StudentSystem.connect()) {
+            db.deleteModule(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getModuleCode() {

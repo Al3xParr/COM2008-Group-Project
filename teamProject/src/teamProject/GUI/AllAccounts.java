@@ -1,10 +1,15 @@
+package teamProject.GUI;
+
+import java.util.HashMap;
+
 import javax.swing.*;
 import teamProject.db.Database;
 import teamProject.Classes.*;
 
 public class AllAccounts extends JPanel{
     
-    
+    private static final long serialVersionUID = 1L;
+
     public AllAccounts(HashMap<String, Student> students, HashMap<String, Registrar> registrars, 
                         HashMap<String, Administrator> admins, HashMap<String, Teacher> teachers) {
         
@@ -14,7 +19,7 @@ public class AllAccounts extends JPanel{
 
         int counter =  0;
 
-        for (Administrator admin : admins.getvalues()){
+        for (Administrator admin : admins.values()){
             accounts[0][counter] = admin.getUsername();
             accounts[1][counter] = "Admin";
             accounts[2][counter] = "Edit Access Level";
@@ -22,24 +27,24 @@ public class AllAccounts extends JPanel{
             counter ++;
         }
 
-        for (Registrar reg : registrars.getvalues()){
-            accounts[0][counter] = registrars.getUsername();
+        for (Registrar reg : registrars.values()){
+            accounts[0][counter] = reg.getUsername();
             accounts[1][counter] = "Registrar";
             accounts[2][counter] = "Edit Access Level";
             accounts[3][counter] = "Remove Account";
             counter ++;
         }
 
-        for (Teacher teacher : teachers.getvalues()){
-            accounts[0][counter] = teachers.getUsername();
+        for (Teacher teacher : teachers.values()){
+            accounts[0][counter] = teacher.getUsername();
             accounts[1][counter] = "Teacher";
             accounts[2][counter] = "Edit Access Level";
             accounts[3][counter] = "Remove Account";
             counter ++;
         }
 
-        for (Student student : students.getvalues()){
-            accounts[0][counter] = students.getUsername();
+        for (Student student : students.values()){
+            accounts[0][counter] = student.getUsername();
             accounts[1][counter] = "Student";
             accounts[2][counter] = "Edit Access Level";
             accounts[3][counter] = "Remove Account";
@@ -49,12 +54,13 @@ public class AllAccounts extends JPanel{
 
         table.addMouseListener(new java.awt.event.MouseAdapter() {
         @Override
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            int row = jTable1.rowAtPoint(evt.getPoint());
-            int col = jTable1.columnAtPoint(evt.getPoint());
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            
+            int row = table.rowAtPoint(evt.getPoint());
+            int col = table.columnAtPoint(evt.getPoint());
             
             if (col == 4){
-                String confirmStr = "Are you sure you want to delete " + accounts[4][row] + "?"
+                    String confirmStr = "Are you sure you want to delete " + accounts[4][row] + "?";
                 int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                 if(dialogResult == JOptionPane.YES_OPTION){
                     //Delete user accounts[4][row]
@@ -63,7 +69,7 @@ public class AllAccounts extends JPanel{
             }
             else if (col == 3){
                 String[] possibleValues = { "Student", "Teacher", "Registrar", "Admin" };
-                String selectedValue = JOptionPane.showInputDialog(null,
+                String selectedValue = (String)JOptionPane.showInputDialog(null,
                     "Choose access level", "Access Level Change",
                     JOptionPane.INFORMATION_MESSAGE, null,
                     possibleValues, possibleValues[0]);

@@ -139,6 +139,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         if (command.equals("StudyPeriods")) {
             Collection<StudyPeriod> list = ((Student) (SystemSecurity.getCurrentUser())).getStudyPeriodList();
             //TODO Open new study period browser
+            
         }
         if (command.equals("CurrentModules")) {
             Collection<Module> modules = ((Student) (SystemSecurity.getCurrentUser())).getLatestModules();

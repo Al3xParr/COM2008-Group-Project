@@ -1,5 +1,8 @@
 package teamProject.Classes;
 
+import teamProject.db.Database;
+import teamProject.*;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -16,11 +19,19 @@ public abstract class User {
 
     protected String username, passwordHash, salt;
     
-  public User(String username, String passwordHash, String salt) {
-    this.username = username;
-    this.passwordHash = passwordHash;
-    this.salt = salt;
-  }
+    public User(String username, String passwordHash, String salt) {
+      this.username = username;
+      this.passwordHash = passwordHash;
+      this.salt = salt;
+    }
+
+    public void delete() {
+      try (Database db = StudentSystem.connect()) {
+        db.deleteUser(this);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
     
 
   public String getUsername() {
