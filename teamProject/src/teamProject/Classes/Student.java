@@ -1,4 +1,5 @@
 package teamProject.Classes;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -8,6 +9,7 @@ package teamProject.Classes;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * User class extention, Student class definition
@@ -18,6 +20,8 @@ public class Student extends User {
     private String title, surname, forenames, email, tutor;
     private Course course;
     private ArrayList<StudyPeriod> studyPeriodList;
+
+    public static HashMap<Integer, Student> instances = new HashMap<>();
 
     public Student(String username, String passwordHash, String salt, int regNum, String title, String surname,
             String forenames, String email, String tutor, Course course, ArrayList<StudyPeriod> studyPeriodList) {
@@ -31,6 +35,44 @@ public class Student extends User {
         this.tutor = tutor;
         this.course = course;
         this.studyPeriodList = studyPeriodList;
+        instances.put(regNum, this);
+
+    }
+
+    public static Student getInstance(Integer key) {
+        return instances.get(key);
+    }
+
+    public static Student getByUsername(String username) {
+        Student res = null;
+        for (Student x : instances.values()) {
+            if (x.getUsername().equals(username)) {
+                res = x;
+            }
+        }
+
+        return res;
+    }
+
+    public static void clearInstances() {
+        instances.clear();
+    }
+
+    public ArrayList<Module> getLatestModules() {
+        ArrayList<Module> ans = new ArrayList<>();
+        if (!studyPeriodList.isEmpty()) {
+            StudyPeriod latest = studyPeriodList.get(0);
+            for (StudyPeriod sP : studyPeriodList) {
+                if (latest.getLabel().compareTo(sP.getLabel()) < 0) {
+                    latest = sP;
+                }
+            }
+
+            for (Grade g : latest.getGradesList()) {
+                ans.add(g.getModule());
+            }
+        }
+        return ans;
     }
 
     public int getRegNum() {
@@ -96,6 +138,5 @@ public class Student extends User {
     public void setStudyPeriodList(ArrayList<StudyPeriod> studyPeriodList) {
         this.studyPeriodList = studyPeriodList;
     }
-    
 
 }
