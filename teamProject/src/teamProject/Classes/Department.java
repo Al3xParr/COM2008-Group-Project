@@ -32,6 +32,17 @@ public class Department {
         instances.put(deptCode, this);
     }
 
+    public static Department createNew(String deptCode, String fullName){
+        Department news = new Department(deptCode, fullName, new ArrayList<Module>(), new ArrayList<Course>());
+                
+        try (Database db = StudentSystem.connect()) {
+            db.addDepartment(news);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return news;
+    }
+
     public static Department getInstance(String key) {
         return instances.get(key);
     }
@@ -42,6 +53,9 @@ public class Department {
 
     public void delete() {
         try (Database db = StudentSystem.connect()) {
+            for (Course c : getCourseList()) {
+                c.delete();
+            }
             db.deleteDepartment(this);
         } catch (Exception e) {
             e.printStackTrace();

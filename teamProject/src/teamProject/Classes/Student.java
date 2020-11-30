@@ -9,6 +9,7 @@ package teamProject.Classes;
  */
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import teamProject.*;
@@ -45,21 +46,21 @@ public class Student extends User {
     }
 
     public static Student createNew(String username, String password, String title, String surname, String forenames,
-            String tutor, Course course, StudyPeriod firstPeriod) {
+            String tutor, Course course, String degreeLvl, Date startDate, Date endDate) {
         ArrayList<String> temp = SystemSecurity.getHashAndSalt(password);
         String hash = temp.get(0);
         String salt = temp.get(1);
         int regNum = -1;
         String email = getNewEmail(forenames, surname);
-        ArrayList<StudyPeriod> periods = new ArrayList<>();
-        periods.add(firstPeriod);
         Student news = new Student(username, hash, salt, regNum, title, surname, forenames, email, tutor, course,
-                periods, firstPeriod.getDegreeLvl().getDegreeLvl());
+                new ArrayList<StudyPeriod>(), degreeLvl);
         try (Database db = StudentSystem.connect()) {
             regNum = db.addUser(news);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        news.getStudyPeriodList().add(StudyPeriod.createNew(regNum, "A", startDate, endDate,
+                StudyLevel.getInstance(degreeLvl + course.getCourseCode())));
         news.setRegNum(regNum);
         return news;
     }
@@ -102,20 +103,23 @@ public class Student extends User {
         instances.clear();
     }
 
+    public StudyPeriod getCurrentStudyPeriod() {
+        StudyPeriod latest = studyPeriodList.get(0);
+        for (StudyPeriod sP : studyPeriodList) {
+            if (latest.getLabel().compareTo(sP.getLabel()) < 0) {
+                latest = sP;
+            }
+        }
+        return latest;
+    }
+
     public ArrayList<Module> getLatestModules() {
         ArrayList<Module> ans = new ArrayList<>();
-        if (!studyPeriodList.isEmpty()) {
-            StudyPeriod latest = studyPeriodList.get(0);
-            for (StudyPeriod sP : studyPeriodList) {
-                if (latest.getLabel().compareTo(sP.getLabel()) < 0) {
-                    latest = sP;
-                }
-            }
-
+            
+        StudyPeriod latest = getCurrentStudyPeriod();
             for (Grade g : latest.getGradesList()) {
                 ans.add(g.getModule());
             }
-        }
         return ans;
     }
 

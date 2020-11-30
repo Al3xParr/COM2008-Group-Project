@@ -33,6 +33,16 @@ public class StudyLevel {
 
     }
 
+    public static StudyLevel createNew(String lvl, String courseCode, ArrayList<Module> core, ArrayList<Module> optional){
+        StudyLevel news = new StudyLevel(lvl, courseCode, core, optional);
+        try (Database db = StudentSystem.connect()) {
+            db.addStudyLevel(news);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return news;
+    }
+
     /**
      * 
      * @param key is degreeLvl + courseCode

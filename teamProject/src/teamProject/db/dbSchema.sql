@@ -52,7 +52,7 @@ CREATE TABLE Modules(
     deptCode CHAR(3) ,
     timeTaught VARCHAR(25) NOT NULL,
     PRIMARY KEY (moduleCode),
-    FOREIGN KEY (deptCode) REFERENCES Departments(deptCode) ON DELETE SET NULL
+    FOREIGN KEY (deptCode) REFERENCES Departments(deptCode) ON DELETE CASCADE
 );
 
 CREATE TABLE BachEquiv(

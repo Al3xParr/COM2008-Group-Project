@@ -39,6 +39,21 @@ public class StudyPeriod {
 
     }
 
+    public static StudyPeriod createNew(int regNum, String label, Date startDate, Date endDate, StudyLevel lvl) {
+        StudyPeriod news = new StudyPeriod(regNum, label, startDate, endDate, lvl, new ArrayList<Grade>());
+        try (Database db = StudentSystem.connect()) {
+            db.addStudyPeriod(news);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for(Module m : lvl.getCoreModules()){
+            news.registerModule(m);
+        }
+
+        return news;
+    }
+
     /**
      * 
      * @param key is regNum + Label
@@ -62,10 +77,21 @@ public class StudyPeriod {
 
     public void unregisterModule(Module m) {
         try (Database db = StudentSystem.connect()) {
-            db.deleteGrade(this , m);
+            db.deleteGrade(this, m);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Grade registerModule(Module m){
+        Grade g = new Grade(m, null, null);
+        gradesList.add(g);
+        try (Database db = StudentSystem.connect()) {
+            db.registerModule(this, g);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return g;
     }
 
     public String getLabel() {

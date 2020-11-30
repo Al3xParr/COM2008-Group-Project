@@ -30,6 +30,21 @@ public class Module {
 
     }
 
+    public static Module createNew(int moduleNum, String deptCode, String fullName, String time){
+        String moduleCode = Integer.toString(moduleNum);
+        while (moduleCode.length() < 4) {
+            moduleCode = '0' + moduleCode;
+        }
+        moduleCode = deptCode + moduleCode;
+        Module news = new Module(moduleCode, deptCode, fullName, time);
+        try (Database db = StudentSystem.connect()) {
+            db.addModule(news);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return news;
+    }
+
     public static Module getInstance(String key) {
         return instances.get(key);
     }
