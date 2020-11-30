@@ -32,8 +32,10 @@ public class MainFrame extends JFrame implements ActionListener{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         logInPanel = new LogInPanel(this);
         ViewStudents studentPanel = new ViewStudents(this, Student.allInstances());
+        IndividualStudent indStudentPanel = new IndividualStudent(this, Student.getInstance(001));
         //setContentPane(logInPanel);
-        setContentPane(studentPanel);
+        //setContentPane(studentPanel);
+        setContentPane(indStudentPanel);
         setVisible(true);
 
     }

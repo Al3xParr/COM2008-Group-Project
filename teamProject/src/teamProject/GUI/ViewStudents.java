@@ -48,7 +48,7 @@ public class ViewStudents extends JPanel implements ActionListener {
         parent.setJMenuBar(menuBar);
 
         JLabel header = new JLabel(
-                "<html><div style = 'text-align : center;'><<h2>View all students:</h2><br><h4>To view a particular student, press the view button</h4></div>");
+                "<html><div style = 'text-align : center;'><<h2>View all students:</h2><br><h3>To view a particular student, press the view button</h3></div>");
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
         header.setHorizontalAlignment(SwingConstants.CENTER);
         add(header);
