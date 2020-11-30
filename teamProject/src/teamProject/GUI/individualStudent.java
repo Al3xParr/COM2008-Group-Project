@@ -57,6 +57,9 @@ public class IndividualStudent extends JPanel {
         JButton confirmButton = new JButton("<html><b>View Course</b>");
         confirmButton.setMaximumSize(new Dimension(130, 40));
         add(confirmButton);
+        JLabel gradesLabel = new JLabel(
+                "<html><div style = 'text-align : center;'><<h3>Grades: </h3>");
+        add(gradesLabel);
 
         String [] colNames = {"Label", "Module Code", "Mark", "Resit mark"};
         int numGrades = 0;
@@ -65,9 +68,19 @@ public class IndividualStudent extends JPanel {
         }
         Object[][] allGrades = new Object[numGrades][4];
 
+        //will use as a reference to use for the position in the table for each grade
+        int count = numGrades;
         //populating the table of grades
         for (StudyPeriod studyPeriod: studyPeriods) {
-            
+            ArrayList<Grade> grades = studyPeriod.getGradesList();
+            String label = studyPeriod.getLabel();
+            for (Grade grade: grades) {
+                allGrades[numGrades-count][0] = label;
+                allGrades[numGrades-count][1] = grade.getModule().getFullName();
+                allGrades[numGrades-count][2] = grade.getMark();
+                allGrades[numGrades-count][3] = grade.getResitMark();
+                count --;
+            }
         }
 
         final JTable gradesTable = new JTable(allGrades, colNames);
