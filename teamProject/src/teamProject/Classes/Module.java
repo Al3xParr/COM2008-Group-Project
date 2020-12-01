@@ -9,6 +9,7 @@ package teamProject.Classes;
  */
 
 import java.util.HashMap;
+import java.util.Collection;
 
 /** 
  * Module class definition
@@ -33,6 +34,10 @@ public class Module {
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public static Collection<Module> allInstances() {
+        return instances.values();
     }
 
     public String getModuleCode() {

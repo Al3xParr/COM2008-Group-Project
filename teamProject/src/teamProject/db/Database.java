@@ -810,8 +810,8 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String moduleCode = results.getString(1);
-                String departmentCode = results.getString(2);
-                String fullName = results.getString(3);
+                String departmentCode = results.getString(3);
+                String fullName = results.getString(2);
                 String timeTaught = results.getString(4);
                 new Module(moduleCode, departmentCode, fullName, timeTaught);
             }
