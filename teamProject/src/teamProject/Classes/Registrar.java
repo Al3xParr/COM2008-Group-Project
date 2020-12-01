@@ -30,4 +30,8 @@ public class Registrar extends User {
     public static void clearInstances() {
         instances.clear();
     }
+
+    public static HashMap<String, Registrar> getAllInstances(){
+        return instances;
+    }
 }

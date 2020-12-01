@@ -777,6 +777,27 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
+    public boolean deleteUser(String username) {
+        boolean succes = false;
+        String deleteUser = "DELETE FROM Accounts WHERE username = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteUser)) {
+            con.setAutoCommit(false);
+            delete.clearParameters();
+            delete.setString(1, username);
+            delete.executeUpdate();
+            con.setAutoCommit(true);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
+        }
+        return succes;
+    }
+
     public void instantiateUsers() {
         StudentSystem.clearHashMaps();
         instantiateModule();
@@ -1106,11 +1127,8 @@ public class Database implements AutoCloseable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-<<<<<<< HEAD
-=======
+    
     }
->>>>>>> f698e7719a3d4a0783469321689b2be70d5e883d
 
 
 }

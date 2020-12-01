@@ -139,4 +139,8 @@ public class Student extends User {
         this.studyPeriodList = studyPeriodList;
     }
 
+    public static HashMap<Integer, Student> getAllInstances(){
+        return instances;
+    }
+
 }

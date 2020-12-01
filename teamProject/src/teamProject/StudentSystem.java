@@ -51,6 +51,7 @@ public class StudentSystem {
             
             ///db.resetDB();
             //db.populateDB();
+            
             new MainFrame();
 
         } catch (Exception e) {

@@ -41,4 +41,8 @@ public class Teacher extends User {
         this.fullName = fullName;
     }
 
+    public static HashMap<String, Teacher> getAllInstances(){
+        return instances;
+    }
+
 }

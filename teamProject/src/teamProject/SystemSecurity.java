@@ -139,4 +139,16 @@ public class SystemSecurity {
         return privilages;
     }
 
+    public static boolean removeUser(String username){
+        try(Database db = StudentSystem.connect()){
+            if (db.deleteUser(username)) {
+                return true;
+            }else { return false;}
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
