@@ -5,6 +5,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import teamProject.SystemSecurity;
+import teamProject.Classes.Course;
+import teamProject.Classes.Student;
 
 /** 
  * Team Project COM2008 year 20/21
@@ -28,10 +30,15 @@ public class MainFrame extends JFrame implements ActionListener {
         setSize(screenSize.width / 4, screenSize.height / 2);
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         logInPanel = new LogInPanel(this);
-        setContentPane(logInPanel);
-
+        studentPanel = new ViewStudents(this, Student.allInstances());
+        indStudentPanel = new IndividualStudent(this, Student.getInstance(001));
+        indCoursePanel = new IndividualCourse(this, Course.getInstance("DEP100"));
+        //setContentPane(logInPanel);
+        //setContentPane(studentPanel);
+        //setContentPane(indStudentPanel);
+        setContentPane(indCoursePanel);
         setVisible(true);
 
     }
@@ -62,6 +69,14 @@ public class MainFrame extends JFrame implements ActionListener {
                         JOptionPane.WARNING_MESSAGE);
 
             }
+        } if (event.getActionCommand().equals("View Course")) {
+            String courseCode = indStudentPanel.courseCode;
+            System.out.println(courseCode);
+            studentPanel = new ViewStudents(this, Student.allInstances());
+            setContentPane(studentPanel);
+            System.out.println("test");
+            revalidate();
+            repaint();
         }
     }
 

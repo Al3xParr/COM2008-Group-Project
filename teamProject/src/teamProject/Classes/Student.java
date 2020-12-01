@@ -9,6 +9,7 @@ package teamProject.Classes;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -43,6 +44,10 @@ public class Student extends User {
         return instances.get(key);
     }
 
+    public static Collection<Student> allInstances() {
+        return instances.values();
+    }
+    
     public static Student getByUsername(String username) {
         Student res = null;
         for (Student x : instances.values()) {
