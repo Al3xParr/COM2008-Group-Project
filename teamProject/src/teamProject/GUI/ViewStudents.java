@@ -23,7 +23,7 @@ public class ViewStudents extends JPanel {
         
         for (Student student: students) {
             
-            allStudents[count][0] = student.getRegNum();
+            allStudents[count][0] = (Integer) student.getRegNum();
             allStudents[count][1] = student.getUsername();
             allStudents[count][2] = student.getTitle();
             allStudents[count][3] = student.getForenames();
@@ -31,7 +31,7 @@ public class ViewStudents extends JPanel {
             allStudents[count][5] = student.getEmail();
             allStudents[count][6] = student.getTutor();
             allStudents[count][7] = student.getCourse().getFullName();
-            allStudents[count][8] = "View";
+            allStudents[count][8] = "<html><B>View Student</B></html>";
             count ++;
         }
 
@@ -57,7 +57,19 @@ public class ViewStudents extends JPanel {
         JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
         
-
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.rowAtPoint(evt.getPoint());
+                int col = table.columnAtPoint(evt.getPoint());
+                //TODO add the deletion function
+                if (col == 8){
+                    new SubFrame("Student: "+ allStudents[row][1], parent, 
+                    new IndividualStudent(parent, Student.getByUsername((String)allStudents[row][1])));
+                    System.out.println(allStudents[row][1]);
+                }
+            }
+        });
     }
 
     public JTable setColumnWidth(JTable table) {

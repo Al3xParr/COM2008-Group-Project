@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import teamProject.Classes.*;
 
-public class IndividualStudent extends JPanel implements ActionListener{
+public class IndividualStudent extends JPanel {
     
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
@@ -36,7 +36,7 @@ public class IndividualStudent extends JPanel implements ActionListener{
         menuBar.add(viewMenu);
         parent.setJMenuBar(menuBar);
 
-        setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 3)); 
+        setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6)); 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
         header.setHorizontalAlignment(SwingConstants.CENTER);
@@ -61,7 +61,7 @@ public class IndividualStudent extends JPanel implements ActionListener{
         JButton courseButton = new JButton("<html>View Course");
         courseButton.setMaximumSize(new Dimension(130, 40));
         courseButton.setActionCommand("View Course");
-        courseButton.addActionListener(this);
+        courseButton.addActionListener(parent);
         add(courseButton);
 
         JLabel gradesLabel = new JLabel(
@@ -96,14 +96,5 @@ public class IndividualStudent extends JPanel implements ActionListener{
         JScrollPane scrollpane = new JScrollPane(gradesTable);
         add(scrollpane);
 
-    }
-
-    public void actionPerformed(ActionEvent event) {
-
-        
-        if (event.getActionCommand().equals("View Course")) {
-            System.out.println(courseCode);
-            //TODO open course window
-        }
     }
 }
