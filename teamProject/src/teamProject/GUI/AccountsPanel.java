@@ -9,10 +9,20 @@ public class AccountsPanel extends JPanel{
     
     private static final long serialVersionUID = 1L;
     
-    public AccountsPanel(HashMap<Integer, Student> students, HashMap<String, Registrar> registrars, 
-                        HashMap<String, Teacher> teachers, HashMap<String, Administrator> admins) {
+    MainFrame parent;
+    HashMap<Integer, Student> students;
+    HashMap<String, Registrar> registrars;
+    HashMap<String, Teacher> teachers;
+    HashMap<String, Administrator> admins;
 
-        
+    public AccountsPanel(MainFrame parent) {
+
+        this.parent = parent;
+        students = Student.getAllInstances();
+        registrars = Registrar.getAllInstances();
+        teachers = Teacher.getAllInstances();
+        admins = Administrator.getAllInstances();
+
         String[] colNames = {"Username", "Access Level", "Delete Account"};
         int totalEntries = students.size() + registrars.size() + admins.size() + teachers.size();
         Object[][] accounts = new Object[totalEntries][3];
