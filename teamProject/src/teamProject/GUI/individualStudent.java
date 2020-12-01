@@ -103,7 +103,7 @@ public class IndividualStudent extends JPanel implements ActionListener{
         
         if (event.getActionCommand().equals("View Course")) {
             System.out.println(courseCode);
-            //TODO open new course indCourse
+            //TODO open course window
         }
     }
 }

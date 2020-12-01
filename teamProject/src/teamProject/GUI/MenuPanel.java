@@ -53,8 +53,8 @@ public class MenuPanel extends JPanel implements ActionListener {
     private void addMenuButtons() {
         int priv = SystemSecurity.getPrivilages();
         if (priv == 0) {
-            JButton browsePeriods = new JButton("Browse StudyPeriods");
-            browsePeriods.setActionCommand("StudyPeriods");
+            JButton browsePeriods = new JButton("Your Details");
+            browsePeriods.setActionCommand("userDetails");
             browsePeriods.setAlignmentX(Component.CENTER_ALIGNMENT);
             browsePeriods.setMaximumSize(new Dimension(200, 70));
             browsePeriods.addActionListener(this);
@@ -136,14 +136,15 @@ public class MenuPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         System.out.println(command);
-        if (command.equals("StudyPeriods")) {
-            Collection<StudyPeriod> list = ((Student) (SystemSecurity.getCurrentUser())).getStudyPeriodList();
-            //TODO Open new study period browser
+        if (command.equals("userDetails")) {
+            
+            new SubFrame("Your Details", parent,
+                    new IndividualStudent(parent, (Student) SystemSecurity.getCurrentUser()));
             
         }
         if (command.equals("CurrentModules")) {
             Collection<Module> modules = ((Student) (SystemSecurity.getCurrentUser())).getLatestModules();
-            //TODO Open new Module browser
+            new SubFrame("Current Modules", parent, new AllModulesPanel(modules));
         }
         if (command.equals("TeacherStudents")) {
             Collection<Student> students = Student.instances.values();
