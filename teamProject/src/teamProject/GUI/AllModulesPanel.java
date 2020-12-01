@@ -24,24 +24,9 @@ public class AllModulesPanel extends JPanel implements ActionListener {
 
     public AllModulesPanel(Collection<Module> modules){
 
-       /* setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        JButton addMButton = new JButton("Add Module");
-        addMButton.setActionCommand("Add Module");
-        addMButton.addActionListener(this);
-
-        gbc.weighty = 0.7;
-        gbc.weightx = 0.7; 
-        gbc.anchor = GridBagConstraints.NORTHEAST;
-        add(addMButton, gbc);   */
-
         JButton addMButton = new JButton("Add Module");
         addMButton.addActionListener(this);
 
-        
-        //JButton delMButton = new JButton("Delete Module");
-        //addMButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        //addMButton.setHorizontalAlignment(SwingConstants.RIGHT);
         int moduleNumber = modules.size();
         Object[][] allModules = new Object[moduleNumber][5];
         String[] columnNames = {"Modul Code","Full Name","Semester","Department Code", ""};
@@ -69,38 +54,25 @@ public class AllModulesPanel extends JPanel implements ActionListener {
         header.setAlignmentY(Component.CENTER_ALIGNMENT);
         header.setVerticalAlignment(SwingConstants.CENTER);
         header.setOpaque(true);
-        //header.setBackground(Color.RED);
 
         JPanel headerPanel = new JPanel();
         BoxLayout form1 = new BoxLayout(headerPanel, BoxLayout.LINE_AXIS);
         headerPanel.setLayout(form1);
-
-        //headerPanel.add(Box.createHorizontalGlue());
-        header.setMaximumSize(new Dimension(500,100));
-        headerPanel.add(Box.createRigidArea(new Dimension(60,0)));
-        headerPanel.add(header);
-        headerPanel.add(Box.createHorizontalGlue());
-        headerPanel.add(addMButton);
-        headerPanel.add(Box.createRigidArea(new Dimension(20,0)));
-    
         add(headerPanel);
-        //add(header);
-        //add(addMButton);
-        /*JPanel modulesPanel1 = new JPanel();
-        FlowLayout modLayout = new FlowLayout();
-        modulesPanel1.setLayout(modLayout);
-        modulesPanel1.setComponentOrientation(
-                ComponentOrientation.LEFT_TO_RIGHT);
-        modulesPanel1.add(new JButton("Button 1"));
-        //add(addMButton);//  */
-        
-        //JPanel modulesPanel = new JPanel();
-        //GroupLayout form = new GroupLayout(modulesPanel);
-        //modulesPanel.setLayout(form);
 
+        headerPanel.add(Box.createHorizontalGlue());
+        header.setMaximumSize(new Dimension(500,100));
+        headerPanel.add(header);
         
-        
-        //Ovverides default data model behind JTable making it unedible
+        Dimension minSize = new Dimension (25,20);
+        Dimension prefSize = new Dimension (400,20);
+        headerPanel.add(new Box.Filler(minSize, prefSize, prefSize));
+
+        headerPanel.add(addMButton);
+        headerPanel.add(Box.createHorizontalGlue());
+    
+
+        //Overides default data model behind JTable making it unedible
         final JTable table = new JTable();
         table.setModel(new DefaultTableModel(allModules, columnNames){
 			private static final long serialVersionUID = 1L;
@@ -129,7 +101,7 @@ public class AllModulesPanel extends JPanel implements ActionListener {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                //TODO add the delition function
+                //TODO add the deletion function
                 if (col == 4){
                     String confirmStr = "Are you sure you want to delete " + allModules[row][1] + "?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
@@ -137,39 +109,13 @@ public class AllModulesPanel extends JPanel implements ActionListener {
                 }
             }
         });
-    
-
-
-
-
-       /* table.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int row = table.rowAtPoint(evt.getPoint());
-                int col = table.columnAtPoint(evt.getPoint());
-                
-                if (col == 4){
-                    String confirmStr = "Are you sure you want to delete " + accounts[4][row] + "?"
-                    int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
-                    if(dialogResult == JOptionPane.YES_OPTION){
-                        //Delete user accounts[4][row]
-                    }
-                    
-                }*/
-    
-
-
-
     }
-//Module(String moduleCode, String departmentCode, String fullName, String timeTaught)
-
     public void setColumnWidth(JTable table) {
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(50);
     }
-
 
     public void actionPerformed(ActionEvent event) {
         //TODO create new instance of Module forms
