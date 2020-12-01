@@ -69,4 +69,8 @@ public class Department {
         this.courseList = courseList;
     }
 
+    public static HashMap<String, Department> getAllInstances(){
+        return instances;
+    }
+
 }

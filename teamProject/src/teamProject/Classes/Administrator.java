@@ -29,4 +29,8 @@ public class Administrator extends User {
     public static void clearInstances() {
         instances.clear();
     }
+
+    public static HashMap<String, Administrator> getAllInstances(){
+        return instances;
+    }
 }
