@@ -68,13 +68,14 @@ public class Course {
         instances.clear();
     }
 
-    public void delete() {
+    public Boolean delete() {
         try (Database db = StudentSystem.connect()) {
             
-            db.deleteCourse(this);
+            return db.deleteCourse(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void addNewStudyLvl(String lvl, ArrayList<Module> core, ArrayList<Module> optional) {

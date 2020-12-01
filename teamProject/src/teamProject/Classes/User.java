@@ -25,12 +25,13 @@ public abstract class User {
       this.salt = salt;
     }
 
-    public void delete() {
+    public Boolean delete() {
       try (Database db = StudentSystem.connect()) {
-        db.deleteUser(this);
+        return db.deleteUser(this);
       } catch (Exception e) {
         e.printStackTrace();
       }
+      return false;
     }
     
 

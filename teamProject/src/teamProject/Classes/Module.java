@@ -53,12 +53,13 @@ public class Module {
         instances.clear();
     }
 
-    public void delete() {
+    public Boolean delete() {
         try (Database db = StudentSystem.connect()) {
-            db.deleteModule(this);
+            return db.deleteModule(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public String getModuleCode() {

@@ -86,12 +86,13 @@ public class StudyPeriod {
         instances.clear();
     }
 
-    public void delete() {
+    public Boolean delete() {
         try (Database db = StudentSystem.connect()) {
-            db.deleteStudyPeriod(this);
+            return db.deleteStudyPeriod(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public Boolean isRegistrationComplete() {
@@ -175,12 +176,13 @@ public class StudyPeriod {
         return 0.0;
     }
 
-    public void unregisterModule(Module m) {
+    public Boolean unregisterModule(Module m) {
         try (Database db = StudentSystem.connect()) {
-            db.deleteGrade(this, m);
+            return db.deleteGrade(this, m);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public Grade registerModule(Module m) {

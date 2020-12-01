@@ -56,12 +56,13 @@ public class StudyLevel {
         instances.clear();
     }
 
-    public void delete() {
+    public Boolean delete() {
         try (Database db = StudentSystem.connect()) {
-            db.deleteStudyLevel(this);
+            return db.deleteStudyLevel(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public String getDegreeLvl() {

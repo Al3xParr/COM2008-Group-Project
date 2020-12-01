@@ -51,15 +51,16 @@ public class Department {
         instances.clear();
     }
 
-    public void delete() {
+    public Boolean delete() {
         try (Database db = StudentSystem.connect()) {
             for (Course c : getCourseList()) {
                 c.delete();
             }
-            db.deleteDepartment(this);
+            return db.deleteDepartment(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public String getDeptCode() {
