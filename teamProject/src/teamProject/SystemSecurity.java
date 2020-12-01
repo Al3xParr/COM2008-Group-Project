@@ -22,6 +22,7 @@ import teamProject.db.Database;
 public class SystemSecurity {
 
     private static User currentUser = null;
+    private static int privilages = -1;
 
     private final static Charset charset = Charset.forName("UTF-8");
 
@@ -51,7 +52,7 @@ public class SystemSecurity {
 
         return result;
     }
-    
+
     private static String byteAToString(byte[] a) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < a.length; i++) {
@@ -81,14 +82,15 @@ public class SystemSecurity {
      * @return true if log in succesfull false otherwise
      */
     public static boolean login(String username, String password) {
-        try(Database db = StudentSystem.connect()){
+        try (Database db = StudentSystem.connect()) {
             ArrayList<String> temp = db.getLoginData(username);
             if (!temp.isEmpty()) {
                 String trueHash = temp.get(0);
                 String salt = temp.get(1);
                 String calcHash = hashString(password, salt);
                 if (calcHash.equals(trueHash)) {
-                    getAccessibleData(username, Integer.parseInt(temp.get(2)));
+                    privilages = Integer.parseInt(temp.get(2));
+                    getAccessibleData(username);
                     return true;
                 }
             }
@@ -98,31 +100,43 @@ public class SystemSecurity {
         return false;
     }
 
-    private static void getAccessibleData(String username, int lvl) {
+    private static void getAccessibleData(String username) {
         try (Database db = StudentSystem.connect()) {
-            if (lvl > 0) {
-                db.instantiateUsers();
-                switch (lvl) {
-                    case 1:
-                        currentUser = Teacher.getInstance(username);
-                        break;
-                    case 2:
-                        currentUser = Registrar.getInstance(username);
-                        break;
-                    case 3:
-                        currentUser = Administrator.getInstance(username);
-                        break;
-                }
-            } else {
-                //TODO initialisation for students
+            db.instantiateUsers();
+
+            switch (privilages) {
+                case 0:
+                    currentUser = Student.getByUsername(username);
+                    StudentSystem.clearHashMaps();
+                    break;
+                case 1:
+                    currentUser = Teacher.getInstance(username);
+                    break;
+                case 2:
+                    currentUser = Registrar.getInstance(username);
+                    break;
+                case 3:
+                    currentUser = Administrator.getInstance(username);
+                    break;
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static User getCurrentUser(){
+    public static void logout() {
+        StudentSystem.clearHashMaps();
+        privilages = -1;
+        currentUser = null;
+    }
+
+    public static User getCurrentUser() {
         return currentUser;
+    }
+
+    public static int getPrivilages() {
+        return privilages;
     }
 
 }

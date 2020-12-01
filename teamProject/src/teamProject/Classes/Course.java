@@ -2,6 +2,7 @@ package teamProject.Classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -10,14 +11,12 @@ import java.util.HashMap;
  * @author Zbigniew Lisak 
  */
 
-
-
 /**
  * Course class definition
 */
 public class Course {
 
-    static HashMap<String, Course> instances = new HashMap<>();
+    public static HashMap<String, Course> instances = new HashMap<>();
 
     private String courseCode, fullName;
     private Course bachEquiv;
@@ -41,7 +40,7 @@ public class Course {
     public static Course getInstance(String key) {
         return instances.get(key);
     }
-    
+
     public static void clearInstances() {
         instances.clear();
     }
@@ -106,5 +105,4 @@ public class Course {
         this.degreeLvlList = degreeLvlList;
     }
 
-    
 }

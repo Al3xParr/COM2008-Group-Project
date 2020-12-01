@@ -18,7 +18,7 @@ public class StudyLevel {
     private String degreeLvl, courseCode;
     private ArrayList<Module> coreModules, optionalModules;
 
-    static HashMap<String, StudyLevel> instances = new HashMap<>();
+    public static HashMap<String, StudyLevel> instances = new HashMap<>();
 
     public StudyLevel(String degreeLvl, String courseCode, ArrayList<Module> coreModules,
             ArrayList<Module> optionalModules) {
@@ -51,9 +51,13 @@ public class StudyLevel {
         this.degreeLvl = degreeLvl;
     }
 
-    public String getCourseCode() { return this.courseCode; }
+    public String getCourseCode() {
+        return this.courseCode;
+    }
 
-    public void setCourseCode(String courseCode) { this.courseCode = courseCode; }
+    public void setCourseCode(String courseCode) {
+        this.courseCode = courseCode;
+    }
 
     public ArrayList<Module> getCoreModules() {
         return this.coreModules;
@@ -70,5 +74,5 @@ public class StudyLevel {
     public void setOptionalModules(ArrayList<Module> optionalModules) {
         this.optionalModules = optionalModules;
     }
-    
+
 }

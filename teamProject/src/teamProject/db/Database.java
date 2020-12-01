@@ -15,6 +15,7 @@ import java.util.*;
 import java.sql.Date;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
+import teamProject.StudentSystem;
 
 /**
  * Class representing and operating database
@@ -776,7 +777,7 @@ public class Database implements AutoCloseable {
     }
 
     public void instantiateUsers() {
-        clearHashMaps();
+        StudentSystem.clearHashMaps();
         instantiateModule();
         instantiateCourse();
         addBachEquiv();
@@ -790,17 +791,7 @@ public class Database implements AutoCloseable {
         instantiateStudent();
     }
 
-    private void clearHashMaps() {
-        Administrator.clearInstances();
-        Course.clearInstances();
-        Department.clearInstances();
-        Module.clearInstances();
-        Registrar.clearInstances();
-        Student.clearInstances();
-        StudyLevel.clearInstances();
-        StudyPeriod.clearInstances();
-        Teacher.clearInstances();
-    }
+    
 
     public void instantiateModule() {
         try (Statement stsm = con.createStatement()) {
@@ -810,8 +801,8 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String moduleCode = results.getString(1);
-                String departmentCode = results.getString(2);
-                String fullName = results.getString(3);
+                String departmentCode = results.getString(3);
+                String fullName = results.getString(2);
                 String timeTaught = results.getString(4);
                 new Module(moduleCode, departmentCode, fullName, timeTaught);
             }

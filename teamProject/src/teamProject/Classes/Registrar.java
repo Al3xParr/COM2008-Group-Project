@@ -15,7 +15,7 @@ import java.util.HashMap;
 */
 public class Registrar extends User {
 
-    static HashMap<String, Registrar> instances = new HashMap<>();
+    public static HashMap<String, Registrar> instances = new HashMap<>();
 
     public Registrar(String username, String passwordHash, String salt) {
         super(username, passwordHash, salt);
@@ -30,5 +30,8 @@ public class Registrar extends User {
     public static void clearInstances() {
         instances.clear();
     }
-}
 
+    public static HashMap<String, Registrar> getAllInstances(){
+        return instances;
+    }
+}

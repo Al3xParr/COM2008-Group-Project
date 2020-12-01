@@ -9,6 +9,7 @@ package teamProject.Classes;
  */
 
 import java.util.HashMap;
+import java.util.Collection;
 
 /** 
  * Module class definition
@@ -16,8 +17,8 @@ import java.util.HashMap;
 public class Module {
     private String moduleCode, fullName, timeTaught, departmentCode;
 
-    static HashMap<String, Module> instances = new HashMap<>();
-    
+    public static HashMap<String, Module> instances = new HashMap<>();
+
     public Module(String moduleCode, String departmentCode, String fullName, String timeTaught) {
         this.moduleCode = moduleCode;
         this.departmentCode = departmentCode;
@@ -33,6 +34,10 @@ public class Module {
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public static Collection<Module> allInstances() {
+        return instances.values();
     }
 
     public String getModuleCode() {
@@ -59,11 +64,12 @@ public class Module {
         this.timeTaught = timeTaught;
     }
 
-    public String getDepartmentCode() { return this.departmentCode; }
+    public String getDepartmentCode() {
+        return this.departmentCode;
+    }
 
     public void setDepartmentCode(String departmentCode) {
         this.departmentCode = departmentCode;
     }
-    
 
 }
