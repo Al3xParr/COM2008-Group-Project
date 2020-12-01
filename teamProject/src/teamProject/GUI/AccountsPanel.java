@@ -71,7 +71,7 @@ public class AccountsPanel extends JPanel{
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
                         System.out.println("Delete user " + accounts[row][0]);
-                        if (Student.getInstanceByUsername(String.valueOf(accounts[row][0])).delete()){
+                        if (Student.getByUsername(String.valueOf(accounts[row][0])).delete()){
                             JOptionPane.showMessageDialog(null, "User Deleted");
                         } else{ 
                             JOptionPane.showMessageDialog(null, "User deletion failed");

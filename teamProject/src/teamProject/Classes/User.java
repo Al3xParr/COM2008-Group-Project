@@ -22,7 +22,6 @@ public abstract class User {
     this.salt = salt;
   }
     
-
   public String getUsername() {
     return this.username;
   }

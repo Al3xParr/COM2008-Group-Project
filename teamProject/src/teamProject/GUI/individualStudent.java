@@ -1,11 +1,12 @@
 package teamProject.GUI;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
 import teamProject.Classes.*;
 
-public class IndividualStudent extends JPanel {
+public class IndividualStudent extends JPanel implements ActionListener{
     
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
@@ -60,7 +61,7 @@ public class IndividualStudent extends JPanel {
         JButton courseButton = new JButton("<html>View Course");
         courseButton.setMaximumSize(new Dimension(130, 40));
         courseButton.setActionCommand("View Course");
-        courseButton.addActionListener(parent);
+        courseButton.addActionListener(this);
         add(courseButton);
 
         JLabel gradesLabel = new JLabel(
@@ -95,5 +96,14 @@ public class IndividualStudent extends JPanel {
         JScrollPane scrollpane = new JScrollPane(gradesTable);
         add(scrollpane);
 
+    }
+
+    public void actionPerformed(ActionEvent event) {
+
+        
+        if (event.getActionCommand().equals("View Course")) {
+            System.out.println(courseCode);
+            //TODO open new course indCourse
+        }
     }
 }

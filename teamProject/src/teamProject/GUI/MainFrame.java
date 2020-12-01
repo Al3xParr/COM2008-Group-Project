@@ -2,11 +2,11 @@ package teamProject.GUI;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 import teamProject.SystemSecurity;
-import teamProject.Classes.Course;
-import teamProject.Classes.Student;
 
 /** 
  * Team Project COM2008 year 20/21
@@ -20,6 +20,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     public static final long serialVersionUID = 1L;
     LogInPanel logInPanel = null;
+    ArrayList<SubFrame> subFrames;
 
     public MainFrame() {
         super("University of COM2008");
@@ -27,18 +28,14 @@ public class MainFrame extends JFrame implements ActionListener {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
 
+        subFrames = new ArrayList<SubFrame>();
         setSize(screenSize.width / 4, screenSize.height / 2);
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         logInPanel = new LogInPanel(this);
-        studentPanel = new ViewStudents(this, Student.allInstances());
-        indStudentPanel = new IndividualStudent(this, Student.getInstance(001));
-        indCoursePanel = new IndividualCourse(this, Course.getInstance("DEP100"));
-        //setContentPane(logInPanel);
-        //setContentPane(studentPanel);
-        //setContentPane(indStudentPanel);
-        setContentPane(indCoursePanel);
+
+        setContentPane(logInPanel);
         setVisible(true);
 
     }
@@ -56,6 +53,10 @@ public class MainFrame extends JFrame implements ActionListener {
         repaint();
     }
 
+    public void newFrame(SubFrame s) {
+        subFrames.add(s);
+    }
+
     public void actionPerformed(ActionEvent event) {
 
         if (event.getActionCommand().equals("Log in")) {
@@ -69,14 +70,6 @@ public class MainFrame extends JFrame implements ActionListener {
                         JOptionPane.WARNING_MESSAGE);
 
             }
-        } if (event.getActionCommand().equals("View Course")) {
-            String courseCode = indStudentPanel.courseCode;
-            System.out.println(courseCode);
-            studentPanel = new ViewStudents(this, Student.allInstances());
-            setContentPane(studentPanel);
-            System.out.println("test");
-            revalidate();
-            repaint();
         }
     }
 
