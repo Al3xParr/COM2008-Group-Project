@@ -49,12 +49,6 @@ public class IndividualCourse extends JPanel {
                 "<html><div style = 'text-align : center;'><<h3>Main Department: " + mainDep + "</h3><br>");
         add(mainDepLabel);
 
-        JButton depButton = new JButton("<html>View Main Department");
-        depButton.setMaximumSize(new Dimension(200, 40));
-        depButton.setActionCommand("View Department");
-        depButton.addActionListener(parent);
-        add(depButton);
-
         /*
         JLabel gradesLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Grades: </h3>");

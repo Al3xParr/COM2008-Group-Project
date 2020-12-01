@@ -62,7 +62,6 @@ public class ViewStudents extends JPanel {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                //TODO add the deletion function
                 if (col == 8){
                     new SubFrame("Student: "+ allStudents[row][1], parent, 
                     new IndividualStudent(parent, Student.getByUsername((String)allStudents[row][1])));

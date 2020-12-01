@@ -6,13 +6,13 @@ import javax.swing.*;
 import java.util.ArrayList;
 import teamProject.Classes.*;
 
-public class IndividualStudent extends JPanel {
+public class IndividualStudent extends JPanel implements ActionListener {
     
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
     int numGrades = 0;
     Student student;
-    String courseCode = null;
+    String courseCode;
 
     public IndividualStudent(MainFrame parent, Student student) {
         this.parent = parent;
@@ -36,7 +36,7 @@ public class IndividualStudent extends JPanel {
         menuBar.add(viewMenu);
         parent.setJMenuBar(menuBar);
 
-        setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6)); 
+        setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3)); 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
         header.setHorizontalAlignment(SwingConstants.CENTER);
@@ -61,40 +61,53 @@ public class IndividualStudent extends JPanel {
         JButton courseButton = new JButton("<html>View Course");
         courseButton.setMaximumSize(new Dimension(130, 40));
         courseButton.setActionCommand("View Course");
-        courseButton.addActionListener(parent);
+        courseButton.addActionListener(this);
         add(courseButton);
 
-        JLabel gradesLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Grades: </h3>");
-        add(gradesLabel);
+        JLabel studyLevelLabel = new JLabel(
+                "<html><div style = 'text-align : center;'><<h3>Study Levels: </h3>");
+        add(studyLevelLabel);
 
-        String [] colNames = {"Label", "Module Code", "Mark", "Resit mark"};
-        int numGrades = 0;
-        for (StudyPeriod studyPeriod: studyPeriods) {
-            numGrades += studyPeriod.getGradesList().size();
-        }
-        Object[][] allGrades = new Object[numGrades][4];
+        String [] colNames = {"Label", "Start Date", "End Date", "Degree Level", "View Grades"};
+        Object[][] allStudyPeriod = new Object[studyPeriods.size()][5];
 
         //will use as a reference to use for the position in the table for each grade
-        int count = numGrades;
-        //populating the table of grades
+        int count = 0;
+        //populating the table of study periods
         for (StudyPeriod studyPeriod: studyPeriods) {
-            ArrayList<Grade> grades = studyPeriod.getGradesList();
-            String label = studyPeriod.getLabel();
-            for (Grade grade: grades) {
-                allGrades[numGrades-count][0] = label;
-                allGrades[numGrades-count][1] = grade.getModule().getFullName();
-                allGrades[numGrades-count][2] = grade.getMark();
-                allGrades[numGrades-count][3] = grade.getResitMark();
-                count --;
-            }
+            allStudyPeriod[count][0] = studyPeriod.getLabel();
+            allStudyPeriod[count][1] = studyPeriod.getStartDate();
+            allStudyPeriod[count][2] = studyPeriod.getEndDate();
+            allStudyPeriod[count][3] = studyPeriod.getDegreeLvl();
+            allStudyPeriod[count][4] = "<html><B>View Grades</B></html>";
+            count ++;
         }
 
-        final JTable gradesTable = new JTable(allGrades, colNames);
-        gradesTable.setPreferredScrollableViewportSize(new Dimension(700, 200));
-        gradesTable.setFillsViewportHeight(true);
-        JScrollPane scrollpane = new JScrollPane(gradesTable);
+        final JTable table = new JTable(allStudyPeriod, colNames);
+        table.setPreferredScrollableViewportSize(new Dimension(500, 200));
+        table.setFillsViewportHeight(true);
+        JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.rowAtPoint(evt.getPoint());
+                int col = table.columnAtPoint(evt.getPoint());
+                if (col == 4){
+                    //TODO Create new study period panel - as an instance, use this students regID + the label
+                    //Will probably have to cast to a String in order to work (look at the ViewStudents.java)
+                    //new SubFrame("Study Period: "+ allStudyPeriod[row][0], parent, ...);
+                    System.out.println(allStudyPeriod[row][0]);
+                }
+            }
+        });
+    }
 
+    public void actionPerformed(ActionEvent event) {
+        if (event.getActionCommand().equals("View Course")) {
+            new SubFrame("Course: " + courseCode, parent, 
+            new IndividualCourse(parent, Course.getInstance(courseCode)));
+            System.out.println("test test");
+        }
     }
 }
