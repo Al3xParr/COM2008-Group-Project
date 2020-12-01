@@ -5,25 +5,23 @@ import javax.swing.*;
 import java.util.ArrayList;
 import teamProject.Classes.*;
 
-public class IndividualStudent extends JPanel {
-    
+public class IndividualCourse extends JPanel {
+
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
-    int numGrades = 0;
-    Student student;
-    String courseCode = null;
+    String[] otherDep;
+    Course course;
+    String otherDepString;
 
-    public IndividualStudent(MainFrame parent, Student student) {
+    public IndividualCourse(MainFrame parent, Course course) {
+
         this.parent = parent;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        String username = student.getUsername();
-        String firstNames = student.getForenames();
-        String surname = student.getSurname();
-        String email = student.getEmail();
-        String tutor = student.getTutor();
-        String course = student.getCourse().getFullName();
-        ArrayList<StudyPeriod> studyPeriods = student.getStudyPeriodList();
-        courseCode = student.getCourse().getCourseCode();
+        String courseCode = course.getCourseCode();
+        String fullName = course.getFullName();
+        Boolean yearII = course.getYearInIndustry();
+        String mainDep = course.getMainDep().getFullName();
+        ArrayList<Department> otherDep = course.getDepartmentList();
 
         //creating a header menu bar
         JMenu viewMenu = new JMenu("View");
@@ -37,32 +35,27 @@ public class IndividualStudent extends JPanel {
 
         setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 3)); 
         JLabel header = new JLabel(
-                "<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
+                "<html><div style = 'text-align : center;'><<h2>Course: " + courseCode + "</h2><br>");
         header.setHorizontalAlignment(SwingConstants.CENTER);
         add(header);
         
-        JLabel firstNameLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>First Name(s): " + firstNames + "</h3><br>");
-        add(firstNameLabel);
-        JLabel surNameLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Surname: " + surname + "</h3><br>");
-        add(surNameLabel);
-        JLabel emailLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Email: " + email + "</h3><br>");
-        add(emailLabel);
-        JLabel tutorLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Tutor: " + tutor + "</h3><br>");
-        add(tutorLabel);
-        JLabel courseLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Course: " + course + "</h3>");
-        add(courseLabel);
+        JLabel fullNameLabel = new JLabel(
+                "<html><div style = 'text-align : center;'><<h3>Full name: " + fullName + "</h3><br>");
+        add(fullNameLabel);
+        JLabel yIILabel = new JLabel(
+                "<html><div style = 'text-align : center;'><<h3>Year in Industry: " + yearII + "</h3><br>");
+        add(yIILabel);
+        JLabel mainDepLabel = new JLabel(
+                "<html><div style = 'text-align : center;'><<h3>Main Department: " + mainDep + "</h3><br>");
+        add(mainDepLabel);
 
-        JButton courseButton = new JButton("<html>View Course");
-        courseButton.setMaximumSize(new Dimension(130, 40));
-        courseButton.setActionCommand("View Course");
-        courseButton.addActionListener(parent);
-        add(courseButton);
+        JButton depButton = new JButton("<html>View Main Department");
+        depButton.setMaximumSize(new Dimension(200, 40));
+        depButton.setActionCommand("View Department");
+        depButton.addActionListener(parent);
+        add(depButton);
 
+        /*
         JLabel gradesLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Grades: </h3>");
         add(gradesLabel);
@@ -94,6 +87,6 @@ public class IndividualStudent extends JPanel {
         gradesTable.setFillsViewportHeight(true);
         JScrollPane scrollpane = new JScrollPane(gradesTable);
         add(scrollpane);
-
+        */
     }
 }

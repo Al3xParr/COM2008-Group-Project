@@ -5,6 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import teamProject.SystemSecurity;
+import teamProject.Classes.Course;
 import teamProject.Classes.Student;
 
 /** 
@@ -21,6 +22,7 @@ public class MainFrame extends JFrame implements ActionListener{
     LogInPanel logInPanel=null;
     ViewStudents studentPanel = null;
     IndividualStudent indStudentPanel = null;
+    IndividualCourse indCoursePanel = null;
     
     public MainFrame() {
         super("University of COM2008");
@@ -35,9 +37,11 @@ public class MainFrame extends JFrame implements ActionListener{
         logInPanel = new LogInPanel(this);
         studentPanel = new ViewStudents(this, Student.allInstances());
         indStudentPanel = new IndividualStudent(this, Student.getInstance(001));
+        indCoursePanel = new IndividualCourse(this, Course.getInstance("DEP100"));
         //setContentPane(logInPanel);
         //setContentPane(studentPanel);
-        setContentPane(indStudentPanel);
+        //setContentPane(indStudentPanel);
+        setContentPane(indCoursePanel);
         setVisible(true);
 
     }
