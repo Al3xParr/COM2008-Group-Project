@@ -18,10 +18,10 @@ public class AccountsPanel extends JPanel{
     public AccountsPanel(MainFrame parent) {
 
         this.parent = parent;
-        students = Student.getAllInstances();
-        registrars = Registrar.getAllInstances();
-        teachers = Teacher.getAllInstances();
-        admins = Administrator.getAllInstances();
+        students = Student.instances;
+        registrars = Registrar.instances;
+        teachers = Teacher.instances;
+        admins = Administrator.instances;
 
         String[] colNames = {"Username", "Access Level", "Delete Account"};
         int totalEntries = students.size() + registrars.size() + admins.size() + teachers.size();
@@ -71,7 +71,7 @@ public class AccountsPanel extends JPanel{
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
                         System.out.println("Delete user " + accounts[row][0]);
-                        if (SystemSecurity.removeUser(String.valueOf(accounts[row][0]))){
+                        if (Student.getInstanceByUsername(String.valueOf(accounts[row][0])).delete()){
                             JOptionPane.showMessageDialog(null, "User Deleted");
                         } else{ 
                             JOptionPane.showMessageDialog(null, "User deletion failed");
