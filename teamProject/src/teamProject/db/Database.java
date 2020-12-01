@@ -668,14 +668,13 @@ public class Database implements AutoCloseable {
     //UPDATES
     /**
      * Changes the grade for given student
-     * @param s student the grade belongs to
      * @param p study period in wchich the grade was awarded
      * @param m module the grade is for
      * @param resit is it resit
      * @param newGrade the new grade
      * @return true if operation was succesfull
      */
-    public boolean changeGrade(Student s, StudyPeriod p, Module m, boolean resit, double newGrade) {
+    public boolean changeGrade(StudyPeriod p, Module m, boolean resit, double newGrade) {
 
         boolean succes = false;
         String updateGrade = "UPDATE Grades SET " + (resit ? "resitMark" : "mark") + " = ?"
@@ -684,7 +683,7 @@ public class Database implements AutoCloseable {
 
             update.clearParameters();
             update.setDouble(1, newGrade);
-            update.setInt(2, s.getRegNum());
+            update.setInt(2, p.getRegNum());
             update.setString(3, "" + p.getLabel());
             update.setString(4, m.getModuleCode());
             update.executeUpdate();
@@ -909,8 +908,8 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String moduleCode = results.getString(1);
-                String departmentCode = results.getString(2);
-                String fullName = results.getString(3);
+                String departmentCode = results.getString(3);
+                String fullName = results.getString(2);
                 String timeTaught = results.getString(4);
                 new Module(moduleCode, departmentCode, fullName, timeTaught);
             }
