@@ -11,6 +11,8 @@ public class IndividualStudent extends JPanel {
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
     int numGrades = 0;
+    Student student;
+    String courseCode = null;
 
     public IndividualStudent(MainFrame parent, Student student) {
         this.parent = parent;
@@ -22,6 +24,7 @@ public class IndividualStudent extends JPanel {
         String tutor = student.getTutor();
         String course = student.getCourse().getFullName();
         ArrayList<StudyPeriod> studyPeriods = student.getStudyPeriodList();
+        courseCode = student.getCourse().getCourseCode();
 
         //creating a header menu bar
         JMenu viewMenu = new JMenu("View");
@@ -54,9 +57,13 @@ public class IndividualStudent extends JPanel {
         JLabel courseLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Course: " + course + "</h3>");
         add(courseLabel);
-        JButton confirmButton = new JButton("<html><b>View Course</b>");
-        confirmButton.setMaximumSize(new Dimension(130, 40));
-        add(confirmButton);
+
+        JButton courseButton = new JButton("<html>View Course");
+        courseButton.setMaximumSize(new Dimension(130, 40));
+        courseButton.setActionCommand("View Course");
+        courseButton.addActionListener(parent);
+        add(courseButton);
+
         JLabel gradesLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Grades: </h3>");
         add(gradesLabel);

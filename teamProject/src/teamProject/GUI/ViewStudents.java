@@ -1,13 +1,11 @@
 package teamProject.GUI;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
 import teamProject.Classes.*;
 import java.util.*;
 
-public class ViewStudents extends JPanel implements ActionListener {
+public class ViewStudents extends JPanel {
     
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
@@ -59,6 +57,7 @@ public class ViewStudents extends JPanel implements ActionListener {
         JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
         
+
     }
 
     public JTable setColumnWidth(JTable table) {
@@ -71,10 +70,5 @@ public class ViewStudents extends JPanel implements ActionListener {
         table.getColumnModel().getColumn(7).setPreferredWidth(110);
         table.getColumnModel().getColumn(8).setPreferredWidth(60);
         return table;
-    }
-
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        System.out.println(command);
     }
 }

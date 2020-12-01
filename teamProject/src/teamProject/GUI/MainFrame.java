@@ -19,6 +19,8 @@ public class MainFrame extends JFrame implements ActionListener{
 
     public static final long serialVersionUID = 1L;
     LogInPanel logInPanel=null;
+    ViewStudents studentPanel = null;
+    IndividualStudent indStudentPanel = null;
     
     public MainFrame() {
         super("University of COM2008");
@@ -29,10 +31,10 @@ public class MainFrame extends JFrame implements ActionListener{
         setSize(screenSize.width / 4, screenSize.height / 2);
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         logInPanel = new LogInPanel(this);
-        ViewStudents studentPanel = new ViewStudents(this, Student.allInstances());
-        IndividualStudent indStudentPanel = new IndividualStudent(this, Student.getInstance(001));
+        studentPanel = new ViewStudents(this, Student.allInstances());
+        indStudentPanel = new IndividualStudent(this, Student.getInstance(001));
         //setContentPane(logInPanel);
         //setContentPane(studentPanel);
         setContentPane(indStudentPanel);
@@ -60,7 +62,14 @@ public class MainFrame extends JFrame implements ActionListener{
                         JOptionPane.WARNING_MESSAGE);
                 
             }
+        } if (event.getActionCommand().equals("View Course")) {
+            String courseCode = indStudentPanel.courseCode;
+            System.out.println(courseCode);
+            studentPanel = new ViewStudents(this, Student.allInstances());
+            setContentPane(studentPanel);
+            System.out.println("test");
+            revalidate();
+            repaint();
         }
     }
-    
 }
