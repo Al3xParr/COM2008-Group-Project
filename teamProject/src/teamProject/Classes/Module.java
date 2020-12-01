@@ -11,6 +11,9 @@ package teamProject.Classes;
 import java.util.HashMap;
 import java.util.Collection;
 
+import teamProject.db.Database;
+import teamProject.*;
+
 /** 
  * Module class definition
 */
@@ -28,6 +31,21 @@ public class Module {
 
     }
 
+    public static Module createNew(int moduleNum, String deptCode, String fullName, String time){
+        String moduleCode = Integer.toString(moduleNum);
+        while (moduleCode.length() < 4) {
+            moduleCode = '0' + moduleCode;
+        }
+        moduleCode = deptCode + moduleCode;
+        Module news = new Module(moduleCode, deptCode, fullName, time);
+        try (Database db = StudentSystem.connect()) {
+            db.addModule(news);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return news;
+    }
+
     public static Module getInstance(String key) {
         return instances.get(key);
     }
@@ -38,6 +56,15 @@ public class Module {
 
     public static Collection<Module> allInstances() {
         return instances.values();
+    }
+
+    public Boolean delete() {
+        try (Database db = StudentSystem.connect()) {
+            return db.deleteModule(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public String getModuleCode() {

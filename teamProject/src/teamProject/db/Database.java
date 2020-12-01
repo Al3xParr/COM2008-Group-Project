@@ -99,17 +99,18 @@ public class Database implements AutoCloseable {
     @Override
     public void close() throws Exception {
         con.close();
+        con = null;
     }
 
     //QUERIES AND PROCESSING
 
     private Set<String> getTableNames() {
-        Set<String> tables = null;
+        Set<String> tables = new HashSet<String>();
         try (Statement stsm = con.createStatement()) {
 
             ResultSet results = stsm.executeQuery("SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "
                     + "WHERE table_schema = (SELECT DATABASE());");
-            tables = new HashSet<String>();
+ 
             while (results.next()) {
                 tables.add(results.getString("TABLE_NAME"));
             }
@@ -124,12 +125,11 @@ public class Database implements AutoCloseable {
     }
 
     private Set<String> getColumnNames(String tableName) {
-        Set<String> columns = null;
+        Set<String> columns = new HashSet<String>();;
         if (getTableNames().contains(tableName)) {
             try (Statement stsm = con.createStatement()) {
                 ResultSet results = stsm.executeQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
                         + "WHERE table_name = '" + tableName + "';");
-                columns = new HashSet<String>();
                 while (results.next()) {
                     columns.add(results.getString("COLUMN_NAME"));
                 }
@@ -157,7 +157,7 @@ public class Database implements AutoCloseable {
                 if (!getColumnNames(tableName).contains(name))
                     return false;
 
-            String query = "SELECT * FROM " + tableName + "WHERE";
+            String query = "SELECT * FROM " + tableName + " WHERE";
             int i = 0;
             query += " " + columnNames[i++] + " = ?";
             for (; i < columnNames.length; i++) {
@@ -183,14 +183,14 @@ public class Database implements AutoCloseable {
 
     }
 
-    public ArrayList<String> getLoginData(String username){
-        ArrayList<String> ans= new ArrayList<String>();
+    public ArrayList<String> getLoginData(String username) {
+        ArrayList<String> ans = new ArrayList<String>();
         String loginQuery = "SELECT passwordHash, salt, accessLvl FROM Accounts WHERE username = ?;";
-        try(PreparedStatement query = con.prepareStatement(loginQuery)){
+        try (PreparedStatement query = con.prepareStatement(loginQuery)) {
             query.clearParameters();
-            query.setString(1,username);
+            query.setString(1, username);
             ResultSet result = query.executeQuery();
-            if(result.next()){
+            if (result.next()) {
                 ans.add(result.getString(1));
                 ans.add(result.getString(2));
                 ans.add(Integer.toString(result.getInt(3)));
@@ -203,20 +203,40 @@ public class Database implements AutoCloseable {
         return ans;
     }
 
+    public int countEmails(String like){
+        String sublike=like+"%@university.com";
+        String query = "SELECT email FROM Students WHERE email LIKE ?;";
+        int res = 0;
+        try(PreparedStatement stsm = con.prepareStatement(query)){
+            stsm.clearParameters();
+            stsm.setString(1, sublike);
+            ResultSet set = stsm.executeQuery();
+            while (set.next()) {
+                String num = set.getString(1);
+                num = num.substring(like.length(),num.indexOf('@', like.length()));
+                int number = Integer.parseInt(num);
+                if (number > res)
+                    res = number;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     //INSERTS - PUBLIC FUNCTIONS
 
     /**
     * Inserts information about new study period into database
     * @param newPeriod new StudyPeriod object to be assigned to student
-    * @param to Student the study period belongs to
     * @return true if operation was compleated false if not
     */
-    public boolean addStudyPeriod(StudyPeriod newPeriod, Student to) {
+    public boolean addStudyPeriod(StudyPeriod newPeriod) {
         boolean succes = false;
         try {
             con.setAutoCommit(false);
             try {
-                insertStudyPeriod(newPeriod, to);
+                insertStudyPeriod(newPeriod);
                 con.commit();
                 succes = true;
 
@@ -234,14 +254,40 @@ public class Database implements AutoCloseable {
     }
 
     /**
+    * Inserts information about new Module registration
+    * @param newGrade new Grade object to be assigned to student
+    * @return true if operation was compleated false if not
+    */
+    public boolean registerModule(StudyPeriod period, Grade grade) {
+        boolean succes = false;
+        try {
+            con.setAutoCommit(false);
+            try {
+                insertGrade(period, grade);
+                con.commit();
+                succes = true;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                con.rollback();
+            }
+            con.setAutoCommit(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return succes;
+    }
+
+    /**
      * Inserting newly created user into database (inserts all relative information)
      * Students shouldnt have study periods yet
      * @param newUser user to be inserted
-     * @return true if user inserted succesfully false if not
+     * @return 1 (or regNum if User was Student) if user inserted succesfully 0 if not
      */
-    public boolean addUser(User newUser) {
+    public int addUser(User newUser) {
 
-        boolean succes = false;
+        int success = 0;
         String[] names = { "username" };
         String[] values = { newUser.getUsername() };
 
@@ -257,7 +303,7 @@ public class Database implements AutoCloseable {
                 type = 3;
             }
 
-            String insertUser = "INSERT INTO Account VALUES(?,?,?,?);";
+            String insertUser = "INSERT INTO Accounts VALUES(?,?,?,?);";
             try (PreparedStatement insert = con.prepareStatement(insertUser)) {
                 insert.clearParameters();
                 insert.setString(1, newUser.getUsername());
@@ -267,19 +313,20 @@ public class Database implements AutoCloseable {
                 insert.executeUpdate();
                 switch (type) {
                     case 0:
-                        insertStudent((Student) newUser);
+                        success = insertStudent((Student) newUser);
                         break;
                     case 1:
                         insertTeacher((Teacher) newUser);
+                    default:
+                        success = 1;
                         break;
                 }
-                succes = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        return succes;
+        return success;
 
     }
 
@@ -350,21 +397,20 @@ public class Database implements AutoCloseable {
     }
 
     /**
-     * Inserts information about new Study Level into Department
+     * Inserts information about new Study Level into Database
      * @param newStudyLevel Level to be added
-     * @param owner Course the study Level belongs to
      * @return true if operation was succesfull
      */
-    public boolean addStudyLevel(StudyLevel newStudyLevel, Course owner) {
+    public boolean addStudyLevel(StudyLevel newStudyLevel) {
         boolean succes = false;
         try {
             con.setAutoCommit(false);
             try {
                 for (Module m : newStudyLevel.getCoreModules()) {
-                    insertModuleCourseLink(m, owner, true, newStudyLevel.getDegreeLvl());
+                    insertModuleCourseLink(m, newStudyLevel.getCourseCode(),true, newStudyLevel.getDegreeLvl());
                 }
                 for (Module m : newStudyLevel.getOptionalModules()) {
-                    insertModuleCourseLink(m, owner, false, newStudyLevel.getDegreeLvl());
+                    insertModuleCourseLink(m, newStudyLevel.getCourseCode(), false, newStudyLevel.getDegreeLvl());
                 }
                 con.commit();
                 succes = true;
@@ -400,41 +446,25 @@ public class Database implements AutoCloseable {
 
     //INSERTS - PRIVATE FUNCTIONS
 
-    private void insertStudyPeriod(StudyPeriod newPeriod, Student student) throws SQLException {
+    private void insertStudyPeriod(StudyPeriod newPeriod) throws SQLException {
 
         String[] names = { "regNum", "label" };
-        String[] values = { Integer.toString(student.getRegNum()), "" + newPeriod.getLabel() };
+        String[] values = { Integer.toString(newPeriod.getRegNum()), "" + newPeriod.getLabel() };
         if (!ValueSetCheck("StudyPeriods", names, values)) {
-            String insertPeriod = "INSERT INTO StudyPeriod VALUES(?,?,?,?,?,?);";
+            String insertPeriod = "INSERT INTO StudyPeriods VALUES(?,?,?,?,?,?);";
 
             try (PreparedStatement insert = con.prepareStatement(insertPeriod)) {
                 insert.clearParameters();
-                insert.setInt(1, student.getRegNum());
+                insert.setInt(1, newPeriod.getRegNum());
                 insert.setString(2, "" + newPeriod.getLabel());
-                insert.setString(3, student.getCourse().getCourseCode());
+                insert.setString(3, newPeriod.getDegreeLvl().getCourseCode());
                 insert.setInt(4, Integer.parseInt(newPeriod.getDegreeLvl().getDegreeLvl()));
                 insert.setDate(5, new Date(newPeriod.getStartDate().getTime()));
                 insert.setDate(6, new Date(newPeriod.getEndDate().getTime()));
                 insert.executeUpdate();
 
                 for (Grade g : newPeriod.getGradesList()) {
-                    String[] namess = { "regNum", "moduleCode", "label" };
-                    String[] valuess = { Integer.toString(student.getRegNum()), g.getModule().getModuleCode(),
-                            "" + newPeriod.getLabel() };
-                    if (!ValueSetCheck("Grades", namess, valuess)) {
-                        String insertGrades = "INSERT INTO Grades VALUES(?,?,?,?,?);";
-                        try (PreparedStatement insertGrade = con.prepareStatement(insertGrades)) {
-                            insert.clearParameters();
-                            insert.setInt(1, student.getRegNum());
-                            insert.setString(2, "" + newPeriod.getLabel());
-                            insert.setString(3, g.getModule().getModuleCode());
-                            insert.setDouble(4, g.getMark());
-                            insert.setDouble(5, g.getResitMark());
-                            insert.executeUpdate();
-                        } catch (SQLException e) {
-                            throw e;
-                        }
-                    }
+                    insertGrade(newPeriod, g);
                 }
             } catch (SQLException e) {
                 throw e;
@@ -442,28 +472,74 @@ public class Database implements AutoCloseable {
         }
     }
 
-    private void insertStudent(Student newStudent) throws SQLException {
-
-        String[] names = { "regNum" };
-        String[] values = { Integer.toString(newStudent.getRegNum()) };
-
-        if (!ValueSetCheck("Students", names, values)) {
-            String insertStudent = "INSERT INTO Students VALUES(?,?,?,?,?,?,?,?)";
-            try (PreparedStatement insert = con.prepareStatement(insertStudent)) {
-                insert.clearParameters();
-                insert.setInt(1, newStudent.getRegNum());
-                insert.setString(2, newStudent.getTitle());
-                insert.setString(3, newStudent.getSurname());
-                insert.setString(4, newStudent.getForenames());
-                insert.setString(5, newStudent.getEmail());
-                insert.setString(6, newStudent.getUsername());
-                insert.setString(7, newStudent.getTutor());
-                insert.setString(8, newStudent.getCourse().getCourseCode());
-                insert.executeUpdate();
+    private void insertGrade(StudyPeriod newPeriod, Grade g) throws SQLException {
+        String[] names = { "regNum", "moduleCode", "label" };
+        String[] values = { Integer.toString(newPeriod.getRegNum()), g.getModule().getModuleCode(),
+                "" + newPeriod.getLabel() };
+        if (!ValueSetCheck("Grades", names, values)) {
+            String insertGrades = "INSERT INTO Grades VALUES(?,?,?,?,?);";
+            try (PreparedStatement insertGrade = con.prepareStatement(insertGrades)) {
+                insertGrade.clearParameters();
+                insertGrade.setInt(1, newPeriod.getRegNum());
+                insertGrade.setString(2, "" + newPeriod.getLabel());
+                insertGrade.setString(3, g.getModule().getModuleCode());
+                if (g.getMark() == null) {
+                    insertGrade.setNull(4, java.sql.Types.DOUBLE);
+                } else {
+                    insertGrade.setDouble(4, g.getMark());
+                }
+                if (g.getResitMark() == null) {
+                    insertGrade.setNull(5, java.sql.Types.DOUBLE);
+                } else {
+                    insertGrade.setDouble(5, g.getResitMark());
+                }
+                insertGrade.executeUpdate();
             } catch (SQLException e) {
                 throw e;
             }
         }
+    }
+
+    private int insertStudent(Student newStudent) throws SQLException {
+
+        String[] names = { "regNum" };
+        String[] values = { Integer.toString(newStudent.getRegNum()) };
+        int newRegNum = 0;
+        if (!ValueSetCheck("Students", names, values)) {
+            String insertStudent = "INSERT INTO Students (title,surname,forenames,email,username,tutor,courseCode,degreeLvl) VALUES(?,?,?,?,?,?,?,?)";
+            try (PreparedStatement insert = con.prepareStatement(insertStudent)) {
+                con.setAutoCommit(false);
+                insert.clearParameters();
+                insert.setString(1, newStudent.getTitle());
+                insert.setString(2, newStudent.getSurname());
+                insert.setString(3, newStudent.getForenames());
+                insert.setString(4, newStudent.getEmail());
+                insert.setString(5, newStudent.getUsername());
+                insert.setString(6, newStudent.getTutor());
+                insert.setString(7, newStudent.getCourse().getCourseCode());
+                insert.setString(8, newStudent.getDegreeLvl());
+                insert.executeUpdate();
+                try(PreparedStatement stsm = con.prepareStatement("SELECT regNum FROM Students WHERE username =?;")){
+                    stsm.clearParameters();
+                    stsm.setString(1,newStudent.getUsername());
+                    ResultSet set = stsm.executeQuery();
+                    if(set.next()){
+                        newRegNum = set.getInt(1);
+                    }
+                }catch(Exception e){
+                    throw e;
+                }
+                con.commit();
+            } catch (SQLException e) {
+                try{
+                    con.rollback();
+                }catch(Exception es){
+                    es.printStackTrace();
+                }
+                throw e;
+            }
+        }
+        return newRegNum;
     }
 
     private void insertTeacher(Teacher newTeacher) throws SQLException {
@@ -472,7 +548,7 @@ public class Database implements AutoCloseable {
         String[] values = { newTeacher.getUsername() };
 
         if (!ValueSetCheck("Students", names, values)) {
-            String insertTeacher = "INSERT INTO Teachers VALUES(?,?)";
+            String insertTeacher = "INSERT INTO Teacher VALUES(?,?)";
             try (PreparedStatement insert = con.prepareStatement(insertTeacher)) {
                 insert.clearParameters();
                 insert.setString(1, newTeacher.getUsername());
@@ -503,6 +579,12 @@ public class Database implements AutoCloseable {
                 if (c.getBachEquiv() != null) {
                     insertBachEquiv(c, c.getBachEquiv());
                 }
+
+                for (Department d : c.getDepartmentList()) {
+                    insertCourseDepartLink(c, d);
+                }
+
+                
             } catch (Exception e) {
                 throw e;
             }
@@ -529,7 +611,7 @@ public class Database implements AutoCloseable {
         String[] names = { "curseCode" };
         String[] values = { master.getCourseCode() };
         if (!ValueSetCheck("BachEquiv", names, values)) {
-            String insertEquiv = "INSERT INTO BachEqiv VALUES(?,?);";
+            String insertEquiv = "INSERT INTO BachEquiv VALUES(?,?);";
             try (PreparedStatement insert = con.prepareStatement(insertEquiv)) {
                 insert.clearParameters();
                 insert.setString(1, master.getCourseCode());
@@ -552,8 +634,8 @@ public class Database implements AutoCloseable {
             try (PreparedStatement insert = con.prepareStatement(insertModule)) {
                 insert.clearParameters();
                 insert.setString(1, m.getModuleCode());
-                insert.setString(2, m.getDepartmentCode());
-                insert.setString(3, m.getFullName());
+                insert.setString(3, m.getDepartmentCode());
+                insert.setString(2, m.getFullName());
                 insert.setString(4, m.getTimeTaught());
                 insert.executeUpdate();
             } catch (SQLException e) {
@@ -563,16 +645,16 @@ public class Database implements AutoCloseable {
 
     }
 
-    private void insertModuleCourseLink(Module m, Course c, Boolean core, String lvl) throws SQLException {
+    private void insertModuleCourseLink(Module m, String c, Boolean core, String lvl) throws SQLException {
 
         String[] names = { "moduleCode", "courseCode" };
-        String[] values = { m.getModuleCode(), c.getCourseCode() };
-        if (!ValueSetCheck("ModulesToCourses", names, values)) {
+        String[] values = { m.getModuleCode(), c };
+        if (!ValueSetCheck("ModulesToCourse", names, values)) {
             String insertLink = "INSERT INTO ModulesToCourse VALUES(?,?,?,?);";
             try (PreparedStatement insert = con.prepareStatement(insertLink)) {
                 insert.clearParameters();
                 insert.setString(1, m.getModuleCode());
-                insert.setString(2, c.getCourseCode());
+                insert.setString(2, c);
                 insert.setBoolean(3, core);
                 insert.setString(4, lvl);
                 insert.executeUpdate();
@@ -586,14 +668,13 @@ public class Database implements AutoCloseable {
     //UPDATES
     /**
      * Changes the grade for given student
-     * @param s student the grade belongs to
      * @param p study period in wchich the grade was awarded
      * @param m module the grade is for
      * @param resit is it resit
      * @param newGrade the new grade
      * @return true if operation was succesfull
      */
-    public boolean changeGrade(Student s, StudyPeriod p, Module m, boolean resit, double newGrade) {
+    public boolean changeGrade(StudyPeriod p, Module m, boolean resit, double newGrade) {
 
         boolean succes = false;
         String updateGrade = "UPDATE Grades SET " + (resit ? "resitMark" : "mark") + " = ?"
@@ -602,7 +683,7 @@ public class Database implements AutoCloseable {
 
             update.clearParameters();
             update.setDouble(1, newGrade);
-            update.setInt(2, s.getRegNum());
+            update.setInt(2, p.getRegNum());
             update.setString(3, "" + p.getLabel());
             update.setString(4, m.getModuleCode());
             update.executeUpdate();
@@ -643,13 +724,41 @@ public class Database implements AutoCloseable {
     }
 
     /**
+     * Delete grade and related records from database
+     * @param g grade to be deleted
+     * @return true if operation was succesfull
+     */
+    public boolean deleteGrade(StudyPeriod p, Module m) {
+        boolean succes = false;
+        String deleteGrade = "DELETE FROM Grades WHERE moduleCode = ? AND regNum = ? AND label = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteGrade)) {
+            con.setAutoCommit(false);
+            delete.clearParameters();
+            delete.setString(1, m.getModuleCode());
+            delete.setInt(2, p.getRegNum());
+            delete.setString(3, p.getLabel());
+            delete.executeUpdate();
+            con.setAutoCommit(true);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
+        }
+        return succes;
+    }
+
+    /**
      * Delete course and related records from database
      * @param c course to be deleted
      * @return true if operation was succesfull
      */
     public boolean deleteCourse(Course c) {
         boolean succes = false;
-        String deleteCourse = "DELETE FROM Courses WHERE courseCode = ?;";
+        String deleteCourse = "DELETE FROM Course WHERE courseCode = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteCourse)) {
             con.setAutoCommit(false);
             delete.clearParameters();
@@ -700,13 +809,13 @@ public class Database implements AutoCloseable {
      * @param s owner of thestudyperiod
      * @return true if operation was succesfull
      */
-    public boolean deleteStudyPeriod(StudyPeriod p, Student s) {
+    public boolean deleteStudyPeriod(StudyPeriod p) {
         boolean succes = false;
         String deleteStudyPeriod = "DELETE FROM StudyPeriods WHERE regNum = ? AND label = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteStudyPeriod)) {
             con.setAutoCommit(false);
             delete.clearParameters();
-            delete.setInt(1, s.getRegNum());
+            delete.setInt(1, p.getRegNum());
             delete.setString(2, "" + p.getLabel());
             delete.executeUpdate();
             con.setAutoCommit(true);
@@ -728,13 +837,13 @@ public class Database implements AutoCloseable {
      * @param c owner of the study level
      * @return true if operation was succesfull
      */
-    public boolean deleteStudyLevel(StudyLevel l, Course c) {
+    public boolean deleteStudyLevel(StudyLevel l) {
         boolean succes = false;
-        String deleteStudyLevel = "DELETE FROM ModulesToCourses WHERE courseCode = ? AND degreeLvl = ?;";
+        String deleteStudyLevel = "DELETE FROM ModulesToCourse WHERE courseCode = ? AND degreeLvl = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteStudyLevel)) {
             con.setAutoCommit(false);
             delete.clearParameters();
-            delete.setString(1, c.getCourseCode());
+            delete.setString(1, l.getCourseCode());
             delete.setString(2, l.getDegreeLvl());
             delete.executeUpdate();
             con.setAutoCommit(true);
@@ -790,8 +899,6 @@ public class Database implements AutoCloseable {
         instantiateTeachers();
         instantiateStudent();
     }
-
-    
 
     public void instantiateModule() {
         try (Statement stsm = con.createStatement()) {
@@ -1078,8 +1185,8 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String username = results.getString(6);
-                String passwordHash = results.getString(9);
-                String salt = results.getString(10);
+                String passwordHash = results.getString(10);
+                String salt = results.getString(11);
                 int regNumber = results.getInt(1);
                 String title = results.getString(2);
                 String surname = results.getString(3);
@@ -1087,6 +1194,7 @@ public class Database implements AutoCloseable {
                 String email = results.getString(5);
                 String tutor = results.getString(7);
                 Course course = Course.getInstance(results.getString(8));
+                String degreeLvl = results.getString(9);
                 ArrayList<StudyPeriod> studyPeriodList = new ArrayList<StudyPeriod>();
                 try (Statement stsm2 = con.createStatement()) {
                     ResultSet resultsStudyPeriods = stsm2
@@ -1097,7 +1205,7 @@ public class Database implements AutoCloseable {
                         studyPeriodList.add(StudyPeriod.getInstance(regNumber + label));
                     }
                     new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email, tutor,
-                            course, studyPeriodList);
+                            course, studyPeriodList,degreeLvl);
 
                 } catch (Exception e) {
                     e.printStackTrace();

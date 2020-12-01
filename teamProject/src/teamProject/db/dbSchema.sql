@@ -26,7 +26,7 @@ CREATE TABLE Course(
 );
 
 CREATE TABLE Students(
-    regNum INT NOT NULL,
+    regNum INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(3),
     surname VARCHAR(25),
     forenames VARCHAR(25),
@@ -52,7 +52,7 @@ CREATE TABLE Modules(
     deptCode CHAR(3) ,
     timeTaught VARCHAR(25) NOT NULL,
     PRIMARY KEY (moduleCode),
-    FOREIGN KEY (deptCode) REFERENCES Departments(deptCode) ON DELETE SET NULL
+    FOREIGN KEY (deptCode) REFERENCES Departments(deptCode) ON DELETE CASCADE
 );
 
 CREATE TABLE BachEquiv(

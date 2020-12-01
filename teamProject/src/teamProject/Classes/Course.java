@@ -3,6 +3,9 @@ package teamProject.Classes;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import teamProject.db.Database;
+import teamProject.*;
+
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -37,12 +40,59 @@ public class Course {
         instances.put(courseCode, this);
     }
 
+    public static Course createNew(int courseNum, String fullName, Boolean YII, Course bachEquiv, Department mainDept,
+            ArrayList<Department> allDepartments) {
+        String courseCode = Integer.toString(courseNum);
+        while(courseCode.length()<3){
+            courseCode = '0' + courseCode;
+        }
+        courseCode = mainDept.getDeptCode() + courseCode;
+        Course news = new Course(courseCode, fullName, YII, bachEquiv, mainDept, allDepartments,
+                new ArrayList<StudyLevel>());
+        for (Department d : allDepartments) {
+            d.getCourseList().add(news);
+        }
+        try (Database db = StudentSystem.connect()) {
+            db.addCourse(news);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return news;
+    }
+
     public static Course getInstance(String key) {
         return instances.get(key);
     }
 
     public static void clearInstances() {
         instances.clear();
+    }
+
+    public Boolean delete() {
+        try (Database db = StudentSystem.connect()) {
+            
+            return db.deleteCourse(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void addNewStudyLvl(String lvl, ArrayList<Module> core, ArrayList<Module> optional) {
+        this.degreeLvlList.add(StudyLevel.createNew(lvl, getCourseCode(), core, optional));
+    }
+
+    public StudyLevel getStudyLvl(int x) {
+        StudyLevel res = null;
+        for (StudyLevel s : getDegreeLvlList()) {
+            if (Integer.parseInt(s.getDegreeLvl()) == x) {
+                res = s;
+                break;
+            }
+        }
+
+        return res;
+        
     }
 
     public String getCourseCode() {
