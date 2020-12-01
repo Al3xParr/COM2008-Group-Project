@@ -38,14 +38,29 @@ public class MenuPanel extends JPanel implements ActionListener {
 
         addMenuButtons();
 
+        JButton refresh = new JButton("Refresh Data");
+        refresh.setActionCommand("Refresh");
+        refresh.setAlignmentX(Component.CENTER_ALIGNMENT);
+        refresh.setMaximumSize(new Dimension(120, 70));
+        refresh.addActionListener(this);
+        refresh.setFocusable(false);
+
         JButton LogOut = new JButton("Log Out");
         LogOut.setActionCommand("LogOut");
         LogOut.setAlignmentX(Component.CENTER_ALIGNMENT);
-        LogOut.setMaximumSize(new Dimension(100, 70));
+        LogOut.setMaximumSize(new Dimension(80, 70));
         LogOut.addActionListener(this);
         LogOut.setFocusable(false);
-        add(LogOut);
 
+        JPanel panel = new JPanel();
+        BoxLayout box = new BoxLayout(panel, BoxLayout.LINE_AXIS);
+        panel.setLayout(box);
+        panel.add(Box.createHorizontalGlue());
+        panel.add(refresh);
+        panel.add(Box.createRigidArea(new Dimension(14, 0)));
+        panel.add(LogOut);
+        panel.add(Box.createHorizontalGlue());
+        add(panel);
         add(Box.createVerticalGlue());
 
     }
@@ -137,10 +152,10 @@ public class MenuPanel extends JPanel implements ActionListener {
         String command = e.getActionCommand();
         System.out.println(command);
         if (command.equals("userDetails")) {
-            
+
             new SubFrame("Your Details", parent,
                     new IndividualStudent(parent, (Student) SystemSecurity.getCurrentUser()));
-            
+
         }
         if (command.equals("CurrentModules")) {
             Collection<Module> modules = ((Student) (SystemSecurity.getCurrentUser())).getLatestModules();
@@ -162,9 +177,26 @@ public class MenuPanel extends JPanel implements ActionListener {
             users.addAll(Administrator.instances.values());
             //TODO Open new Student Browser for Teachers
         }
+        if (command.equals("Departments")) {
+            Collection<Department> departments = Department.instances.values();
+            //TODO Open new Department Browser
+        }
+        if (command.equals("Courses")) {
+            Collection<Course> courses = Course.instances.values();
+            //TODO Open new Course Browser
+        }
+        if (command.equals("Modules")) {
+            Collection<Module> modules = Module.instances.values();
+            new SubFrame("All Modules", parent, new AllModulesPanel(modules));
+        }
         if (command.equals("LogOut")) {
             SystemSecurity.logout();
+            parent.disposeOfSubFrames();
             parent.changeLogIn();
+        }
+        if (command.equals("Refresh")) {
+            parent.disposeOfSubFrames();
+            SystemSecurity.getAccessibleData(SystemSecurity.getCurrentUser().getUsername());
         }
 
     }

@@ -43,6 +43,19 @@ public class StudyLevel {
         return news;
     }
 
+    public void reAddToInstances() {
+        instances.put(getDegreeLvl()+ getCourseCode(), this);
+        
+        for (Module m : getOptionalModules()) {
+            m.reAddToInstances();
+        }
+
+        for (Module m : getCoreModules()) {
+            m.reAddToInstances();
+        }
+
+    }
+
     /**
      * 
      * @param key is degreeLvl + courseCode

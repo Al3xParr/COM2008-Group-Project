@@ -57,6 +57,13 @@ public class MainFrame extends JFrame implements ActionListener {
         subFrames.add(s);
     }
 
+    public void disposeOfSubFrames() {
+        for (SubFrame s : subFrames) {
+            s.dispose();
+        }
+        subFrames.clear();
+    }
+
     public void actionPerformed(ActionEvent event) {
 
         if (event.getActionCommand().equals("Log in")) {

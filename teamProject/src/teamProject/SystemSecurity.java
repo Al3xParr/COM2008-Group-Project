@@ -100,7 +100,9 @@ public class SystemSecurity {
         return false;
     }
 
-    private static void getAccessibleData(String username) {
+    public static void getAccessibleData(String username) {
+        currentUser = null;
+        StudentSystem.clearHashMaps();
         try (Database db = StudentSystem.connect()) {
             db.instantiateUsers();
 
@@ -108,6 +110,7 @@ public class SystemSecurity {
                 case 0:
                     currentUser = Student.getByUsername(username);
                     StudentSystem.clearHashMaps();
+                    ((Student)currentUser).reAddToInstances();
                     break;
                 case 1:
                     currentUser = Teacher.getInstance(username);

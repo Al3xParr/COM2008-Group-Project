@@ -908,10 +908,13 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String moduleCode = results.getString(1);
-                String departmentCode = results.getString(3);
-                String fullName = results.getString(2);
-                String timeTaught = results.getString(4);
-                new Module(moduleCode, departmentCode, fullName, timeTaught);
+                if (!moduleCode.equals("")) {
+                    String departmentCode = results.getString(3);
+                    String fullName = results.getString(2);
+                    String timeTaught = results.getString(4);
+                    new Module(moduleCode, departmentCode, fullName, timeTaught);
+                }
+            
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -970,25 +973,27 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String deptCode = results.getString(1);
-                String fullName = results.getString(2);
-                try (Statement stsm2 = con.createStatement()) {
-                    //finding the courses from that department
-                    ResultSet coursesResults = stsm2
-                            .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = '" + deptCode + "';");
-                    coursesList.clear();
-                    while (coursesResults.next()) {
-                        coursesList.add(Course.getInstance(results.getString(1)));
+                if (!deptCode.equals("")) {
+                    String fullName = results.getString(2);
+                    try (Statement stsm2 = con.createStatement()) {
+                        //finding the courses from that department
+                        ResultSet coursesResults = stsm2
+                                .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = '" + deptCode + "';");
+                        coursesList.clear();
+                        while (coursesResults.next()) {
+                            coursesList.add(Course.getInstance(results.getString(1)));
+                        }
+                        //finding the modules within that department
+                        ResultSet modulesResults = stsm2
+                                .executeQuery("SELECT * FROM Modules WHERE deptCode = '" + deptCode + "';");
+                        modulesList.clear();
+                        while (modulesResults.next()) {
+                            modulesList.add(Module.getInstance(modulesResults.getString(3)));
+                        }
+                        new Department(deptCode, fullName, modulesList, coursesList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    //finding the modules within that department
-                    ResultSet modulesResults = stsm2
-                            .executeQuery("SELECT * FROM Modules WHERE deptCode = '" + deptCode + "';");
-                    modulesList.clear();
-                    while (modulesResults.next()) {
-                        modulesList.add(Module.getInstance(modulesResults.getString(3)));
-                    }
-                    new Department(deptCode, fullName, modulesList, coursesList);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
@@ -1027,7 +1032,9 @@ public class Database implements AutoCloseable {
                                             + degreeLvl + "' AND courseCode = '" + courseCode + "' AND core = False;");
                             while (optionalModuleList.next()) {
                                 String moduleCode = optionalModuleList.getString(1);
-                                optionalModules.add(Module.getInstance(moduleCode));
+                                if(!moduleCode.equals("")){
+                                    optionalModules.add(Module.getInstance(moduleCode));
+                                }
                             }
 
                             new StudyLevel(degreeLvl, courseCode, coreModules, optionalModules);

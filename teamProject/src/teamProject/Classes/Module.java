@@ -46,6 +46,10 @@ public class Module {
         return news;
     }
 
+    public void reAddToInstances(){
+        instances.put(getModuleCode(), this);
+    }
+
     public static Module getInstance(String key) {
         return instances.get(key);
     }

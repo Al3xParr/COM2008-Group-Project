@@ -73,6 +73,15 @@ public class StudyPeriod {
         return news;
     }
 
+    public void reAddToInstances() {
+        instances.put(getRegNum() + getLabel(), this);
+        getDegreeLvl().reAddToInstances();
+        for (Grade g : getGradesList()) {
+            g.getModule().reAddToInstances();
+        }
+        
+    }
+
     /**
      * 
      * @param key is regNum + Label

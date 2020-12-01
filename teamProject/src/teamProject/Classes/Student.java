@@ -85,6 +85,13 @@ public class Student extends User {
 
     }
 
+    public void reAddToInstances() {
+        instances.put(getRegNum(), this);
+        for(StudyPeriod sp : getStudyPeriodList()){
+            sp.reAddToInstances();
+        }
+    }
+
     public static Student getInstance(Integer key) {
         return instances.get(key);
     }

@@ -1,6 +1,7 @@
 /*"PasswordHash" is the password for all accounts*/
 INSERT INTO Course VALUES("DEP100", "DEpartmentCourse1",false);
 INSERT INTO Departments VALUES("DEP","Department1");
+INSERT INTO Departments VALUES("","");
 INSERT INTO Accounts VALUES("user1","145fa28cc91a1001eb85b7546fc972dfefbaffba0507562df9a237e569a74a68","1b6a599d797af9efefc607d4a640c383",0);
 INSERT INTO Students (title,surname,forenames,email,username,tutor,courseCode,degreeLvl)VALUES("Mr","SUR","FORE NAMES","fnsur1@university.com","user1","Teacher1","DEP100",'1');
 INSERT INTO Accounts VALUES("user2","93d570ed60090c10a5962a1367c2670316778964aafa42fb7af1302d5e823f28","0eb4a4062add1d18ce230619b55dc11d",0);
@@ -9,14 +10,17 @@ INSERT INTO Accounts VALUES("user3","c73fe5f379de216d8fab215dcb5f3c1a92bf98a3f4b
 INSERT INTO Teacher VALUES("user3", "Teacher1");
 INSERT INTO Accounts VALUES("user4","9ed1cbc565f4982bc00e32361c346ca9303821c0a4e40c110d0e094ce7c35150","2e32d4e0672dd76b134c521710b9d0ed",2);
 INSERT INTO Accounts VALUES("user5","b507a51ab9b8837af39127c8cbf702db39745b6432d470466482a8aa3e895271","5287be5deedd55f37f359281ffde09f7",3);
+INSERT INTO Modules VALUES("","","","");
 INSERT INTO Modules VALUES("DEP1001","Module1","DEP","SPRING");
 INSERT INTO Modules VALUES("DEP1002","Module2","DEP","SPRING");
 INSERT INTO Modules VALUES("DEP1003","Module3","DEP","SPRING");
 INSERT INTO Modules VALUES("DEP1004","Module4","DEP","SPRING");
 INSERT INTO CourseToDepartment VALUES("DEP100","DEP",true);
+INSERT INTO ModulesToCourse VALUES("","DEP100",false,1);
 INSERT INTO ModulesToCourse VALUES("DEP1001","DEP100",true,1);
 INSERT INTO ModulesToCourse VALUES("DEP1002","DEP100",false,1);
 INSERT INTO ModulesToCourse VALUES("DEP1003","DEP100",false,1);
+INSERT INTO ModulesToCourse VALUES("","DEP100",false,2);
 INSERT INTO ModulesToCourse VALUES("DEP1004","DEP100",true,2);
 
 INSERT INTO StudyPeriods VALUES(001,"A","DEP100",1,"2020-08-08","2021-08-07");
