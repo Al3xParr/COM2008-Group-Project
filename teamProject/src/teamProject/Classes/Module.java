@@ -78,6 +78,17 @@ public class Module {
         return false;
     }
 
+    public static Boolean checkPrimaryKeyExists(String key){
+        try(Database db = StudentSystem.connect()){
+            String[] names = {"moduleCode"};
+            String[] values = {key};
+            return db.ValueSetCheck("Modules", names, values);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     public String getModuleCode() {
         return this.moduleCode;
     }
