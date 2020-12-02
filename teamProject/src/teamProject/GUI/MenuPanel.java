@@ -187,7 +187,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
         if (command.equals("Modules")) {
             Collection<Module> modules = Module.instances.values();
-            new SubFrame("All Modules", parent, new AllModulesPanel(modules));
+            new SubFrame("All Modules", parent, new AllModulesPanel(parent,modules));
         }
         if (command.equals("LogOut")) {
             SystemSecurity.logout();
