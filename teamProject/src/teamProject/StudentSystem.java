@@ -22,6 +22,18 @@ public class StudentSystem {
     final static String user = "team044";
     final static String pass = "872345c0";
 
+    public static void reinstance(){
+        clearHashMaps();
+
+        try (Database db = connect()) {
+            db.instantiateUsers();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void clearHashMaps() {
         Administrator.clearInstances();
         Course.clearInstances();

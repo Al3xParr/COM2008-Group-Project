@@ -3,6 +3,7 @@ package teamProject.GUI;
 import javax.swing.*;
 import teamProject.Classes.*;
 import teamProject.SystemSecurity;
+import teamProject.StudentSystem;
 import java.util.*;
 
 public class AccountsPanel extends JPanel{
@@ -15,6 +16,9 @@ public class AccountsPanel extends JPanel{
     HashMap<String, Teacher> teachers;
     HashMap<String, Administrator> admins;
 
+    Object[][] accounts;
+    JTable table;
+
     public AccountsPanel(MainFrame parent) {
 
         this.parent = parent;
@@ -24,46 +28,15 @@ public class AccountsPanel extends JPanel{
         admins = Administrator.instances;
 
         String[] colNames = {"Username", "Access Level", "Delete Account"};
-        int totalEntries = students.size() + registrars.size() + admins.size() + teachers.size();
-        Object[][] accounts = new Object[totalEntries][3];
+        accounts = fillData();
 
-        int counter =  0;
-
-        for (Administrator admin : admins.values()){
-            accounts[counter][0] = admin.getUsername();
-            accounts[counter][1]= "Admin";
-            accounts[counter][2] = "Remove Account";
-            counter ++;
-        }
-
-        for (Registrar reg : registrars.values()){
-            accounts[counter][0] = reg.getUsername();
-            accounts[counter][1] = "Registrar";
-            accounts[counter][2] = "Remove Account";
-            counter ++;
-        }
-
-        for (Teacher teacher : teachers.values()){
-            accounts[counter][0] = teacher.getUsername();
-            accounts[counter][1] = "Teacher";
-            accounts[counter][2] = "Remove Account";
-            counter ++;
-        }
-
-        for (Student student : students.values()){
-            accounts[counter][0] = student.getUsername();
-            accounts[counter][1] = "Student";
-            accounts[counter][2] = "Remove Account";
-            counter ++;
-        }
-        JTable table = new JTable(accounts, colNames);
-
+        table = new JTable(accounts, colNames);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 
-                
+                System.out.println(teachers.size());
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
                 if (col == 2){
@@ -93,16 +66,66 @@ public class AccountsPanel extends JPanel{
                         } else{ 
                             JOptionPane.showMessageDialog(null, "User deletion failed");
                         }
+                        
+                        StudentSystem.reinstance();
+                        accounts = fillData();
+                        table = new JTable(accounts, colNames);
+                        updateScreen();
+                        
                     }
                 }
             }
         });
 
+        updateScreen();
+    }
+
+    public void updateScreen(){
+        this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         table.setEnabled(false);
         this.add(new JScrollPane(table));
-
+        revalidate();
+        repaint();
     }
+
+    public Object[][] fillData(){
+        int totalEntries = students.size() + registrars.size() + admins.size() + teachers.size();
+        Object[][] data = new Object[totalEntries][3];
+        int counter =  0;
+        System.out.println("Number: " + Integer.toString(totalEntries));
+        for (Administrator admin : admins.values()){
+            data[counter][0] = admin.getUsername();
+            data[counter][1]= "Admin";
+            data[counter][2] = "Remove Account";
+            counter ++;
+        }
+
+        for (Registrar reg : registrars.values()){
+            data[counter][0] = reg.getUsername();
+            data[counter][1] = "Registrar";
+            data[counter][2] = "Remove Account";
+            counter ++;
+        }
+
+        for (Teacher teacher : teachers.values()){
+            data[counter][0] = teacher.getUsername();
+            data[counter][1] = "Teacher";
+            data[counter][2] = "Remove Account";
+            counter ++;
+        }
+
+        for (Student student : students.values()){
+            data[counter][0] = student.getUsername();
+            data[counter][1] = "Student";
+            data[counter][2] = "Remove Account";
+            counter ++;
+        }
+
+        return data;
+    }
+
+    
     
     
 
