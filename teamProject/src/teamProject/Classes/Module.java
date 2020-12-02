@@ -40,6 +40,7 @@ public class Module {
         Module news = new Module(moduleCode, deptCode, fullName, time);
         try (Database db = StudentSystem.connect()) {
             db.addModule(news);
+            Department.getInstance(deptCode).getModuleList().add(news);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,6 +61,12 @@ public class Module {
 
     public static Collection<Module> allInstances() {
         return instances.values();
+    }
+
+    public static Module getFantomModule() {
+        Module m = new Module("", "", "", "");
+        instances.remove("");
+        return m;
     }
 
     public Boolean delete() {

@@ -412,6 +412,8 @@ public class Database implements AutoCloseable {
                 for (Module m : newStudyLevel.getOptionalModules()) {
                     insertModuleCourseLink(m, newStudyLevel.getCourseCode(), false, newStudyLevel.getDegreeLvl());
                 }
+                insertModuleCourseLink(Module.getFantomModule(), newStudyLevel.getCourseCode(), false,
+                        newStudyLevel.getDegreeLvl());
                 con.commit();
                 succes = true;
             } catch (Exception e) {
@@ -437,6 +439,17 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         try {
             insertCourseDepartLink(c, d);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    public boolean addModuleToStudyLvl(Module m, StudyLevel s, Boolean core) {
+        boolean succes = false;
+        try {
+            insertModuleCourseLink(m, s.getCourseCode(), core, s.getDegreeLvl());
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -695,6 +708,21 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
+    public Boolean changeStudentProgress(String to, Student s){
+        boolean succes = false;
+        String update = "UPDATE Students SET degreeLvl = ? WHERE regNum = ?;";
+        try (PreparedStatement stsm = con.prepareStatement(update)) {
+            stsm.clearParameters();
+            stsm.setString(1,to);
+            stsm.setInt(2, s.getRegNum());
+            stsm.executeUpdate();
+            succes = true;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
     //DELETIONS
 
     /**
@@ -871,6 +899,29 @@ public class Database implements AutoCloseable {
             con.setAutoCommit(false);
             delete.clearParameters();
             delete.setString(1, u.getUsername());
+            delete.executeUpdate();
+            con.setAutoCommit(true);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
+        }
+        return succes;
+    }
+
+    public boolean disconnectModule(Module m,StudyLevel s){
+        boolean succes = false;
+        String deleteLink = "DELETE FROM ModulesToCourse WHERE moduleCode = ? AND degreeLvl = ? AND courseCode = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteLink)) {
+            con.setAutoCommit(false);
+            delete.clearParameters();
+            delete.setString(1, m.getModuleCode());
+            delete.setString(2, s.getDegreeLvl());
+            delete.setString(3, s.getCourseCode());
             delete.executeUpdate();
             con.setAutoCommit(true);
             succes = true;

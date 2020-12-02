@@ -62,6 +62,7 @@ public class StudyPeriod {
         StudyPeriod news = new StudyPeriod(regNum, label, startDate, endDate, lvl, new ArrayList<Grade>());
         try (Database db = StudentSystem.connect()) {
             db.addStudyPeriod(news);
+            Student.getInstance(regNum).getStudyPeriodList().add(news);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,7 +72,7 @@ public class StudyPeriod {
         }
 
         return news;
-    }
+    }   
 
     public void reAddToInstances() {
         instances.put(getRegNum() + getLabel(), this);
@@ -125,6 +126,11 @@ public class StudyPeriod {
         }
 
         return g.getResitMark();
+    }
+
+    public boolean isPass(Grade g){
+        Double mark = judgeGrade(g);
+        return mark >= passMark;
     }
 
     /**
@@ -196,7 +202,9 @@ public class StudyPeriod {
 
     public Grade registerModule(Module m) {
         Grade g = new Grade(m, null, null);
-        gradesList.add(g);
+        if(!gradesList.contains(g)){
+            gradesList.add(g);
+        }
         try (Database db = StudentSystem.connect()) {
             db.registerModule(this, g);
         } catch (Exception e) {
