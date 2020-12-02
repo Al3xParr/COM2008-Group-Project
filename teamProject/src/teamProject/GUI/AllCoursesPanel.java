@@ -41,10 +41,11 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
 
             allCourses[row][0] = course.getCourseCode();
             allCourses[row][1] = course.getFullName();
-            allCourses[row][2] = (course.getBachEquiv()==null) ? "NONE" : course.getBachEquiv().getFullName();
+            allCourses[row][2] = (course.getBachEquiv() == null) ? "NONE" : course.getBachEquiv().getFullName();
             allCourses[row][3] = course.isYearInIndustry();
+            allCourses[row][4] = "<html><B>VIEW</B></html>";
             if (SystemSecurity.getPrivilages() == 3) {
-                allCourses[row][4] = "<html><B>DELETE</B></html>";
+                allCourses[row][5] = "<html><B>DELETE</B></html>";
             }
             row++;
         }
@@ -108,6 +109,10 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
                 if (col == 4 && row != (-1)) {
+                    Course c = Course.getInstance((String) (allCourses[row][0]));
+                    new SubFrame("Course: " + c.getFullName(), parent, new IndividualCourse(parent, c));
+                }
+                if (col == 5 && row != (-1)) {
                     String confirmStr = "Are you sure you want to delete " + allCourses[row][1] + "?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr, "Warning",
                             JOptionPane.YES_NO_OPTION);
@@ -120,6 +125,7 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
                         }
                     }
                 }
+
             }
         });
     }
@@ -133,14 +139,15 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent event) {
         //TODO create new instance of Course forms
-        
+
     }
 
     private String[] getColumnNames() {
         if (SystemSecurity.getPrivilages() == 3) {
-            return new String[] { "Course Code","Full Name","Equivalent Bachelor","With Year in Industry ?", "" };
+            return new String[] { "Course Code", "Full Name", "Equivalent Bachelor", "With Year in Industry ?", "",
+                    "" };
         }
 
-        return new String[] { "Course Code", "Full Name", "Equivalent Bachelor", "With Year in Industry ?" };
+        return new String[] { "Course Code", "Full Name", "Equivalent Bachelor", "With Year in Industry ?", "" };
     }
 }
