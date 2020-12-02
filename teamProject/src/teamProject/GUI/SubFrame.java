@@ -1,7 +1,8 @@
 package teamProject.GUI;
 
 import teamProject.StudentSystem;
-import teamProject.Classes.*;
+import teamProject.SystemSecurity;
+import teamProject.Classes.Module;
 import teamProject.db.Database;
 
 import java.awt.*;
@@ -36,8 +37,9 @@ public class SubFrame extends JFrame {
     } catch (Exception ex) {
       ex.printStackTrace();
     }
+    SystemSecurity.login("user5", "passwordHash");
     MainFrame main = new MainFrame();
-    new SubFrame("Test", main, new AllCoursesPanel(main, Course.instances.values()));
+    new SubFrame("Test", main, new AllModulesPanel(main, Module.allInstances()));
         
   }
 }

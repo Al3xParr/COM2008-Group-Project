@@ -27,7 +27,7 @@ public class NewModuleForm extends SubFrame implements ActionListener{
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
 
-        setSize(screenSize.width/3, screenSize.height/3);
+        setSize(650,115);
         setLocation(screenSize.width/4, screenSize.height/4);
 
         JPanel panel = new JPanel();

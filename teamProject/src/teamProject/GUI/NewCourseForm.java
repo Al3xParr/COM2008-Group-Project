@@ -2,19 +2,15 @@ package teamProject.GUI;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 
 import java.awt.event.*;
-import java.text.ParseException;
 
-import teamProject.StudentSystem;
 import teamProject.Classes.Course;
 import teamProject.Classes.Department;
-import teamProject.Classes.Module;
-import teamProject.db.Database;
 
 public class NewCourseForm extends SubFrame implements ActionListener, ItemListener {
 
@@ -35,15 +31,15 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
     JTextField courseNameBSc;
     JTextField courseNameMEng;
 
-    JComboBox courseMainMSc;
-    JComboBox courseMainBSc;
-    JComboBox courseMainMEng;
+    JComboBox<String> courseMainMSc;
+    JComboBox<String> courseMainBSc;
+    JComboBox<String> courseMainMEng;
 
     JCheckBox courseYIIMSc;
     JCheckBox courseYIIBSc;
     JCheckBox courseYIIMEng;
 
-    JComboBox courseEquivMSc;
+    JComboBox<String> courseEquivMSc;
 
     MainFrame parent;
 
@@ -58,7 +54,7 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-
+        panel.add(Box.createVerticalGlue());
         courseTypes = new String[] { "1 year MSc", "BSc/BEng", "MComp/MEng" };
         cards = new JPanel(new CardLayout());
 
@@ -82,7 +78,7 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
 
         panel.add(comboBoxPane);
         panel.add(cards);
-
+        panel.add(Box.createVerticalGlue());
         selectedDepartments = new ArrayList<String>();
 
         setContentPane(panel);
@@ -114,11 +110,11 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
         b.addActionListener(this);
         res.add(getFormField("Choose Departments:", b));
 
-        ArrayList<String> departments = new ArrayList<>();
+        Vector<String> departments = new Vector<>();
         for (Department d : Department.instances.values()) {
             departments.add(d.getDeptCode());
         }
-        courseMainMSc = new JComboBox<>(departments.toArray());
+        courseMainMSc = new JComboBox<>(departments);
         courseMainMSc.setMaximumSize(maxSize);
         res.add(getFormField("Main Department: ", courseMainMSc));
 
@@ -159,11 +155,11 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
         b.addActionListener(this);
         res.add(getFormField("Choose Departments:", b));
 
-        ArrayList<String> departments = new ArrayList<>();
+        Vector<String> departments = new Vector<>();
         for (Department d : Department.instances.values()) {
             departments.add(d.getDeptCode());
         }
-        courseMainBSc = new JComboBox<>(departments.toArray());
+        courseMainBSc = new JComboBox<>(departments);
         courseMainBSc.setMaximumSize(maxSize);
         res.add(getFormField("Main Department: ", courseMainBSc));
 
@@ -204,22 +200,22 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
         b.addActionListener(this);
         res.add(getFormField("Choose Departments:", b));
 
-        ArrayList<String> departments = new ArrayList<>();
+        Vector<String> departments = new Vector<>();
         for (Department d : Department.instances.values()) {
             departments.add(d.getDeptCode());
         }
-        courseMainMEng = new JComboBox<>(departments.toArray());
+        courseMainMEng = new JComboBox<>(departments);
         courseMainMEng.setMaximumSize(maxSize);
         res.add(getFormField("Main Department: ", courseMainMEng));
 
         courseYIIMEng = new JCheckBox();
         res.add(getFormField("With year in Industry ", courseYIIMEng));
 
-        ArrayList<String> courses = new ArrayList<>();
+        Vector<String> courses = new Vector<>();
         for (Course c : Course.instances.values()) {
             courses.add(c.getCourseCode());
         }
-        courseEquivMSc = new JComboBox<>(courses.toArray());
+        courseEquivMSc = new JComboBox<>(courses);
         courseEquivMSc.setMaximumSize(maxSize);
         res.add(getFormField("Bachelor Equivalent: ", courseEquivMSc));
 
@@ -259,10 +255,17 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
             for (String depCode : selectedDepartments) {
                 departments.add(Department.getInstance(depCode));
             }
+            if (!departments.contains(mainDept)) {
+                departments.add(mainDept);
+            }
             Boolean industry = courseYIIMSc.isSelected();
 
             if (name.length() < 1) {
                 JOptionPane.showMessageDialog(null, "Name cannot be empty");
+                return;
+            }
+            if(!Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())){
+                JOptionPane.showMessageDialog(null, "Course code already taken");
                 return;
             }
 
@@ -283,13 +286,15 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
             if (!departments.contains(mainDept)) {
                 departments.add(mainDept);
             }
-            if (!departments.contains(mainDept)) {
-                departments.add(mainDept);
-            }
+            
             Boolean industry = courseYIIBSc.isSelected();
 
             if (name.length() < 1) {
                 JOptionPane.showMessageDialog(null, "Name cannot be empty");
+                return;
+            }
+            if(!Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())){
+                JOptionPane.showMessageDialog(null, "Course code already taken");
                 return;
             }
 
@@ -315,6 +320,10 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
 
             if (name.length() < 1) {
                 JOptionPane.showMessageDialog(null, "Name cannot be empty");
+                return;
+            }
+            if(!Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())){
+                JOptionPane.showMessageDialog(null, "Course code already taken");
                 return;
             }
 

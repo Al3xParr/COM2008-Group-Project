@@ -178,7 +178,7 @@ public class MenuPanel extends JPanel implements ActionListener {
             new SubFrame("All Users", parent, new AccountsPanel(parent));
         }
         if (command.equals("Departments")) {
-            Collection<Department> departments = Department.instances.values();
+            //Collection<Department> departments = Department.instances.values();
             new SubFrame("All Departments", parent, new DepartmentsPanel(parent));
         }
         if (command.equals("Courses")) {

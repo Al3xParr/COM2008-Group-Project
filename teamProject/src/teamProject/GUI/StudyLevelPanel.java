@@ -2,13 +2,13 @@ package teamProject.GUI;
 
 import teamProject.SystemSecurity;
 import teamProject.Classes.Module;
+import teamProject.Classes.StudyLevel;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import java.util.*;
 /**
  * Team Project COM2008 year 20/21
  * @author Nathan Mitchell
@@ -19,29 +19,45 @@ import java.util.*;
  /** GUI for all Modules
 */
 
-public class AllModulesPanel extends JPanel implements ActionListener {
+public class StudyLevelPanel extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
+    StudyLevel SL;
 
-    public AllModulesPanel(MainFrame parent, Collection<Module> modules){
+    public StudyLevelPanel(MainFrame parent, StudyLevel SL) {
         this.parent = parent;
+        this.SL = SL;
         JButton addMButton = new JButton("Add Module");
         addMButton.addActionListener(this);
 
-        int moduleNumber = modules.size();
+        int moduleNumber = SL.getCoreModules().size() + SL.getOptionalModules().size();
         String[] columnNames = getColumnNames();
         Object[][] allModules = new Object[moduleNumber][columnNames.length];
         int row = 0;
 
-        for (Module module: modules) {
+        for (Module module: SL.getCoreModules()) {
             
             allModules[row][0] = module.getModuleCode();
             allModules[row][1] = module.getFullName();
             allModules[row][2] = module.getTimeTaught();
             allModules[row][3] = module.getDepartmentCode();
+            allModules[row][4] = "YES";
             if (SystemSecurity.getPrivilages()==3){
-                allModules[row][4] = "<html><B>DELETE</B></html>"; 
+                allModules[row][5] = "<html><B>DELETE</B></html>"; 
+            }
+            row++;
+        }
+
+        for (Module module: SL.getOptionalModules()) {
+            
+            allModules[row][0] = module.getModuleCode();
+            allModules[row][1] = module.getFullName();
+            allModules[row][2] = module.getTimeTaught();
+            allModules[row][3] = module.getDepartmentCode();
+            allModules[row][4] = "NO";
+            if (SystemSecurity.getPrivilages()==3){
+                allModules[row][5] = "<html><B>DELETE</B></html>"; 
             }
             row++;
         }
@@ -52,7 +68,8 @@ public class AllModulesPanel extends JPanel implements ActionListener {
         add(Box.createVerticalGlue());
 
         JLabel header = new JLabel(
-            "<html><div style = 'text-align : center;'><<h2>View All Modules:</h2><br><h4></h4></div>");
+            "<html><div style = 'text-align : center;'><<h2>Study Level no."+SL.getDegreeLvl()+" for "+
+                                SL.getCourseCode()+"</h2><br><h4></h4></div>");
         header.setAlignmentY(Component.CENTER_ALIGNMENT);
         header.setVerticalAlignment(SwingConstants.CENTER);
         header.setOpaque(true);
@@ -105,14 +122,14 @@ public class AllModulesPanel extends JPanel implements ActionListener {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                if (col == 4 && row != (-1)){
-                    String confirmStr = "Are you sure you want to delete " + allModules[row][1] + "?";
+                if (col == 5 && row != (-1)){
+                    String confirmStr = "Are you sure you want to remove " + allModules[row][1] + " from this level?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
-                        if (Module.getInstance((String)(allModules[row][0])).delete()){
-                            JOptionPane.showMessageDialog(null, "Module Deleted, to see the changes please refresh the application.");
+                        if (SL.removeModule(Module.getInstance((String)(allModules[row][0])))){
+                            JOptionPane.showMessageDialog(null, "Module removed, to see the changes please refresh the application.");
                         } else{ 
-                            JOptionPane.showMessageDialog(null, "Module deletion failed");
+                            JOptionPane.showMessageDialog(null, "Module removal failed");
                         }
                     }
                 }
@@ -127,13 +144,13 @@ public class AllModulesPanel extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        new NewModuleForm(parent);
+        new StudyLevelChooseModule(parent,SL);
     }
     private String[] getColumnNames() {
         if (SystemSecurity.getPrivilages() == 3) {
-            return new String[] { "Modul Code", "Full Name", "Semester", "Department Code", "" };
+            return new String[] { "Modul Code", "Full Name", "Semester", "Department Code","Is Core?", "" };
         }
 
-        return new String[] { "Modul Code", "Full Name", "Semester", "Department Code" };
+        return new String[] { "Modul Code", "Full Name", "Semester", "Department Code", "Is Core?" };
     }
 }
