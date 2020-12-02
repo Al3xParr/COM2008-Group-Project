@@ -96,28 +96,28 @@ public class AccountsPanel extends JPanel{
         for (Administrator admin : admins.values()){
             data[counter][0] = admin.getUsername();
             data[counter][1]= "Admin";
-            data[counter][2] = "Remove Account";
+            data[counter][2] = "DELETE";
             counter ++;
         }
 
         for (Registrar reg : registrars.values()){
             data[counter][0] = reg.getUsername();
             data[counter][1] = "Registrar";
-            data[counter][2] = "Remove Account";
+            data[counter][2] = "DELETE";
             counter ++;
         }
 
         for (Teacher teacher : teachers.values()){
             data[counter][0] = teacher.getUsername();
             data[counter][1] = "Teacher";
-            data[counter][2] = "Remove Account";
+            data[counter][2] = "DELETE";
             counter ++;
         }
 
         for (Student student : students.values()){
             data[counter][0] = student.getUsername();
             data[counter][1] = "Student";
-            data[counter][2] = "Remove Account";
+            data[counter][2] = "DELETE";
             counter ++;
         }
 

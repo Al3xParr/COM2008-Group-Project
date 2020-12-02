@@ -3,16 +3,19 @@ package teamProject.GUI;
 import javax.swing.*;
 import teamProject.Classes.*;
 import java.util.*;
+import java.awt.event.*;
 import teamProject.StudentSystem;
 
-public class DepartmentsPanel extends JPanel {
+public class DepartmentsPanel extends JPanel implements ActionListener {
     
     private static final long serialVersionUID = 1L;
     MainFrame parent;
     HashMap<String, Department> depts;
     
+    JButton addBtn;
     JTable table;
     Object[][] data;
+    String[] colNames = new String[3];
 
 
     public DepartmentsPanel(MainFrame parent){
@@ -20,11 +23,14 @@ public class DepartmentsPanel extends JPanel {
         this.parent = parent;
         depts = Department.getAllInstances();
 
-        String[] colNames = {"Department Code", "Department Name", "Remove Department"};
+        colNames[0] = "Department Code";
+        colNames[1] = "Department Name";
+        colNames[2] = "Remove Department";
 
         data = fillData();
         table = new JTable(data, colNames);
-
+        addBtn = new JButton("Add Department");
+        addBtn.addActionListener(this);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             
             @Override
@@ -52,7 +58,6 @@ public class DepartmentsPanel extends JPanel {
                 }
             }
         });
-
         updateScreen();
 
     }
@@ -60,8 +65,10 @@ public class DepartmentsPanel extends JPanel {
     public void updateScreen(){
         this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+
         table.setEnabled(false);
         this.add(new JScrollPane(table));
+        this.add(addBtn);
         revalidate();
         repaint();
     }
@@ -74,10 +81,30 @@ public class DepartmentsPanel extends JPanel {
         for (Department dept : depts.values()){
             data[counter][0] = dept.getDeptCode();
             data[counter][1] = dept.getFullName();
-            data[counter][2] = "Remove Department";
+            data[counter][2] = "DELETE";
             counter++;
         }
 
         return data;
+    }
+
+    public void actionPerformed(ActionEvent event) {
+        JTextField code = new JTextField();
+        JTextField name = new JTextField();
+
+        Object[] msg = {"Course Code: ", code, "Course Name", name};
+
+        int option = JOptionPane.showConfirmDialog(null, msg, "Add Department", JOptionPane.OK_CANCEL_OPTION);
+        
+
+        if (option == JOptionPane.OK_OPTION){
+            Department.createNew(code.getText(), name.getText());
+            JOptionPane.showMessageDialog(null, "Department Added");
+            StudentSystem.reinstance();
+            data = fillData();
+            table = new JTable(data, colNames);
+            updateScreen();
+        }
+
     }
 }
