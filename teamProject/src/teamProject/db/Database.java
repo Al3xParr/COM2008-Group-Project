@@ -412,6 +412,8 @@ public class Database implements AutoCloseable {
                 for (Module m : newStudyLevel.getOptionalModules()) {
                     insertModuleCourseLink(m, newStudyLevel.getCourseCode(), false, newStudyLevel.getDegreeLvl());
                 }
+                insertModuleCourseLink(Module.getFantomModule(), newStudyLevel.getCourseCode(), false,
+                        newStudyLevel.getDegreeLvl());
                 con.commit();
                 succes = true;
             } catch (Exception e) {
@@ -437,6 +439,17 @@ public class Database implements AutoCloseable {
         boolean succes = false;
         try {
             insertCourseDepartLink(c, d);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
+    public boolean addModuleToStudyLvl(Module m, StudyLevel s, Boolean core) {
+        boolean succes = false;
+        try {
+            insertModuleCourseLink(m, s.getCourseCode(), core, s.getDegreeLvl());
             succes = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -695,6 +708,21 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
+    public Boolean changeStudentProgress(String to, Student s){
+        boolean succes = false;
+        String update = "UPDATE Students SET degreeLvl = ? WHERE regNum = ?;";
+        try (PreparedStatement stsm = con.prepareStatement(update)) {
+            stsm.clearParameters();
+            stsm.setString(1,to);
+            stsm.setInt(2, s.getRegNum());
+            stsm.executeUpdate();
+            succes = true;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return succes;
+    }
+
     //DELETIONS
 
     /**
@@ -885,6 +913,29 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
+    public boolean disconnectModule(Module m,StudyLevel s){
+        boolean succes = false;
+        String deleteLink = "DELETE FROM ModulesToCourse WHERE moduleCode = ? AND degreeLvl = ? AND courseCode = ?;";
+        try (PreparedStatement delete = con.prepareStatement(deleteLink)) {
+            con.setAutoCommit(false);
+            delete.clearParameters();
+            delete.setString(1, m.getModuleCode());
+            delete.setString(2, s.getDegreeLvl());
+            delete.setString(3, s.getCourseCode());
+            delete.executeUpdate();
+            con.setAutoCommit(true);
+            succes = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                con.rollback();
+            } catch (Exception en) {
+                en.printStackTrace();
+            }
+        }
+        return succes;
+    }
+
     public void instantiateUsers() {
         StudentSystem.clearHashMaps();
         instantiateModule();
@@ -908,10 +959,13 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String moduleCode = results.getString(1);
-                String departmentCode = results.getString(3);
-                String fullName = results.getString(2);
-                String timeTaught = results.getString(4);
-                new Module(moduleCode, departmentCode, fullName, timeTaught);
+                if (!moduleCode.equals("")) {
+                    String departmentCode = results.getString(3);
+                    String fullName = results.getString(2);
+                    String timeTaught = results.getString(4);
+                    new Module(moduleCode, departmentCode, fullName, timeTaught);
+                }
+            
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -970,25 +1024,27 @@ public class Database implements AutoCloseable {
             while (results.next()) {
                 //not sure where the attributes are stored yet, can change later
                 String deptCode = results.getString(1);
-                String fullName = results.getString(2);
-                try (Statement stsm2 = con.createStatement()) {
-                    //finding the courses from that department
-                    ResultSet coursesResults = stsm2
-                            .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = '" + deptCode + "';");
-                    coursesList.clear();
-                    while (coursesResults.next()) {
-                        coursesList.add(Course.getInstance(results.getString(1)));
+                if (!deptCode.equals("")) {
+                    String fullName = results.getString(2);
+                    try (Statement stsm2 = con.createStatement()) {
+                        //finding the courses from that department
+                        ResultSet coursesResults = stsm2
+                                .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = '" + deptCode + "';");
+                        coursesList.clear();
+                        while (coursesResults.next()) {
+                            coursesList.add(Course.getInstance(results.getString(1)));
+                        }
+                        //finding the modules within that department
+                        ResultSet modulesResults = stsm2
+                                .executeQuery("SELECT * FROM Modules WHERE deptCode = '" + deptCode + "';");
+                        modulesList.clear();
+                        while (modulesResults.next()) {
+                            modulesList.add(Module.getInstance(modulesResults.getString(3)));
+                        }
+                        new Department(deptCode, fullName, modulesList, coursesList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    //finding the modules within that department
-                    ResultSet modulesResults = stsm2
-                            .executeQuery("SELECT * FROM Modules WHERE deptCode = '" + deptCode + "';");
-                    modulesList.clear();
-                    while (modulesResults.next()) {
-                        modulesList.add(Module.getInstance(modulesResults.getString(3)));
-                    }
-                    new Department(deptCode, fullName, modulesList, coursesList);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
@@ -1027,7 +1083,9 @@ public class Database implements AutoCloseable {
                                             + degreeLvl + "' AND courseCode = '" + courseCode + "' AND core = False;");
                             while (optionalModuleList.next()) {
                                 String moduleCode = optionalModuleList.getString(1);
-                                optionalModules.add(Module.getInstance(moduleCode));
+                                if(!moduleCode.equals("")){
+                                    optionalModules.add(Module.getInstance(moduleCode));
+                                }
                             }
 
                             new StudyLevel(degreeLvl, courseCode, coreModules, optionalModules);
