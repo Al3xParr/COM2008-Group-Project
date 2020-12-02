@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
+
+import teamProject.SystemSecurity;
 import teamProject.Classes.*;
 
 public class IndividualStudent extends JPanel implements ActionListener {
@@ -16,7 +18,9 @@ public class IndividualStudent extends JPanel implements ActionListener {
 
     public IndividualStudent(MainFrame parent, Student student) {
         this.parent = parent;
+        this.student = student;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        int regNum = student.getRegNum();
         String username = student.getUsername();
         String firstNames = student.getForenames();
         String surname = student.getSurname();
@@ -26,17 +30,6 @@ public class IndividualStudent extends JPanel implements ActionListener {
         ArrayList<StudyPeriod> studyPeriods = student.getStudyPeriodList();
         courseCode = student.getCourse().getCourseCode();
 
-        //creating a header menu bar
-        JMenu viewMenu = new JMenu("View");
-        viewMenu.add(new JMenuItem("Departments"));
-        viewMenu.add(new JMenuItem("Courses"));
-        viewMenu.add(new JMenuItem("Modules"));
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.add(viewMenu);
-        parent.setJMenuBar(menuBar);
-
-        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
         header.setHorizontalAlignment(SwingConstants.CENTER);
@@ -71,6 +64,16 @@ public class IndividualStudent extends JPanel implements ActionListener {
         String [] colNames = {"Label", "Start Date", "End Date", "Degree Level", "View Grades"};
         Object[][] allStudyPeriod = new Object[studyPeriods.size()][5];
 
+        if (SystemSecurity.getPrivilages() == 1) {
+            JButton gradeButton = new JButton("View Current Progress");
+            gradeButton.addActionListener(this);
+            add(gradeButton);
+
+            JButton progressButton = new JButton("Progress Student");
+            progressButton.addActionListener(this);
+            add(progressButton);
+        }
+
         //will use as a reference to use for the position in the table for each grade
         int count = 0;
         //populating the table of study periods
@@ -96,8 +99,10 @@ public class IndividualStudent extends JPanel implements ActionListener {
                 if (col == 4){
                     //TODO Create new study period panel - as an instance, use this students regID + the label
                     //Will probably have to cast to a String in order to work (look at the ViewStudents.java)
-                    //new SubFrame("Study Period: "+ allStudyPeriod[row][0], parent, ...);
-                    System.out.println(allStudyPeriod[row][0]);
+                    String ref = regNum + (String)allStudyPeriod[row][0];
+                    StudyPeriod period = StudyPeriod.getInstance(ref);
+                    new SubFrame("Study Period: "+ allStudyPeriod[row][0], parent, 
+                                new StudyPeriodPanel(parent, period));
                 }
             }
         });
@@ -108,10 +113,17 @@ public class IndividualStudent extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        String courseCode = getCourseCode();
-        Course course = Course.getInstance(courseCode);
         if (event.getActionCommand().equals("View Course")) {
+            String courseCode = getCourseCode();
+            Course course = Course.getInstance(courseCode);
             new SubFrame("Course: " + courseCode, parent, new IndividualCourse(parent, course));
+        } 
+        if (event.getActionCommand().equals("View Current Progress")) {
+            System.out.println("in button");
+            JOptionPane.showMessageDialog(null, student.getStudentResults());
+        } 
+        if (event.getActionCommand().equals("Progress Student")) {
+            //StudyPeriod.createNew(student.getRegNum(), abel, startDate, endDate, lvl)
         }
     }
 }

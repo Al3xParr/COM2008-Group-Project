@@ -35,6 +35,7 @@ public class Student extends User {
 
         super(username, passwordHash, salt);
 
+        this.regNum = regNum;
         this.title = title;
         this.surname = surname;
         this.forenames = forenames;

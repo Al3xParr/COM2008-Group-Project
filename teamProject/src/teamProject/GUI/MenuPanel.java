@@ -149,6 +149,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         if (command.equals("TeacherStudents")) {
             Collection<Student> students = Student.instances.values();
             //TODO Open new Student Browser for Teachers
+            new SubFrame("All students", parent, new ViewStudents(parent, Student.allInstances()));
         }
         if (command.equals("RegistrarStudents")) {
             Collection<Student> students = Student.instances.values();

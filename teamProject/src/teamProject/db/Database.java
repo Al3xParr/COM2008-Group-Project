@@ -1200,6 +1200,7 @@ public class Database implements AutoCloseable {
                 String passwordHash = results.getString(10);
                 String salt = results.getString(11);
                 int regNumber = results.getInt(1);
+                System.out.println(regNumber);
                 String title = results.getString(2);
                 String surname = results.getString(3);
                 String forenames = results.getString(4);

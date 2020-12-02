@@ -23,7 +23,7 @@ public class ViewStudents extends JPanel {
         
         for (Student student: students) {
             System.out.println(student.getRegNum());
-            allStudents[count][0] = (Integer) student.getRegNum();
+            allStudents[count][0] = student.getRegNum();
             allStudents[count][1] = student.getUsername();
             allStudents[count][2] = student.getTitle();
             allStudents[count][3] = student.getForenames();
@@ -34,16 +34,6 @@ public class ViewStudents extends JPanel {
             allStudents[count][8] = "<html><B>View Student</B></html>";
             count ++;
         }
-
-        //creating a header menu bar
-        JMenu viewMenu = new JMenu("View");
-        viewMenu.add(new JMenuItem("Departments"));
-        viewMenu.add(new JMenuItem("Courses"));
-        viewMenu.add(new JMenuItem("Modules"));
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.add(viewMenu);
-        parent.setJMenuBar(menuBar);
 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>View all students:</h2><br><h3>To view a particular student, press the view button</h3></div>");
@@ -65,7 +55,6 @@ public class ViewStudents extends JPanel {
                 if (col == 8){
                     new SubFrame("Student: "+ allStudents[row][1], parent, 
                     new IndividualStudent(parent, Student.getByUsername((String)allStudents[row][1])));
-                    System.out.println(allStudents[row][1]);
                 }
             }
         });

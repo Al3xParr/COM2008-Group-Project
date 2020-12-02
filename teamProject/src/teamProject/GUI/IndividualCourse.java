@@ -23,17 +23,6 @@ public class IndividualCourse extends JPanel {
         String mainDep = course.getMainDep().getFullName();
         ArrayList<StudyLevel> degreeLvls = course.getDegreeLvlList();
 
-        //creating a header menu bar
-        JMenu viewMenu = new JMenu("View");
-        viewMenu.add(new JMenuItem("Departments"));
-        viewMenu.add(new JMenuItem("Courses"));
-        viewMenu.add(new JMenuItem("Modules"));
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.add(viewMenu);
-        parent.setJMenuBar(menuBar);
-
-        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>Course: " + courseCode + "</h2><br>");
         header.setHorizontalAlignment(SwingConstants.CENTER);
