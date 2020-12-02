@@ -99,6 +99,17 @@ public class Course {
         
     }
 
+    public static Boolean checkPrimaryKeyExists(String key){
+        try(Database db = StudentSystem.connect()){
+            String[] names = {"courseCode"};
+            String[] values = {key};
+            return db.ValueSetCheck("Course", names, values);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     public String getCourseCode() {
         return this.courseCode;
     }

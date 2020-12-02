@@ -2,7 +2,6 @@ package teamProject.GUI;
 
 import teamProject.SystemSecurity;
 import teamProject.Classes.Course;
-import teamProject.Classes.Module;
 
 import java.awt.*;
 import java.awt.event.*;
