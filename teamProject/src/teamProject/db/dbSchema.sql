@@ -37,7 +37,7 @@ CREATE TABLE Students(
     degreeLvl CHAR(1),
     PRIMARY KEY (regNum),
     FOREIGN KEY (username) REFERENCES Accounts(username) ON DELETE CASCADE,
-    FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE SET NULL
+    FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE CASCADE
 );
 
 CREATE TABLE Departments(
