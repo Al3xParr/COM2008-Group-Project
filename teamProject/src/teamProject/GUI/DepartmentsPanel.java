@@ -5,6 +5,7 @@ import teamProject.Classes.*;
 import java.util.*;
 import java.awt.event.*;
 import teamProject.StudentSystem;
+import teamProject.SystemSecurity;
 
 public class DepartmentsPanel extends JPanel implements ActionListener {
     
@@ -89,22 +90,31 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        JTextField code = new JTextField();
-        JTextField name = new JTextField();
-
-        Object[] msg = {"Course Code: ", code, "Course Name", name};
-
-        int option = JOptionPane.showConfirmDialog(null, msg, "Add Department", JOptionPane.OK_CANCEL_OPTION);
-        
-
-        if (option == JOptionPane.OK_OPTION){
-            Department.createNew(code.getText(), name.getText());
-            JOptionPane.showMessageDialog(null, "Department Added");
-            StudentSystem.reinstance();
-            data = fillData();
-            table = new JTable(data, colNames);
-            updateScreen();
+        if (SystemSecurity.getPrivilages() == 3){
+            JTextField code = new JTextField();
+            JTextField name = new JTextField();
+    
+            Object[] msg = {"Department Code: ", code, "Department Name", name};
+    
+            int option = JOptionPane.showConfirmDialog(null, msg, "Add Department", JOptionPane.OK_CANCEL_OPTION);
+            
+    
+            if (option == JOptionPane.OK_OPTION){
+                if (code.getText().length() != 3){
+                    JOptionPane.showMessageDialog(null, "Please enter a valid department code");
+                }else if (name.getText().equals("")){
+                    JOptionPane.showMessageDialog(null, "Please enter a valid department name");
+                }else{
+                    Department.createNew(code.getText(), name.getText());
+                    JOptionPane.showMessageDialog(null, "Department Added");
+                    StudentSystem.reinstance();
+                    data = fillData();
+                    table = new JTable(data, colNames);
+                    updateScreen();
+                }
+            }
         }
+
 
     }
 }
