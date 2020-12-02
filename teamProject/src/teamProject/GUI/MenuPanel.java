@@ -183,7 +183,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
         if (command.equals("Courses")) {
             Collection<Course> courses = Course.instances.values();
-            //TODO Open new Course Browser
+            new SubFrame("Test", parent, new AllCoursesPanel(parent, courses));
         }
         if (command.equals("Modules")) {
             Collection<Module> modules = Module.instances.values();

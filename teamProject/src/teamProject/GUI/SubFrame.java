@@ -37,7 +37,7 @@ public class SubFrame extends JFrame {
       ex.printStackTrace();
     }
     MainFrame main = new MainFrame();
-    new SubFrame("Test", main, new ViewStudents(main, Student.instances.values()));
+    new SubFrame("Test", main, new AllCoursesPanel(main, Course.instances.values()));
         
   }
 }
