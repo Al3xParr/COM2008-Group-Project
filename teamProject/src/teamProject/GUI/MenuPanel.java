@@ -144,7 +144,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
         if (command.equals("CurrentModules")) {
             Collection<Module> modules = ((Student) (SystemSecurity.getCurrentUser())).getLatestModules();
-            new SubFrame("Current Modules", parent, new AllModulesPanel(modules));
+            new SubFrame("Current Modules", parent, new AllModulesPanel(parent,modules));
         }
         if (command.equals("TeacherStudents")) {
             Collection<Student> students = Student.instances.values();
