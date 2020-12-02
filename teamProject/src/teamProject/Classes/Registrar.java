@@ -1,5 +1,7 @@
 package teamProject.Classes;
 
+
+
 import java.util.ArrayList;
 
 /**
@@ -39,6 +41,17 @@ public class Registrar extends User {
             e.printStackTrace();
         }
         return news;
+    }
+
+    public static Registrar getByUsername(String username) {
+        Registrar res = null;
+        for (Registrar x : instances.values()) {
+            if (x.getUsername().equals(username)) {
+                res = x;
+            }
+        }
+
+        return res;
     }
 
     public static Registrar getInstance(String key) {

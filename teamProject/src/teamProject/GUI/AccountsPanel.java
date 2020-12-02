@@ -70,8 +70,25 @@ public class AccountsPanel extends JPanel{
                     String confirmStr = "Are you sure you want to delete " + accounts[row][0] + "?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
+                        boolean success = false;
+                        switch (String.valueOf(accounts[row][1])){
+                            case "Student":
+                                success = Student.getByUsername(String.valueOf(accounts[row][0])).delete();
+                                break;
+                            case "Teacher":
+                                success = Teacher.getByUsername(String.valueOf(accounts[row][0])).delete();
+                                break;
+                            case "Registrar":
+                                success = Registrar.getByUsername(String.valueOf(accounts[row][0])).delete();
+                                break;
+                            case "Admin":
+                                success = Administrator.getByUsername(String.valueOf(accounts[row][0])).delete();
+                                break;
+                        }
+
                         System.out.println("Delete user " + accounts[row][0]);
-                        if (Student.getByUsername(String.valueOf(accounts[row][0])).delete()){
+                    
+                        if (success){
                             JOptionPane.showMessageDialog(null, "User Deleted");
                         } else{ 
                             JOptionPane.showMessageDialog(null, "User deletion failed");
