@@ -63,14 +63,13 @@ public class AccountsPanel extends JPanel{
                     
                         if (success){
                             JOptionPane.showMessageDialog(null, "User Deleted");
+                            StudentSystem.reinstance();
+                            accounts = fillData();
+                            table = new JTable(accounts, colNames);
+                            updateScreen();
                         } else{ 
                             JOptionPane.showMessageDialog(null, "User deletion failed");
                         }
-                        
-                        StudentSystem.reinstance();
-                        accounts = fillData();
-                        table = new JTable(accounts, colNames);
-                        updateScreen();
                         
                     }
                 }
