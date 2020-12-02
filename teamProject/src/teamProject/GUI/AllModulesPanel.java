@@ -73,7 +73,6 @@ public class AllModulesPanel extends JPanel implements ActionListener {
         if (SystemSecurity.getPrivilages()==3) {
             headerPanel.add(addMButton);
         }
-        headerPanel.add(addMButton);
         headerPanel.add(Box.createHorizontalGlue());
     
 

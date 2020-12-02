@@ -9,17 +9,15 @@ import javax.swing.text.MaskFormatter;
 import java.awt.event.*;
 import java.text.ParseException;
 
-import teamProject.StudentSystem;
 import teamProject.Classes.Department;
 import teamProject.Classes.Module;
-import teamProject.db.Database;
 
 public class NewModuleForm extends SubFrame implements ActionListener{
 
     private static final long serialVersionUID = 1L;
 
-    public JFormattedTextField modCodeField  = null;
-    public JTextField modNameField = null;
+    JFormattedTextField modCodeField  = null;
+    JTextField modNameField = null;
     JComboBox<String> deptBox = null;
     JComboBox<String> timeBox = null;
     JButton okButton = null;
@@ -34,8 +32,18 @@ public class NewModuleForm extends SubFrame implements ActionListener{
 
         JPanel panel = new JPanel();
         setContentPane(panel);
-        
-        okButton = new JButton();
+
+        JLabel codeNumLabel = new JLabel("Enter Number value for Module Code, ");
+        JLabel fullNameLabel = new JLabel("Full Module Name, ");
+        JLabel timeLabel = new JLabel("Choose the Time Period, ");
+        JLabel depLabel = new JLabel("and the Department.");
+
+        add(codeNumLabel);
+        add(fullNameLabel);
+        add(timeLabel);
+        add(depLabel);
+
+        okButton = new JButton("ok");
 
         MaskFormatter formatter  = null; 
          
@@ -46,6 +54,9 @@ public class NewModuleForm extends SubFrame implements ActionListener{
             catch (ParseException e)  {
                 e.printStackTrace();
             } 
+
+        modCodeField.setColumns(4);
+
         add(modCodeField);
 
         modNameField = new JTextField(15);
@@ -76,12 +87,27 @@ public class NewModuleForm extends SubFrame implements ActionListener{
     }      
 
     public void actionPerformed(ActionEvent e) {
-        int moduleNum = (int) modCodeField.getValue();
+        int moduleNum =  Integer.valueOf((String) modCodeField.getValue());
         String deptCode = deptBox.getItemAt(deptBox.getSelectedIndex());
         String fullName = modNameField.getText();
         String time = timeBox.getItemAt(timeBox.getSelectedIndex());
-        Module.createNew(moduleNum, deptCode, fullName, time);
-        JOptionPane.showMessageDialog(null, 
-         "A Module added sucessfuly. Please refresh the application to see the result.");
+        String modCode = deptCode+String.valueOf(moduleNum);
+
+        if (String.valueOf(moduleNum).length() == 0) {
+            JOptionPane.showMessageDialog(null, 
+                "Module Name cannot be empty");
+        }
+        else if (fullName.length() == 0) {
+            JOptionPane.showMessageDialog(null, 
+                "Module Name cannot be empty");
+        } else if (Module.checkPrimaryKeyExists(modCode)){
+            JOptionPane.showMessageDialog(null, 
+                "Module code taken, please choose different number");
+        } else {
+            Module.createNew(moduleNum, deptCode, fullName, time);
+            JOptionPane.showMessageDialog(null, 
+                "A Module added sucessfuly. Please refresh the application to see the result.");
+                dispose();
+        }
     }
 }
