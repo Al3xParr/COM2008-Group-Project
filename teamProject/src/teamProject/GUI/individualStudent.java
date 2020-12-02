@@ -36,7 +36,7 @@ public class IndividualStudent extends JPanel implements ActionListener {
         menuBar.add(viewMenu);
         parent.setJMenuBar(menuBar);
 
-        setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3)); 
+        setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
         header.setHorizontalAlignment(SwingConstants.CENTER);
@@ -78,7 +78,7 @@ public class IndividualStudent extends JPanel implements ActionListener {
             allStudyPeriod[count][0] = studyPeriod.getLabel();
             allStudyPeriod[count][1] = studyPeriod.getStartDate();
             allStudyPeriod[count][2] = studyPeriod.getEndDate();
-            allStudyPeriod[count][3] = studyPeriod.getDegreeLvl();
+            allStudyPeriod[count][3] = studyPeriod.getDegreeLvl().getDegreeLvl();
             allStudyPeriod[count][4] = "<html><B>View Grades</B></html>";
             count ++;
         }
@@ -103,11 +103,15 @@ public class IndividualStudent extends JPanel implements ActionListener {
         });
     }
 
+    public String getCourseCode() {
+        return this.courseCode;
+    }
+
     public void actionPerformed(ActionEvent event) {
+        String courseCode = getCourseCode();
+        Course course = Course.getInstance(courseCode);
         if (event.getActionCommand().equals("View Course")) {
-            new SubFrame("Course: " + courseCode, parent, 
-            new IndividualCourse(parent, Course.getInstance(courseCode)));
-            System.out.println("test test");
+            new SubFrame("Course: " + courseCode, parent, new IndividualCourse(parent, course));
         }
     }
 }

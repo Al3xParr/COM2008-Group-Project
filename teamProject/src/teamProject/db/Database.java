@@ -12,6 +12,9 @@ import java.sql.*;
 import java.nio.file.*;
 import java.io.IOException;
 import java.util.*;
+
+import com.mysql.cj.protocol.Resultset;
+
 import java.sql.Date;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
@@ -1087,6 +1090,7 @@ public class Database implements AutoCloseable {
         try (Statement stsm = con.createStatement()) {
 
             ArrayList<Department> otherDepartments = new ArrayList<Department>();
+            ArrayList<StudyLevel> studyLevels = new ArrayList<StudyLevel>();
             ResultSet results = stsm.executeQuery("SELECT courseCode FROM Course;");
 
             while (results.next()) {
@@ -1110,7 +1114,15 @@ public class Database implements AutoCloseable {
                         otherDepartments.add(Department.getInstance(deptResult.getString(1)));
                     }
                     course.setDepartmentList(otherDepartments);
-                    //TO-DO: setting the degree level list
+
+                    //NEW CODE FOR LINKING THE STUDY LEVEL TO THE COURSES
+                    ResultSet studyLevelResult = stsm2
+                    .executeQuery("SELECT DISTINCT degreeLvl FROM ModulesToCourse WHERE courseCode = '" + courseCode + "'");
+                    studyLevels.clear();
+                    while (studyLevelResult.next()) {
+                        studyLevels.add(StudyLevel.getInstance(studyLevelResult.getString(1) + courseCode));
+                    }
+                    course.setDegreeLvlList(studyLevels);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -22,7 +22,7 @@ public class ViewStudents extends JPanel {
 
         
         for (Student student: students) {
-            
+            System.out.println(student.getRegNum());
             allStudents[count][0] = (Integer) student.getRegNum();
             allStudents[count][1] = student.getUsername();
             allStudents[count][2] = student.getTitle();
@@ -56,7 +56,7 @@ public class ViewStudents extends JPanel {
         table.setFillsViewportHeight(true);
         JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
-        
+
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {

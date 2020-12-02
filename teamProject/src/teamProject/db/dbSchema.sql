@@ -67,7 +67,7 @@ CREATE TABLE ModulesToCourse(
     moduleCode CHAR(7) NOT NULL,
     courseCode CHAR(6) NOT NULL,
     core BOOLEAN NOT NULL,
-    degreeLvl TINYINT NOT NULL,
+    degreeLvl CHAR(1) NOT NULL,
     CONSTRAINT id PRIMARY KEY (moduleCode, courseCode),
     FOREIGN KEY (moduleCode) REFERENCES Modules(moduleCode) ON DELETE CASCADE,
     FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE CASCADE
