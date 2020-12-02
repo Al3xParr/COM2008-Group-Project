@@ -163,11 +163,11 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
         if (command.equals("TeacherStudents")) {
             Collection<Student> students = Student.instances.values();
-            //TODO Open new Student Browser for Teachers
+            new SubFrame("All Students", parent, new ViewStudents(parent, students));
         }
         if (command.equals("RegistrarStudents")) {
             Collection<Student> students = Student.instances.values();
-            //TODO Open new Student Browser for Registrar
+            new SubFrame("All Students", parent, new ViewStudents(parent, students));
         }
         if (command.equals("Users")) {
             Collection<User> users = new ArrayList<>();
@@ -175,11 +175,11 @@ public class MenuPanel extends JPanel implements ActionListener {
             users.addAll(Teacher.instances.values());
             users.addAll(Registrar.instances.values());
             users.addAll(Administrator.instances.values());
-            //TODO Open new Student Browser for Teachers
+            new SubFrame("All Users", parent, new AccountsPanel(parent));
         }
         if (command.equals("Departments")) {
             Collection<Department> departments = Department.instances.values();
-            //TODO Open new Department Browser
+            new SubFrame("All Departments", parent, new DepartmentsPanel(parent));
         }
         if (command.equals("Courses")) {
             Collection<Course> courses = Course.instances.values();

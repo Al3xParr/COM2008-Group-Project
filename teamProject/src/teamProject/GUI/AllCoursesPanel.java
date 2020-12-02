@@ -138,7 +138,8 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        //TODO create new instance of Course forms
+        
+        new NewCourseForm(parent);
 
     }
 
