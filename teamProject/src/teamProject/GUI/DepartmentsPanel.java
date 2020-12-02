@@ -1,6 +1,8 @@
 package teamProject.GUI;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import teamProject.Classes.*;
 import java.util.*;
 import java.awt.event.*;
@@ -15,6 +17,7 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
     
     JButton addBtn;
     JTable table;
+    DefaultTableModel model;
     Object[][] data;
     String[] colNames = new String[3];
 
@@ -29,7 +32,8 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
         colNames[2] = "Remove Department";
 
         data = fillData();
-        table = new JTable(data, colNames);
+        model = new DefaultTableModel(data, colNames);
+        table = new JTable(model);
         addBtn = new JButton("Add Department");
         addBtn.addActionListener(this);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -50,7 +54,8 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
                             JOptionPane.showMessageDialog(null, "Department Deleted");
                             StudentSystem.reinstance();
                             data = fillData();
-                            table = new JTable(data, colNames);
+                            model = new DefaultTableModel(data, colNames);
+                            table.setModel(model);
                             updateScreen();
                         }else{ 
                             JOptionPane.showMessageDialog(null, "Department deletion failed");
@@ -82,7 +87,7 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
         for (Department dept : depts.values()){
             data[counter][0] = dept.getDeptCode();
             data[counter][1] = dept.getFullName();
-            data[counter][2] = "DELETE";
+            data[counter][2] = "<html><B>DELETE</B><html>";
             counter++;
         }
 
@@ -109,10 +114,13 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Department Added");
                     StudentSystem.reinstance();
                     data = fillData();
-                    table = new JTable(data, colNames);
+                    model = new DefaultTableModel(data, colNames);
+                    table.setModel(model);
                     updateScreen();
                 }
             }
+        }else{
+            JOptionPane.showMessageDialog(null, "You do not have the privileges required to do this");
         }
 
 

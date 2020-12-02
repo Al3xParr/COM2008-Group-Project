@@ -1,12 +1,15 @@
 package teamProject.GUI;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import teamProject.Classes.*;
 import teamProject.SystemSecurity;
 import teamProject.StudentSystem;
 import java.util.*;
+import java.awt.event.*;
 
-public class AccountsPanel extends JPanel{
+public class AccountsPanel extends JPanel implements ActionListener{
     
     private static final long serialVersionUID = 1L;
     
@@ -17,7 +20,10 @@ public class AccountsPanel extends JPanel{
     HashMap<String, Administrator> admins;
 
     Object[][] accounts;
+    String[] colNames = new String[3];
+    DefaultTableModel model;
     JTable table;
+    JButton addBtn;
 
     public AccountsPanel(MainFrame parent) {
 
@@ -27,16 +33,21 @@ public class AccountsPanel extends JPanel{
         teachers = Teacher.instances;
         admins = Administrator.instances;
 
-        String[] colNames = {"Username", "Access Level", "Delete Account"};
+        colNames[0] = "Username";
+        colNames[1] = "Access Level";
+        colNames[2] = "Delete Account";
         accounts = fillData();
+        model = new DefaultTableModel(accounts, colNames);
+        table = new JTable(model);
 
-        table = new JTable(accounts, colNames);
+        addBtn = new JButton("Add New Account");
+        addBtn.addActionListener(this);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
+                System.out.println("PPboi");
                 
-                System.out.println(teachers.size());
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
                 if (col == 2){
@@ -58,15 +69,18 @@ public class AccountsPanel extends JPanel{
                                 success = Administrator.getByUsername(String.valueOf(accounts[row][0])).delete();
                                 break;
                         }
-
-                        System.out.println("Delete user " + accounts[row][0]);
                     
                         if (success){
-                            JOptionPane.showMessageDialog(null, "User Deleted");
-                            StudentSystem.reinstance();
-                            accounts = fillData();
-                            table = new JTable(accounts, colNames);
-                            updateScreen();
+                            if (SystemSecurity.getPrivilages() == 3){
+                                JOptionPane.showMessageDialog(null, "User Deleted");
+                                StudentSystem.reinstance();
+                                accounts = fillData();
+                                model = new DefaultTableModel(accounts, colNames);
+                                table.setModel(model);
+                                updateScreen();
+                            }else{
+                                JOptionPane.showMessageDialog(null, "You do not have the privileges required to do this");
+                            }
                         } else{ 
                             JOptionPane.showMessageDialog(null, "User deletion failed");
                         }
@@ -79,11 +93,14 @@ public class AccountsPanel extends JPanel{
         updateScreen();
     }
 
+
+
     public void updateScreen(){
         this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         table.setEnabled(false);
         this.add(new JScrollPane(table));
+        this.add(addBtn);
         revalidate();
         repaint();
     }
@@ -96,36 +113,80 @@ public class AccountsPanel extends JPanel{
         for (Administrator admin : admins.values()){
             data[counter][0] = admin.getUsername();
             data[counter][1]= "Admin";
-            data[counter][2] = "DELETE";
+            data[counter][2] = "<html><B>DELETE</B><html>";
             counter ++;
         }
 
         for (Registrar reg : registrars.values()){
             data[counter][0] = reg.getUsername();
             data[counter][1] = "Registrar";
-            data[counter][2] = "DELETE";
+            data[counter][2] = "<html><B>DELETE</B><html>";
             counter ++;
         }
 
         for (Teacher teacher : teachers.values()){
             data[counter][0] = teacher.getUsername();
             data[counter][1] = "Teacher";
-            data[counter][2] = "DELETE";
+            data[counter][2] = "<html><B>DELETE</B><html>";
             counter ++;
         }
 
         for (Student student : students.values()){
             data[counter][0] = student.getUsername();
             data[counter][1] = "Student";
-            data[counter][2] = "DELETE";
+            data[counter][2] = "<html><B>DELETE</B><html>";
             counter ++;
         }
 
         return data;
     }
 
-    
-    
-    
+    public void actionPerformed(ActionEvent event) {
+
+        String[] types = { "Teacher", "Registrar", "Admin"};
+        JComboBox type = new JComboBox<String>(types);
+        JTextField username = new JTextField();
+        JTextField pass = new JTextField();
+        JTextField confirmpass = new JTextField();
+        JTextField name = new JTextField();
+
+        Object[] msg = {"Account Type: ", type, "Username: ", username, 
+                            "Password: ", pass, "Confirm Password: ", confirmpass,
+                            "Name:", name};
+        
+        int option = JOptionPane.showConfirmDialog(null, msg, "Add Account", JOptionPane.OK_CANCEL_OPTION);    
+        
+
+        if (option == JOptionPane.OK_OPTION){
+            if (SystemSecurity.getPrivilages() == 3){
+            
+                if (pass.getText().equals(confirmpass.getText())){
+                    
+                    switch (String.valueOf(type.getSelectedItem())){
+                        case "Admin":
+                            Administrator.createNew(username.getText(), pass.getText());
+                            break;
+                        case "Registrar":
+                            Registrar.createNew(username.getText(), pass.getText());
+                            break;
+                        case "Teacher":
+                            Teacher.createNew(username.getText(), pass.getText(), name.getText());
+                            break;
+                    }
+
+                    JOptionPane.showMessageDialog(null, "New User Added");
+                    StudentSystem.reinstance();
+                    accounts = fillData();
+                    model = new DefaultTableModel(accounts, colNames);
+                    table.setModel(model);
+                    updateScreen();
+                }else{
+                    JOptionPane.showMessageDialog(null, "Please enter the same password");
+                }
+            } else{
+                JOptionPane.showMessageDialog(null, "You do not have the privileges required to do this");
+            }
+        }
+    }
 
 }
