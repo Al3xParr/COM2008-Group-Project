@@ -33,6 +33,17 @@ public abstract class User {
       }
       return false;
     }
+
+    public static Boolean checkPrimaryKeyExists(String key) {
+      try (Database db = StudentSystem.connect()) {
+        String[] names = { "username" };
+        String[] values = { key };
+        return db.ValueSetCheck("Accounts", names, values);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      return true;
+    }
     
   public String getUsername() {
     return this.username;
