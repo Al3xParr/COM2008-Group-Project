@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import javax.swing.*;
 
+import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 
 /** 
@@ -62,6 +63,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     public void refreshAll() {
+        StudentSystem.reinstance();
         for(SubFrame s : subFrames){
             s.panel.refresh();
         }

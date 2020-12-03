@@ -61,9 +61,9 @@ public class StudentSystem {
         try (Database db = connect()) {
             //DO STUFF HERE
 
-            db.resetDB();
-            db.populateDB();
-            db.instantiateUsers();
+            //db.resetDB();
+            //db.populateDB();
+            //db.instantiateUsers();
             new MainFrame();
 
         } catch (Exception e) {

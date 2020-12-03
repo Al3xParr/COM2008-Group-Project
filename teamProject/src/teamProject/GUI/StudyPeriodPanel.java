@@ -7,7 +7,6 @@ import javax.swing.table.DefaultTableModel;
 
 import java.util.ArrayList;
 
-import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
@@ -144,7 +143,6 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
     }
 
     public void refresh() {
-        StudentSystem.reinstance();
         table.setModel(new DefaultTableModel(getData(),columnNames));
         revalidate();
         repaint();

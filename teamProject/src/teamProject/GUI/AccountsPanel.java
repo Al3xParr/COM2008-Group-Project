@@ -5,7 +5,6 @@ import javax.swing.table.DefaultTableModel;
 
 import teamProject.Classes.*;
 import teamProject.SystemSecurity;
-import teamProject.StudentSystem;
 import java.util.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -141,7 +140,6 @@ public class AccountsPanel extends RefreshablePanel implements ActionListener{
     }
     
     public void refresh(){
-        StudentSystem.reinstance();
         accounts = fillData();
         model = new DefaultTableModel(accounts, colNames);
         table.setModel(model);

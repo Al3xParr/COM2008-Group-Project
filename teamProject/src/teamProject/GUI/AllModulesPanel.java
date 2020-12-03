@@ -1,6 +1,5 @@
 package teamProject.GUI;
 
-import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 import teamProject.Classes.Module;
 
@@ -135,7 +134,6 @@ public class AllModulesPanel extends RefreshablePanel implements ActionListener 
     
     @Override
     public void refresh() {
-        StudentSystem.reinstance();
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

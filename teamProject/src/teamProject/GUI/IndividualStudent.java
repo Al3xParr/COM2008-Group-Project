@@ -93,8 +93,6 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
                 if (col == 4 && row != -1) {
-                    //TODO Create new study period panel - as an instance, use this students regID + the label
-                    //Will probably have to cast to a String in order to work (look at the ViewStudents.java)
                     String ref = regNum + (String) allStudyPeriod[row][0];
                     StudyPeriod period = StudyPeriod.getInstance(ref);
                     new SubFrame("Study Period: " + allStudyPeriod[row][0], parent,
@@ -125,7 +123,6 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
     }
     
     public void refresh() {
-        StudentSystem.reinstance();
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

@@ -1,6 +1,5 @@
 package teamProject.GUI;
 
-import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 import teamProject.Classes.Module;
 import teamProject.Classes.StudyLevel;
@@ -70,7 +69,7 @@ public class StudyLevelPanel extends RefreshablePanel implements ActionListener 
     
 
         //Overides default data model behind JTable making it unedible
-        final JTable table = new JTable();
+        table = new JTable();
         table.setModel(new DefaultTableModel(allModules, columnNames));
         table.setEnabled(false);
         setColumnWidth(table);
@@ -150,7 +149,6 @@ public class StudyLevelPanel extends RefreshablePanel implements ActionListener 
     }
 
     public void refresh() {
-        StudentSystem.reinstance();
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

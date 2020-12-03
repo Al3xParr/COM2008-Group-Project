@@ -7,7 +7,6 @@ import teamProject.Classes.*;
 import java.util.*;
 import java.awt.event.*;
 import java.awt.*;
-import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 
 public class DepartmentsPanel extends RefreshablePanel implements ActionListener {
@@ -120,7 +119,6 @@ public class DepartmentsPanel extends RefreshablePanel implements ActionListener
     }
 
     public void refresh() {
-        StudentSystem.reinstance();
         data = fillData();
         model = new DefaultTableModel(data, colNames);
         table.setModel(model);

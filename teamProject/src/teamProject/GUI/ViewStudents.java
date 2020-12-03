@@ -81,7 +81,6 @@ public class ViewStudents extends RefreshablePanel implements ActionListener {
     }
     
     public void refresh() {
-        StudentSystem.reinstance();
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

@@ -6,7 +6,6 @@ import javax.swing.table.DefaultTableModel;
 
 import java.util.ArrayList;
 
-import teamProject.StudentSystem;
 import teamProject.Classes.*;
 
 public class IndividualCourse extends RefreshablePanel {
@@ -65,9 +64,6 @@ public class IndividualCourse extends RefreshablePanel {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
                 if (col == 1 && row != -1) {
-                    //TODO Create new study period panel - as an instance, use this students regID + the label
-                    //Will probably have to cast to a String in order to work (look at the ViewStudents.java)
-                    //new SubFrame("Study Period: "+ allDegreeLvl[row][0], parent, ...);
                     new SubFrame("Study Level: " + allDegreeLvl[row][0], parent,
                             new StudyLevelPanel(parent, StudyLevel.getInstance(allDegreeLvl[row][0] + courseCode)));
                     System.out.println(allDegreeLvl[row][0]);
@@ -92,7 +88,6 @@ public class IndividualCourse extends RefreshablePanel {
     }
 
     public void refresh() {
-        StudentSystem.reinstance();
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();
