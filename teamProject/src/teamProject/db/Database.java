@@ -1017,8 +1017,6 @@ public class Database implements AutoCloseable {
     //instantiating the departments
     public void instantiateDepartment() {
         try (Statement stsm = con.createStatement()) {
-            ArrayList<Course> coursesList = new ArrayList<Course>();
-            ArrayList<Module> modulesList = new ArrayList<Module>();
             ResultSet results = stsm.executeQuery("SELECT * FROM Departments;");
 
             while (results.next()) {
@@ -1030,14 +1028,14 @@ public class Database implements AutoCloseable {
                         //finding the courses from that department
                         ResultSet coursesResults = stsm2
                                 .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = '" + deptCode + "';");
-                        coursesList.clear();
+                        ArrayList<Course> coursesList = new ArrayList<Course>();
                         while (coursesResults.next()) {
                             coursesList.add(Course.getInstance(results.getString(1)));
                         }
                         //finding the modules within that department
                         ResultSet modulesResults = stsm2
                                 .executeQuery("SELECT * FROM Modules WHERE deptCode = '" + deptCode + "';");
-                        modulesList.clear();
+                        ArrayList<Module> modulesList = new ArrayList<Module>();
                         while (modulesResults.next()) {
                             modulesList.add(Module.getInstance(modulesResults.getString(3)));
                         }
@@ -1144,7 +1142,6 @@ public class Database implements AutoCloseable {
     public void addCourseInformation() {
         try (Statement stsm = con.createStatement()) {
 
-            ArrayList<Department> otherDepartments = new ArrayList<Department>();
             ResultSet results = stsm.executeQuery("SELECT courseCode FROM Course;");
 
             while (results.next()) {
@@ -1163,12 +1160,20 @@ public class Database implements AutoCloseable {
                     //setting the other departments
                     ResultSet deptResult = stsm2.executeQuery(
                             "SELECT deptCode FROM CourseToDepartment WHERE courseCode = '" + courseCode + "';");
-                    otherDepartments.clear();
+                    ArrayList<Department> otherDepartments = new ArrayList<Department>();
                     while (deptResult.next()) {
                         otherDepartments.add(Department.getInstance(deptResult.getString(1)));
                     }
                     course.setDepartmentList(otherDepartments);
-                    //TO-DO: setting the degree level list
+
+                    //NEW CODE FOR LINKING THE STUDY LEVEL TO THE COURSES
+                    ResultSet studyLevelResult = stsm2
+                    .executeQuery("SELECT DISTINCT degreeLvl FROM ModulesToCourse WHERE courseCode = '" + courseCode + "'");
+                    ArrayList<StudyLevel> studyLevels = new ArrayList<StudyLevel>();
+                    while (studyLevelResult.next()) {
+                        studyLevels.add(StudyLevel.getInstance(studyLevelResult.getString(1) + courseCode));
+                    }
+                    course.setDegreeLvlList(studyLevels);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

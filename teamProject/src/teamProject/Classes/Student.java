@@ -61,9 +61,10 @@ public class Student extends User {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        news.setRegNum(regNum);
         StudyPeriod.createNew(regNum, "A", startDate, endDate,
                 StudyLevel.getInstance(degreeLvl + course.getCourseCode()));
-        news.setRegNum(regNum);
+        
         return news;
     }
 
@@ -413,6 +414,8 @@ public class Student extends User {
     }
 
     public void setRegNum(int regNum) {
+        instances.remove(this.regNum);
+        instances.put(regNum,this);
         this.regNum = regNum;
     }
 
