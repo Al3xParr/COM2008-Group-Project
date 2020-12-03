@@ -47,15 +47,16 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
         }
 
         if (SystemSecurity.getPrivilages() == 1) {
-            String[] colNames = {"Module", "Mark", "Resit Mark", "Edit Grades"};
-            Object[][] gradesTable = new Object[grades.size()][4];
+            String[] colNames = {"Module Code", "Module Name", "Mark", "Resit Mark", "Edit Grades"};
+            Object[][] gradesTable = new Object[grades.size()][5];
 
             int count = 0;
             for (Grade grade: grades) {
                 gradesTable[count][0] = grade.getModule().getModuleCode();
-                gradesTable[count][1] = grade.getMark();
-                gradesTable[count][2] = grade.getResitMark();
-                gradesTable[count][3] = "<html><B>Edit Grades</B></html>";
+                gradesTable[count][1] = grade.getModule().getFullName();
+                gradesTable[count][2] = grade.getMark();
+                gradesTable[count][3] = grade.getResitMark();
+                gradesTable[count][4] = "<html><B>Edit Grades</B></html>";
                 count ++;
             }
             
@@ -70,7 +71,7 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
                     int row = table.rowAtPoint(evt.getPoint());
                     int col = table.columnAtPoint(evt.getPoint());
-                    if (col == 3){
+                    if (col == 4){
                         String[] markTypes = {"Mark", "Resit Mark"};
                         JFormattedTextField gradeInp = new JFormattedTextField(new Double(100.00));
 
@@ -102,14 +103,15 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
             });
 
         } else {
-            String[] colNames = {"Module", "Mark", "Resit Mark"};
-            Object[][] gradesTable = new Object[grades.size()][3];
+            String[] colNames = {"Module", "Module Name", "Mark", "Resit Mark"};
+            Object[][] gradesTable = new Object[grades.size()][4];
 
             int count = 0;
             for (Grade grade: grades) {
-                gradesTable[count][0] = grade.getModule().getFullName();
-                gradesTable[count][1] = grade.getMark();
-                gradesTable[count][2] = grade.getResitMark();
+                gradesTable[count][0] = grade.getModule().getModuleCode();
+                gradesTable[count][1] = grade.getModule().getFullName();
+                gradesTable[count][2] = grade.getMark();
+                gradesTable[count][3] = grade.getResitMark();
                 count ++;
             }
             
