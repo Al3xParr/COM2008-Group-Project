@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Calendar;
 
 import teamProject.SystemSecurity;
 import teamProject.Classes.*;
@@ -13,8 +15,9 @@ public class IndividualStudent extends JPanel implements ActionListener {
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
     int numGrades = 0;
-    Student student;
+    Student student = null;
     String courseCode;
+    Course course = null;
 
     public IndividualStudent(MainFrame parent, Student student) {
         this.parent = parent;
@@ -26,9 +29,10 @@ public class IndividualStudent extends JPanel implements ActionListener {
         String surname = student.getSurname();
         String email = student.getEmail();
         String tutor = student.getTutor();
-        String course = student.getCourse().getFullName();
+        String courseName = student.getCourse().getFullName();
         ArrayList<StudyPeriod> studyPeriods = student.getStudyPeriodList();
         courseCode = student.getCourse().getCourseCode();
+        course = Course.getInstance(courseCode);
 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
@@ -48,7 +52,7 @@ public class IndividualStudent extends JPanel implements ActionListener {
                 "<html><div style = 'text-align : center;'><<h3>Tutor: " + tutor + "</h3><br>");
         add(tutorLabel);
         JLabel courseLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Course: " + course + "</h3>");
+                "<html><div style = 'text-align : center;'><<h3>Course: " + courseName + "</h3>");
         add(courseLabel);
 
         JButton courseButton = new JButton("<html>View Course");
@@ -119,11 +123,54 @@ public class IndividualStudent extends JPanel implements ActionListener {
             new SubFrame("Course: " + courseCode, parent, new IndividualCourse(parent, course));
         } 
         if (event.getActionCommand().equals("View Current Progress")) {
-            System.out.println("in button");
             JOptionPane.showMessageDialog(null, student.getStudentResults());
         } 
         if (event.getActionCommand().equals("Progress Student")) {
-            //StudyPeriod.createNew(student.getRegNum(), abel, startDate, endDate, lvl)
+            String level;
+            /*if (course.getMasters()) {
+                if (student.getDegreeLvl() == "3" && course.getYearInIndustry()) {
+                    level = "P";
+                } else if (student.getDegreeLvl() == "3" && !course.getYearInIndustry()) {
+                    level = "4";
+                } else if (student.getDegreeLvl() == "4") {
+                    level = "G";
+                } else if (student.getDegreeLvl().equals("2")) {
+                    level = "3";
+                } else {
+                    level = "2";
+                }
+            //else {*/
+            if (student.getDegreeLvl().equals("2")) {
+                if (course.getYearInIndustry()) {
+                    level = "P";
+                } else {
+                    level = "3";
+                }
+            } else if (student.getDegreeLvl().equals("3"))  {
+                level = "G";
+            } else {
+                level = "2";
+            }
+            //}
+            System.out.println(level);
+            if (!level.equals("G")) {
+                //working out the start and end date
+                long milliStart =System.currentTimeMillis();  
+                java.sql.Date startDate =new java.sql.Date(milliStart);  
+                System.out.println(startDate);
+                Calendar c = Calendar.getInstance(); 
+                c.setTime(startDate); 
+                c.add(Calendar.YEAR, 1);
+                long milliEnd = c.getTimeInMillis();
+                java.sql.Date endDate = new java.sql.Date(milliEnd);
+                System.out.println(endDate);
+
+                //retrieving the study level
+                StudyLevel studyLevel = StudyLevel.getInstance(level + courseCode);
+
+                StudyPeriod.createNew(student.getRegNum(), "Z", startDate, endDate, studyLevel);
+                System.out.println("Update success");
+            }
         }
     }
 }
