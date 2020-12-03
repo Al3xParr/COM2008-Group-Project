@@ -1,8 +1,7 @@
 package teamProject.GUI;
 
 import java.awt.*;
-import java.text.NumberFormat;
-
+import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
 
@@ -10,16 +9,22 @@ import teamProject.SystemSecurity;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
 
-public class StudyPeriodPanel extends JPanel {
+public class StudyPeriodPanel extends JPanel implements ActionListener {
     
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
+    StudyPeriod studyPeriod = null;
+    StudyLevel studyLevel = null;
+    ArrayList<Grade> grades = null;
 
     public StudyPeriodPanel(MainFrame parent, StudyPeriod studyPeriod) {
         this.parent = parent;
+        this.studyPeriod = studyPeriod;
+        this.studyLevel = studyPeriod.getDegreeLvl();
+        this.grades = studyPeriod.getGradesList();
+
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         String label = studyPeriod.getLabel();
-        ArrayList<Grade> grades = studyPeriod.getGradesList();
 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Period: " + label + " </h3><br>");
@@ -31,6 +36,16 @@ public class StudyPeriodPanel extends JPanel {
         gradeLabel.setHorizontalAlignment(SwingConstants.LEFT);
         add(gradeLabel);
         
+        if (SystemSecurity.getPrivilages() == 2) {
+            JButton addModuleButton = new JButton("Add Module");
+            addModuleButton.addActionListener(this);
+            add(addModuleButton);
+
+            JButton progressButton = new JButton("Remove Module");
+            progressButton.addActionListener(this);
+            add(progressButton);
+        }
+
         if (SystemSecurity.getPrivilages() == 1) {
             String[] colNames = {"Module", "Mark", "Resit Mark", "Edit Grades"};
             Object[][] gradesTable = new Object[grades.size()][4];
@@ -104,6 +119,40 @@ public class StudyPeriodPanel extends JPanel {
             JScrollPane scrollpane = new JScrollPane(table);
             add(scrollpane);
         }
+    }
+    public void actionPerformed(ActionEvent event) {
+        if (event.getActionCommand().equals("Add Module")) {
+            ArrayList<Module> optionaModules = studyLevel.getOptionalModules();
+            String modulesString= "";
+            for (Module module: optionaModules) {
+                Boolean flag = true;
+                //checking the module is already selected
+                for (Grade grade: grades) {
+                    if (grade.getModule().equals(module)) {
+                        flag = false;
+                    }
+                }
+                if (flag) {
+                    modulesString += module.getModuleCode() + " ";
+                }
+            }
+            
+            String[] modulesOptions = modulesString.split("\\W+");;
+            for (int i=0; i<modulesOptions.length; i++) {
+                System.out.println(modulesOptions[i]);
+            }
+            JComboBox <String> modulesCombo = new JComboBox<String>(modulesOptions);
 
+            Object[] msg = {"Optional modules available: ", modulesCombo};
+            int option = JOptionPane.showConfirmDialog(null, msg, "Add Module", JOptionPane.OK_CANCEL_OPTION);
+            
+            if (option == JOptionPane.OK_OPTION){
+                Module selectedModule = Module.getInstance(modulesCombo.getItemAt(modulesCombo.getSelectedIndex()));
+                studyPeriod.registerModule(selectedModule);
+            }
+        }
+        if (event.getActionCommand().equals("Delete Module")) {
+
+        }
     }
 }

@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Calendar;
 
 import teamProject.SystemSecurity;
@@ -54,12 +53,6 @@ public class IndividualStudent extends JPanel implements ActionListener {
         JLabel courseLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Course: " + courseName + "</h3>");
         add(courseLabel);
-
-        JButton courseButton = new JButton("<html>View Course");
-        courseButton.setMaximumSize(new Dimension(130, 40));
-        courseButton.setActionCommand("View Course");
-        courseButton.addActionListener(this);
-        add(courseButton);
 
         JLabel studyLevelLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Study Levels: </h3>");
@@ -117,17 +110,12 @@ public class IndividualStudent extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        if (event.getActionCommand().equals("View Course")) {
-            String courseCode = getCourseCode();
-            Course course = Course.getInstance(courseCode);
-            new SubFrame("Course: " + courseCode, parent, new IndividualCourse(parent, course));
-        } 
         if (event.getActionCommand().equals("View Current Progress")) {
             JOptionPane.showMessageDialog(null, student.getStudentResults());
         } 
         if (event.getActionCommand().equals("Progress Student")) {
             String level;
-            /*if (course.getMasters()) {
+            if (course.getMasters()) {
                 if (student.getDegreeLvl() == "3" && course.getYearInIndustry()) {
                     level = "P";
                 } else if (student.getDegreeLvl() == "3" && !course.getYearInIndustry()) {
@@ -139,37 +127,33 @@ public class IndividualStudent extends JPanel implements ActionListener {
                 } else {
                     level = "2";
                 }
-            //else {*/
-            if (student.getDegreeLvl().equals("2")) {
-                if (course.getYearInIndustry()) {
-                    level = "P";
-                } else {
-                    level = "3";
-                }
-            } else if (student.getDegreeLvl().equals("3"))  {
-                level = "G";
             } else {
-                level = "2";
+                if (student.getDegreeLvl().equals("2")) {
+                    if (course.getYearInIndustry()) {
+                        level = "P";
+                    } else {
+                        level = "3";
+                    }
+                } else if (student.getDegreeLvl().equals("3"))  {
+                    level = "G";
+                } else {
+                    level = "2";
+                }
             }
-            //}
-            System.out.println(level);
             if (!level.equals("G")) {
                 //working out the start and end date
                 long milliStart =System.currentTimeMillis();  
                 java.sql.Date startDate =new java.sql.Date(milliStart);  
-                System.out.println(startDate);
                 Calendar c = Calendar.getInstance(); 
                 c.setTime(startDate); 
                 c.add(Calendar.YEAR, 1);
                 long milliEnd = c.getTimeInMillis();
                 java.sql.Date endDate = new java.sql.Date(milliEnd);
-                System.out.println(endDate);
 
                 //retrieving the study level
                 StudyLevel studyLevel = StudyLevel.getInstance(level + courseCode);
 
                 StudyPeriod.createNew(student.getRegNum(), "Z", startDate, endDate, studyLevel);
-                System.out.println("Update success");
             }
         }
     }
