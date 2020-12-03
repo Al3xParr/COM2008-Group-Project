@@ -32,7 +32,7 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
         add(header);
 
         JLabel gradeLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Grades: </h3><br>");
+                "<html><div style = 'text-align : center;'><<h3>Grades: </h3>");
         gradeLabel.setHorizontalAlignment(SwingConstants.LEFT);
         add(gradeLabel);
         
@@ -41,9 +41,9 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
             addModuleButton.addActionListener(this);
             add(addModuleButton);
 
-            JButton progressButton = new JButton("Remove Module");
-            progressButton.addActionListener(this);
-            add(progressButton);
+            JButton removeButton = new JButton("Remove Module");
+            removeButton.addActionListener(this);
+            add(removeButton);
         }
 
         if (SystemSecurity.getPrivilages() == 1) {
@@ -120,6 +120,26 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
             add(scrollpane);
         }
     }
+
+    public String[] getRegisteredModules() {
+        ArrayList<Module> optionaModules = studyLevel.getOptionalModules();
+            String modulesString= "";
+            for (Module module: optionaModules) {
+                Boolean flag = false;
+                //checking the module is already selected
+                for (Grade grade: grades) {
+                    if (grade.getModule().equals(module)) {
+                        flag = true;
+                    }
+                }
+                if (flag) {
+                    modulesString += module.getModuleCode() + " ";
+                }
+            }
+            String[] modulesOptions = modulesString.split("\\W+");;
+            return modulesOptions;
+    }
+
     public void actionPerformed(ActionEvent event) {
         if (event.getActionCommand().equals("Add Module")) {
             ArrayList<Module> optionaModules = studyLevel.getOptionalModules();
@@ -136,11 +156,7 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
                     modulesString += module.getModuleCode() + " ";
                 }
             }
-            
             String[] modulesOptions = modulesString.split("\\W+");;
-            for (int i=0; i<modulesOptions.length; i++) {
-                System.out.println(modulesOptions[i]);
-            }
             JComboBox <String> modulesCombo = new JComboBox<String>(modulesOptions);
 
             Object[] msg = {"Optional modules available: ", modulesCombo};
@@ -151,8 +167,18 @@ public class StudyPeriodPanel extends JPanel implements ActionListener {
                 studyPeriod.registerModule(selectedModule);
             }
         }
-        if (event.getActionCommand().equals("Delete Module")) {
+        if (event.getActionCommand().equals("Remove Module")) {
+            String[] modulesTaken = getRegisteredModules();
+            JComboBox <String> deletionCombo = new JComboBox<String>(modulesTaken);
 
+            Object[] msg = {"Optional modules for Deletion: ", deletionCombo};
+            int option = JOptionPane.showConfirmDialog(null, msg, "Delete Module", JOptionPane.OK_CANCEL_OPTION);
+            
+            if (option == JOptionPane.OK_OPTION){
+                Module selectedModule = Module.getInstance(deletionCombo.getItemAt(deletionCombo.getSelectedIndex()));
+                studyPeriod.unregisterModule(selectedModule);
+                System.out.println("Successfully deleted");
+            }
         }
     }
 }
