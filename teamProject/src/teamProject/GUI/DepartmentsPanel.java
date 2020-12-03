@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import teamProject.Classes.*;
 import java.util.*;
 import java.awt.event.*;
+import java.awt.*;
 import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 
@@ -21,6 +22,12 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
     Object[][] data;
     String[] colNames = new String[3];
 
+    JLabel header;
+
+    JPanel headerPanel;
+    JScrollPane scrollPane;
+
+    BoxLayout mainForm = new BoxLayout(this,BoxLayout.PAGE_AXIS);
 
     public DepartmentsPanel(MainFrame parent){
 
@@ -34,8 +41,43 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
         data = fillData();
         model = new DefaultTableModel(data, colNames);
         table = new JTable(model);
-        addBtn = new JButton("Add Department");
+
+        table.setEnabled(false);
+
+        header = new JLabel("<html><div style = 'text-align : center;'><<h2>View All Departments:</h2><br><h4></h4></div>");
+        header.setAlignmentY(Component.CENTER_ALIGNMENT);
+        header.setVerticalAlignment(SwingConstants.CENTER);
+        header.setOpaque(true);
+
+        addBtn = new JButton("Add New Department");
         addBtn.addActionListener(this);
+
+        headerPanel = new JPanel();
+
+        BoxLayout headerForm = new BoxLayout(headerPanel, BoxLayout.LINE_AXIS);
+        headerPanel.setLayout(headerForm);
+
+        headerPanel.add(Box.createHorizontalGlue());
+        header.setMaximumSize(new Dimension(500,100));
+        headerPanel.add(header);
+        
+        Dimension minSize = new Dimension (25,20);
+        Dimension prefSize = new Dimension (400,20);
+        headerPanel.add(new Box.Filler(minSize, prefSize, prefSize));
+
+        headerPanel.add(addBtn);
+        headerPanel.add(Box.createHorizontalGlue());
+
+        table.setPreferredSize(new Dimension(700, 200));
+        table.setFillsViewportHeight(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        scrollPane = new JScrollPane(table);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setMaximumSize(new Dimension(703,200));
+
+        
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             
             @Override
@@ -47,16 +89,18 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
                     String confirmStr = "Are you sure you want to delete " + data[row][0] + "?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
-                        System.out.println("Delete dept " + data[row][0]);
-
-                        System.out.println(Department.getInstance(String.valueOf(data[row][0])).getFullName());
+                        
                         if (Department.getInstance(String.valueOf(data[row][0])).delete()){
-                            JOptionPane.showMessageDialog(null, "Department Deleted");
-                            StudentSystem.reinstance();
-                            data = fillData();
-                            model = new DefaultTableModel(data, colNames);
-                            table.setModel(model);
-                            updateScreen();
+                            if (SystemSecurity.getPrivilages() == 3){
+                                JOptionPane.showMessageDialog(null, "Department Deleted");
+                                StudentSystem.reinstance();
+                                data = fillData();
+                                model = new DefaultTableModel(data, colNames);
+                                table.setModel(model);
+                                updateScreen();
+                            }else{
+                                JOptionPane.showMessageDialog(null, "You do not have the privileges required to do this");
+                            }
                         }else{ 
                             JOptionPane.showMessageDialog(null, "Department deletion failed");
                         }
@@ -68,21 +112,20 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
 
     }
 
-    public void updateScreen(){
-        this.removeAll();
-        this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
-        table.setEnabled(false);
-        this.add(new JScrollPane(table));
-        this.add(addBtn);
+    public void updateScreen(){
+        removeAll();
+        setLayout(mainForm);
+        add(Box.createVerticalGlue());
+        add(headerPanel);
+        add(scrollPane);
         revalidate();
         repaint();
     }
 
     public Object[][] fillData(){
         String[][] data = new String[depts.size()][3];
-        System.out.println(depts.size());
-
+        
         int counter = 0;
         for (Department dept : depts.values()){
             data[counter][0] = dept.getDeptCode();
@@ -96,6 +139,7 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent event) {
         if (SystemSecurity.getPrivilages() == 3){
+        
             JTextField code = new JTextField();
             JTextField name = new JTextField();
     

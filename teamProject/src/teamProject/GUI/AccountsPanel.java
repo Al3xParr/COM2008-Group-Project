@@ -8,6 +8,7 @@ import teamProject.SystemSecurity;
 import teamProject.StudentSystem;
 import java.util.*;
 import java.awt.event.*;
+import java.awt.*;
 
 public class AccountsPanel extends JPanel implements ActionListener{
     
@@ -24,7 +25,14 @@ public class AccountsPanel extends JPanel implements ActionListener{
     DefaultTableModel model;
     JTable table;
     JButton addBtn;
+    
+    JLabel header;
 
+    JPanel headerPanel;
+    JScrollPane scrollPane;
+
+    BoxLayout mainForm = new BoxLayout(this,BoxLayout.PAGE_AXIS);
+    
     public AccountsPanel(MainFrame parent) {
 
         this.parent = parent;
@@ -39,15 +47,48 @@ public class AccountsPanel extends JPanel implements ActionListener{
         accounts = fillData();
         model = new DefaultTableModel(accounts, colNames);
         table = new JTable(model);
+        table.setEnabled(false);
+
+
+        header = new JLabel("<html><div style = 'text-align : center;'><<h2>View All Accounts:</h2><br><h4></h4></div>");
+        header.setAlignmentY(Component.CENTER_ALIGNMENT);
+        header.setVerticalAlignment(SwingConstants.CENTER);
+        header.setOpaque(true);
 
         addBtn = new JButton("Add New Account");
         addBtn.addActionListener(this);
+
+        headerPanel = new JPanel();
+
+        BoxLayout headerForm = new BoxLayout(headerPanel, BoxLayout.LINE_AXIS);
+        headerPanel.setLayout(headerForm);
+
+        headerPanel.add(Box.createHorizontalGlue());
+        header.setMaximumSize(new Dimension(500,100));
+        headerPanel.add(header);
+        
+        Dimension minSize = new Dimension (25,20);
+        Dimension prefSize = new Dimension (400,20);
+        headerPanel.add(new Box.Filler(minSize, prefSize, prefSize));
+
+        headerPanel.add(addBtn);
+        headerPanel.add(Box.createHorizontalGlue());
+
+        table.setPreferredSize(new Dimension(700, 200));
+        table.setFillsViewportHeight(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        scrollPane = new JScrollPane(table);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setMaximumSize(new Dimension(703,200));
+           
+
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                System.out.println("PPboi");
-                
+                                
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
                 if (col == 2){
@@ -84,23 +125,21 @@ public class AccountsPanel extends JPanel implements ActionListener{
                         } else{ 
                             JOptionPane.showMessageDialog(null, "User deletion failed");
                         }
-                        
                     }
                 }
             }
         });
-
         updateScreen();
     }
 
 
 
     public void updateScreen(){
-        this.removeAll();
-        this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-        table.setEnabled(false);
-        this.add(new JScrollPane(table));
-        this.add(addBtn);
+        removeAll();
+        setLayout(mainForm);
+        add(Box.createVerticalGlue());
+        add(headerPanel);
+        add(scrollPane);
         revalidate();
         repaint();
     }
@@ -109,7 +148,7 @@ public class AccountsPanel extends JPanel implements ActionListener{
         int totalEntries = students.size() + registrars.size() + admins.size() + teachers.size();
         Object[][] data = new Object[totalEntries][3];
         int counter =  0;
-        System.out.println("Number: " + Integer.toString(totalEntries));
+    
         for (Administrator admin : admins.values()){
             data[counter][0] = admin.getUsername();
             data[counter][1]= "Admin";
