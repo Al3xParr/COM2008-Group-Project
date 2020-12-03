@@ -41,7 +41,7 @@ public class Course {
     }
 
     public static Course createNew(int courseNum, String fullName, Boolean YII, Course bachEquiv, Department mainDept,
-            ArrayList<Department> allDepartments) {
+            ArrayList<Department> allDepartments, int numberOfStudyLvl) {
         String courseCode = Integer.toString(courseNum);
         while(courseCode.length()<3){
             courseCode = '0' + courseCode;
@@ -49,14 +49,18 @@ public class Course {
         courseCode = mainDept.getDeptCode() + courseCode;
         Course news = new Course(courseCode, fullName, YII, bachEquiv, mainDept, allDepartments,
                 new ArrayList<StudyLevel>());
-        for (Department d : allDepartments) {
-            d.getCourseList().add(news);
-        }
+        
+        
         try (Database db = StudentSystem.connect()) {
             db.addCourse(news);
+            StudyLevel.createLevels(numberOfStudyLvl,news);
+            for (Department d : allDepartments) {
+                d.getCourseList().add(news);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
         return news;
     }
 
@@ -93,6 +97,17 @@ public class Course {
 
         return res;
         
+    }
+
+    public static Boolean checkPrimaryKeyExists(String key){
+        try(Database db = StudentSystem.connect()){
+            String[] names = {"courseCode"};
+            String[] values = {key};
+            return db.ValueSetCheck("Course", names, values);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return true;
     }
 
     public String getCourseCode() {

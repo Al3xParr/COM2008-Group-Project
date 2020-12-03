@@ -43,6 +43,17 @@ public class Teacher extends User {
         return news;
     }
 
+    public static Teacher getByUsername(String username) {
+        Teacher res = null;
+        for (Teacher x : instances.values()) {
+            if (x.getUsername().equals(username)) {
+                res = x;
+            }
+        }
+
+        return res;
+    }
+
     public static Teacher getInstance(String key) {
         return instances.get(key);
     }

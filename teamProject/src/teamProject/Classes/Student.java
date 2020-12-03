@@ -62,9 +62,10 @@ public class Student extends User {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        news.getStudyPeriodList().add(StudyPeriod.createNew(regNum, "A", startDate, endDate,
-                StudyLevel.getInstance(degreeLvl + course.getCourseCode())));
         news.setRegNum(regNum);
+        StudyPeriod.createNew(regNum, "A", startDate, endDate,
+                StudyLevel.getInstance(degreeLvl + course.getCourseCode()));
+        
         return news;
     }
 
@@ -86,6 +87,13 @@ public class Student extends User {
 
     }
 
+    public void reAddToInstances() {
+        instances.put(getRegNum(), this);
+        for (StudyPeriod sp : getStudyPeriodList()) {
+            sp.reAddToInstances();
+        }
+    }
+
     public static Student getInstance(Integer key) {
         return instances.get(key);
     }
@@ -93,7 +101,7 @@ public class Student extends User {
     public static Collection<Student> allInstances() {
         return instances.values();
     }
-    
+
     public static Student getByUsername(String username) {
         Student res = null;
         for (Student x : instances.values()) {
@@ -109,6 +117,136 @@ public class Student extends User {
         instances.clear();
     }
 
+    /**
+     * Attempts to progress student to next period of study or graduate them
+     * @return false if the registration or mark assignment is not complete
+     */
+    public boolean nextYear() {
+        if (degreeLvl.equals("P")) {
+            progress();
+        }
+        if (isRegistrationComplete() && areMarksAssigned()) {
+            if (getCourse().getDegreeLvlList().size() == 1) {
+                StudyPeriod last = getCurrentStudyPeriod();
+                if (last.isFail()) {
+                    if (getStudyPeriodList().size() == 2) {
+                        changeLvl("G");
+                        return true;
+                    }
+                    repeatStudyPeriod();
+                    return true;
+                } else {
+                    changeLvl("G");
+                    return true;
+                }
+            }
+
+            StudyPeriod last = getCurrentStudyPeriod();
+            StudyPeriod second = getPreviousStudyPeriod();
+
+            if (isInFinalYear()) {
+                if (second.getDegreeLvl().getDegreeLvl().equals(last.getDegreeLvl().getDegreeLvl())) {
+                    changeLvl("G");
+                    return true;
+                }
+                if (last.isFail()) {
+                    repeatStudyPeriod();
+                    return true;
+                }
+                changeLvl("G");
+                return true;
+            }
+            if (second == null) {
+                if (last.isFail()) {
+                    repeatStudyPeriod();
+                    return true;
+                }
+                progress();
+                return true;
+            }
+            if (second.getDegreeLvl().getDegreeLvl().equals(last.getDegreeLvl().getDegreeLvl())) {
+                if (last.isFail()) {
+                    changeLvl("G");
+                    return true;
+                }
+                progress();
+                return true;
+            }
+            if (last.isFail()) {
+                repeatStudyPeriod();
+                return true;
+            } else {
+                progress();
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    private void progress() {
+
+        if (degreeLvl.equals("P")) {
+            StudyPeriod last = getCurrentStudyPeriod();
+            long milisecInYear = 31557600000L;
+            Date start = new Date(last.getStartDate().getTime() + 2 * milisecInYear);
+            Date end = new Date(last.getEndDate().getTime() + 2 * milisecInYear);
+            String label = "" + (char) ((int) last.getLabel().charAt(0) + 1);
+            StudyLevel lvl = last.getDegreeLvl().nextLvl();
+            StudyPeriod.createNew(regNum, label, start, end, lvl);
+            changeLvl(lvl.getDegreeLvl());
+            return;
+        }
+
+        if (isInPenUltimateYear() && course.isYearInIndustry()) {
+            changeLvl("P");
+            return;
+        }
+        StudyPeriod last = getCurrentStudyPeriod();
+        long milisecInYear = 31557600000L;
+        Date start = new Date(last.getStartDate().getTime() + milisecInYear);
+        Date end = new Date(last.getEndDate().getTime() + milisecInYear);
+        String label = "" + (char) ((int) last.getLabel().charAt(0) + 1);
+        StudyLevel lvl = last.getDegreeLvl().nextLvl();
+        StudyPeriod.createNew(regNum, label, start, end, lvl);
+        changeLvl(lvl.getDegreeLvl());
+    }
+
+    private void repeatStudyPeriod() {
+        StudyPeriod last = getCurrentStudyPeriod();
+        long milisecInYear = 31557600000L;
+        Date start = new Date(last.getStartDate().getTime() + milisecInYear);
+        Date end = new Date(last.getEndDate().getTime() + milisecInYear);
+        String label = "" + (char) ((int) last.getLabel().charAt(0) + 1);
+        StudyPeriod news = StudyPeriod.createNew(regNum, label, start, end, last.getDegreeLvl());
+
+        for (Grade g : last.getGradesList()) {
+            news.registerModule(g.getModule());
+            if (last.isPass(g)) {
+                news.awardMark(g.getModule(), g.getMark(), false);
+                news.awardMark(g.getModule(), g.getResitMark(), true);
+            }
+        }
+    }
+
+    private boolean isInFinalYear() {
+        StudyPeriod last = getCurrentStudyPeriod();
+        return Integer.parseInt(last.getDegreeLvl().getDegreeLvl()) == course.getDegreeLvlList().size();
+    }
+
+    private boolean isInPenUltimateYear() {
+        StudyPeriod last = getCurrentStudyPeriod();
+        return Integer.parseInt(last.getDegreeLvl().getDegreeLvl()) == course.getDegreeLvlList().size() - 1;
+    }
+
+    private void changeLvl(String lvl) {
+        try (Database db = StudentSystem.connect()) {
+            db.changeStudentProgress(lvl, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public Double getOverallAverage() {
         return getCurrentStudyPeriod().getAverageMark();
     }
@@ -122,7 +260,8 @@ public class Student extends User {
 
     private String getCareerResults() {
 
-        if (getStudyPeriodList().size() > 1 && getCurrentStudyPeriod().isFail() && getPreviousStudyPeriod().isFail() && !getCurrentStudyPeriod().getDegreeLvl().getDegreeLvl().equals("4")){
+        if (getStudyPeriodList().size() > 1 && getCurrentStudyPeriod().isFail() && getPreviousStudyPeriod().isFail()
+                && !getCurrentStudyPeriod().getDegreeLvl().getDegreeLvl().equals("4")) {
             return "Failed lvl " + getCurrentStudyPeriod().getDegreeLvl().getDegreeLvl() + " twice";
         }
 
@@ -141,14 +280,14 @@ public class Student extends User {
 
     }
 
-    private String judgeMasters(){
+    private String judgeMasters() {
         StudyPeriod last = getCurrentStudyPeriod();
         StudyPeriod second = getPreviousStudyPeriod();
         if (last.isFail() && second.isFail()) {
             return judgeBachelors(getCourse().getBachEquiv());
         }
-        Double avg = (getStudyPeriodByLvl(2).getAverageMark() + 2 * getStudyPeriodByLvl(3).getAverageMark() + 2* getStudyPeriodByLvl(
-                4).getAverageMark()) / 5;
+        Double avg = (getStudyPeriodByLvl(2).getAverageMark() + 2 * getStudyPeriodByLvl(3).getAverageMark()
+                + 2 * getStudyPeriodByLvl(4).getAverageMark()) / 5;
 
         if (avg < 49.5) {
             return "Failed the BSc/BEng degree (" + getCourse().getFullName() + " average grade " + avg;
@@ -165,12 +304,12 @@ public class Student extends User {
 
     private String judgeBachelors(Course c) {
         StudyPeriod second = getPreviousStudyPeriod();
-        Double avg = (getStudyPeriodByLvl(2).getAverageMark() + 2 * getStudyPeriodByLvl(3).getAverageMark())/3;
+        Double avg = (getStudyPeriodByLvl(2).getAverageMark() + 2 * getStudyPeriodByLvl(3).getAverageMark()) / 3;
         if (second.isFail()) {
             if (avg >= 39.5) {
                 return "Achieved 'pass (nonhonours)' mark in " + c.getFullName();
             }
-            return "Failed the BSc/BEng degree ("+c.getFullName()+" average grade " + avg;
+            return "Failed the BSc/BEng degree (" + c.getFullName() + " average grade " + avg;
         }
         if (avg < 39.5) {
             return "Failed the BSc/BEng degree (" + c.getFullName() + " average grade " + avg;
@@ -191,7 +330,7 @@ public class Student extends User {
         StudyPeriod sp = getCurrentStudyPeriod();
         Double average = sp.getAverageMark();
         if (average < 49.5) {
-            return "Failed the 1 year MSc degree ("+getCourse().getFullName()+" average grade " + average;
+            return "Failed the 1 year MSc degree (" + getCourse().getFullName() + " average grade " + average;
         }
         if (average < 59.5) {
             return "Achieved a 'pass' mark in " + getCourse().getFullName();
@@ -201,7 +340,7 @@ public class Student extends User {
         }
 
         return "Achieved a 'distinction' mark in " + getCourse().getFullName();
-        
+
     }
 
     private String getCurrentResults() {
@@ -215,6 +354,10 @@ public class Student extends User {
 
     public Boolean isRegistrationComplete() {
         return getCurrentStudyPeriod().isRegistrationComplete();
+    }
+
+    public Boolean areMarksAssigned() {
+        return getCurrentStudyPeriod().areMarksAssigned();
     }
 
     public StudyPeriod getCurrentStudyPeriod() {
@@ -251,7 +394,7 @@ public class Student extends User {
                 }
             }
         }
-        
+
         if (second != null && first.getLabel().compareTo(second.getLabel()) < 0)
             return second;
         return first;
@@ -272,6 +415,8 @@ public class Student extends User {
     }
 
     public void setRegNum(int regNum) {
+        instances.remove(this.regNum);
+        instances.put(regNum,this);
         this.regNum = regNum;
     }
 

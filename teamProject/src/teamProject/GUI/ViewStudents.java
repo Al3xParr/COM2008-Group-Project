@@ -1,12 +1,14 @@
 package teamProject.GUI;
 
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import teamProject.Classes.*;
+import teamProject.*;
 import java.util.*;
 
-public class ViewStudents extends JPanel {
-    
+public class ViewStudents extends JPanel implements ActionListener {
+
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
 
@@ -15,14 +17,14 @@ public class ViewStudents extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         int numStudents = students.size();
-        String[] colNames = {"RegNum", "Username", "Title", "First names", "Surname", "Email", "Tutor", "Course", "View"};
+        String[] colNames = { "RegNum", "Username", "Title", "First names", "Surname", "Email", "Tutor", "Course",
+                "View" };
         Object[][] allStudents = new Object[numStudents][9];
 
         int count = 0;
 
-        
-        for (Student student: students) {
-            System.out.println(student.getRegNum());
+        for (Student student : students) {
+
             allStudents[count][0] = student.getRegNum();
             allStudents[count][1] = student.getUsername();
             allStudents[count][2] = student.getTitle();
@@ -40,6 +42,13 @@ public class ViewStudents extends JPanel {
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
         header.setHorizontalAlignment(SwingConstants.CENTER);
         add(header);
+        if (SystemSecurity.getPrivilages() == 2) {
+            JButton addStudentButton = new JButton("Add student");
+            addStudentButton.addActionListener(this);
+            addStudentButton.setMaximumSize(new Dimension(140, 0));
+            addStudentButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            add(addStudentButton);
+        }
 
         final JTable table = setColumnWidth(new JTable(allStudents, colNames));
         table.setPreferredScrollableViewportSize(new Dimension(700, 200));
@@ -70,5 +79,12 @@ public class ViewStudents extends JPanel {
         table.getColumnModel().getColumn(7).setPreferredWidth(110);
         table.getColumnModel().getColumn(8).setPreferredWidth(60);
         return table;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        
+        new NewStudentForm(parent);
+
     }
 }

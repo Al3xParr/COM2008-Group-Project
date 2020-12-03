@@ -37,7 +37,7 @@ CREATE TABLE Students(
     degreeLvl CHAR(1),
     PRIMARY KEY (regNum),
     FOREIGN KEY (username) REFERENCES Accounts(username) ON DELETE CASCADE,
-    FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE SET NULL
+    FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE CASCADE
 );
 
 CREATE TABLE Departments(
@@ -68,7 +68,8 @@ CREATE TABLE ModulesToCourse(
     courseCode CHAR(6) NOT NULL,
     core BOOLEAN NOT NULL,
     degreeLvl CHAR(1) NOT NULL,
-    CONSTRAINT id PRIMARY KEY (moduleCode, courseCode),
+    CONSTRAINT id PRIMARY KEY (moduleCode, courseCode, degreeLvl),
+
     FOREIGN KEY (moduleCode) REFERENCES Modules(moduleCode) ON DELETE CASCADE,
     FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE CASCADE
 );

@@ -40,10 +40,15 @@ public class Module {
         Module news = new Module(moduleCode, deptCode, fullName, time);
         try (Database db = StudentSystem.connect()) {
             db.addModule(news);
+            Department.getInstance(deptCode).getModuleList().add(news);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return news;
+    }
+
+    public void reAddToInstances(){
+        instances.put(getModuleCode(), this);
     }
 
     public static Module getInstance(String key) {
@@ -58,6 +63,12 @@ public class Module {
         return instances.values();
     }
 
+    public static Module getFantomModule() {
+        Module m = new Module("", "", "", "");
+        instances.remove("");
+        return m;
+    }
+
     public Boolean delete() {
         try (Database db = StudentSystem.connect()) {
             return db.deleteModule(this);
@@ -65,6 +76,17 @@ public class Module {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static Boolean checkPrimaryKeyExists(String key){
+        try(Database db = StudentSystem.connect()){
+            String[] names = {"moduleCode"};
+            String[] values = {key};
+            return db.ValueSetCheck("Modules", names, values);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return true;
     }
 
     public String getModuleCode() {

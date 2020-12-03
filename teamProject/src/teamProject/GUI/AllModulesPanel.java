@@ -1,5 +1,6 @@
 package teamProject.GUI;
 
+import teamProject.SystemSecurity;
 import teamProject.Classes.Module;
 
 import java.awt.*;
@@ -21,16 +22,16 @@ import java.util.*;
 public class AllModulesPanel extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;
+    MainFrame parent = null;
 
-    public AllModulesPanel(Collection<Module> modules){
-
+    public AllModulesPanel(MainFrame parent, Collection<Module> modules){
+        this.parent = parent;
         JButton addMButton = new JButton("Add Module");
         addMButton.addActionListener(this);
 
         int moduleNumber = modules.size();
-        Object[][] allModules = new Object[moduleNumber][5];
-        String[] columnNames = {"Modul Code","Full Name","Semester","Department Code", ""};
-
+        String[] columnNames = getColumnNames();
+        Object[][] allModules = new Object[moduleNumber][columnNames.length];
         int row = 0;
 
         for (Module module: modules) {
@@ -39,11 +40,12 @@ public class AllModulesPanel extends JPanel implements ActionListener {
             allModules[row][1] = module.getFullName();
             allModules[row][2] = module.getTimeTaught();
             allModules[row][3] = module.getDepartmentCode();
-            allModules[row][4] = "<html><B>DELETE</B></html>";
+            if (SystemSecurity.getPrivilages()==3){
+                allModules[row][4] = "<html><B>DELETE</B></html>"; 
+            }
             row++;
         }
-    
-        
+
         BoxLayout form = new BoxLayout(this,BoxLayout.PAGE_AXIS);
         setLayout(form);
 
@@ -68,7 +70,9 @@ public class AllModulesPanel extends JPanel implements ActionListener {
         Dimension prefSize = new Dimension (400,20);
         headerPanel.add(new Box.Filler(minSize, prefSize, prefSize));
 
-        headerPanel.add(addMButton);
+        if (SystemSecurity.getPrivilages()==3) {
+            headerPanel.add(addMButton);
+        }
         headerPanel.add(Box.createHorizontalGlue());
     
 
@@ -101,11 +105,16 @@ public class AllModulesPanel extends JPanel implements ActionListener {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                //TODO add the deletion function
-                if (col == 4){
+                if (col == 4 && row != (-1)){
                     String confirmStr = "Are you sure you want to delete " + allModules[row][1] + "?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
-                    if(dialogResult == JOptionPane.YES_OPTION);
+                    if(dialogResult == JOptionPane.YES_OPTION){
+                        if (Module.getInstance((String)(allModules[row][0])).delete()){
+                            JOptionPane.showMessageDialog(null, "Module Deleted, to see the changes please refresh the application.");
+                        } else{ 
+                            JOptionPane.showMessageDialog(null, "Module deletion failed");
+                        }
+                    }
                 }
             }
         });
@@ -118,7 +127,13 @@ public class AllModulesPanel extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent event) {
-        //TODO create new instance of Module forms
+        new NewModuleForm(parent);
+    }
+    private String[] getColumnNames() {
+        if (SystemSecurity.getPrivilages() == 3) {
+            return new String[] { "Modul Code", "Full Name", "Semester", "Department Code", "" };
+        }
 
+        return new String[] { "Modul Code", "Full Name", "Semester", "Department Code" };
     }
 }

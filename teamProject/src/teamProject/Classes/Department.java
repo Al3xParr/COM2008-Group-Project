@@ -9,6 +9,7 @@ package teamProject.Classes;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import teamProject.db.Database;
@@ -97,6 +98,9 @@ public class Department {
 
     public static HashMap<String, Department> getAllInstances(){
         return instances;
+    }
+    public static Collection<Department> allInstances() {
+        return instances.values();
     }
 
 }

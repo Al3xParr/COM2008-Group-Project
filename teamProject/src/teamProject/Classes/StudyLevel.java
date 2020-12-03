@@ -35,12 +35,27 @@ public class StudyLevel {
 
     public static StudyLevel createNew(String lvl, String courseCode, ArrayList<Module> core, ArrayList<Module> optional){
         StudyLevel news = new StudyLevel(lvl, courseCode, core, optional);
+        
         try (Database db = StudentSystem.connect()) {
             db.addStudyLevel(news);
+            Course.getInstance(courseCode).getDegreeLvlList().add(news);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return news;
+    }
+
+    public void reAddToInstances() {
+        instances.put(getDegreeLvl()+ getCourseCode(), this);
+        
+        for (Module m : getOptionalModules()) {
+            m.reAddToInstances();
+        }
+
+        for (Module m : getCoreModules()) {
+            m.reAddToInstances();
+        }
+
     }
 
     /**
@@ -63,6 +78,41 @@ public class StudyLevel {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean addModule(Module m, Boolean core) {
+        if (!getCoreModules().contains(m) && !getOptionalModules().contains(m)) {
+            try (Database db = StudentSystem.connect()) {
+                return db.addModuleToStudyLvl(m, this, core);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public StudyLevel nextLvl(){
+        int cur = Integer.parseInt(degreeLvl);
+        return Course.getInstance(courseCode).getStudyLvl(cur + 1);
+    }
+
+    public boolean removeModule(Module m) {
+        try (Database db = StudentSystem.connect()) {
+            return db.disconnectModule(m, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void createLevels(int x,Course c){
+        if (x == 1) {
+            StudyLevel.createNew("4", c.getCourseCode(), new ArrayList<Module>(), new ArrayList<Module>());
+            return;
+        }
+        for(int i=1;i<=x;i++){
+            StudyLevel.createNew(Integer.toString(i), c.getCourseCode(), new ArrayList<Module>(), new ArrayList<Module>());
+        }
     }
 
     public String getDegreeLvl() {
