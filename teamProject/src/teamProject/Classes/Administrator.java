@@ -39,6 +39,17 @@ public class Administrator extends User {
         return news;
     }
 
+    public static Administrator getByUsername(String username) {
+        Administrator res = null;
+        for (Administrator x : instances.values()) {
+            if (x.getUsername().equals(username)) {
+                res = x;
+            }
+        }
+
+        return res;
+    }
+
     public static Administrator getInstance(String key) {
         return instances.get(key);
     }
