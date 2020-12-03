@@ -33,19 +33,9 @@ public class ViewStudents extends JPanel implements ActionListener {
             allStudents[count][5] = student.getEmail();
             allStudents[count][6] = student.getTutor();
             allStudents[count][7] = student.getCourse().getFullName();
-            allStudents[count][8] = "View";
-            count++;
+            allStudents[count][8] = "<html><B>View Student</B></html>";
+            count ++;
         }
-
-        //creating a header menu bar
-        JMenu viewMenu = new JMenu("View");
-        viewMenu.add(new JMenuItem("Departments"));
-        viewMenu.add(new JMenuItem("Courses"));
-        viewMenu.add(new JMenuItem("Modules"));
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.add(viewMenu);
-        parent.setJMenuBar(menuBar);
 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>View all students:</h2><br><h3>To view a particular student, press the view button</h3></div>");
@@ -66,6 +56,17 @@ public class ViewStudents extends JPanel implements ActionListener {
         JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
 
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.rowAtPoint(evt.getPoint());
+                int col = table.columnAtPoint(evt.getPoint());
+                if (col == 8){
+                    new SubFrame("Student: "+ allStudents[row][1], parent, 
+                    new IndividualStudent(parent, Student.getByUsername((String)allStudents[row][1])));
+                }
+            }
+        });
     }
 
     public JTable setColumnWidth(JTable table) {
