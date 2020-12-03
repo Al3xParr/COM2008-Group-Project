@@ -1,5 +1,6 @@
 package teamProject.GUI;
 
+import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 import teamProject.Classes.Module;
 import teamProject.Classes.StudyLevel;
@@ -19,48 +20,23 @@ import javax.swing.table.DefaultTableModel;
  /** GUI for all Modules
 */
 
-public class StudyLevelPanel extends JPanel implements ActionListener {
+public class StudyLevelPanel extends RefreshablePanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
     StudyLevel SL;
+    JTable table;
+    String[] columnNames;
 
     public StudyLevelPanel(MainFrame parent, StudyLevel SL) {
         this.parent = parent;
         this.SL = SL;
         JButton addMButton = new JButton("Add Module");
         addMButton.addActionListener(this);
-
-        int moduleNumber = SL.getCoreModules().size() + SL.getOptionalModules().size();
-        String[] columnNames = getColumnNames();
-        Object[][] allModules = new Object[moduleNumber][columnNames.length];
-        int row = 0;
-
-        for (Module module: SL.getCoreModules()) {
-            
-            allModules[row][0] = module.getModuleCode();
-            allModules[row][1] = module.getFullName();
-            allModules[row][2] = module.getTimeTaught();
-            allModules[row][3] = module.getDepartmentCode();
-            allModules[row][4] = "YES";
-            if (SystemSecurity.getPrivilages()==3){
-                allModules[row][5] = "<html><B>DELETE</B></html>"; 
-            }
-            row++;
-        }
-
-        for (Module module: SL.getOptionalModules()) {
-            
-            allModules[row][0] = module.getModuleCode();
-            allModules[row][1] = module.getFullName();
-            allModules[row][2] = module.getTimeTaught();
-            allModules[row][3] = module.getDepartmentCode();
-            allModules[row][4] = "NO";
-            if (SystemSecurity.getPrivilages()==3){
-                allModules[row][5] = "<html><B>DELETE</B></html>"; 
-            }
-            row++;
-        }
+        
+        columnNames = getColumnNames();
+        
+        Object[][] allModules = getData();
 
         BoxLayout form = new BoxLayout(this,BoxLayout.PAGE_AXIS);
         setLayout(form);
@@ -95,15 +71,8 @@ public class StudyLevelPanel extends JPanel implements ActionListener {
 
         //Overides default data model behind JTable making it unedible
         final JTable table = new JTable();
-        table.setModel(new DefaultTableModel(allModules, columnNames){
-			private static final long serialVersionUID = 1L;
-
-			@Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-            
-        });
+        table.setModel(new DefaultTableModel(allModules, columnNames));
+        table.setEnabled(false);
         setColumnWidth(table);
 
 
@@ -127,7 +96,9 @@ public class StudyLevelPanel extends JPanel implements ActionListener {
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
                         if (SL.removeModule(Module.getInstance((String)(allModules[row][0])))){
-                            JOptionPane.showMessageDialog(null, "Module removed, to see the changes please refresh the application.");
+                            JOptionPane.showMessageDialog(null,
+                                    "Module removed");
+                            parent.refreshAll();
                         } else{ 
                             JOptionPane.showMessageDialog(null, "Module removal failed");
                         }
@@ -136,11 +107,53 @@ public class StudyLevelPanel extends JPanel implements ActionListener {
             }
         });
     }
+
     public void setColumnWidth(JTable table) {
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(50);
+    }
+    
+    private Object[][] getData() {
+        int moduleNumber = SL.getCoreModules().size() + SL.getOptionalModules().size();
+        Object[][] allModules = new Object[moduleNumber][columnNames.length];
+        int row = 0;
+
+        for (Module module : SL.getCoreModules()) {
+
+            allModules[row][0] = module.getModuleCode();
+            allModules[row][1] = module.getFullName();
+            allModules[row][2] = module.getTimeTaught();
+            allModules[row][3] = module.getDepartmentCode();
+            allModules[row][4] = "YES";
+            if (SystemSecurity.getPrivilages() == 3) {
+                allModules[row][5] = "<html><B>DELETE</B></html>";
+            }
+            row++;
+        }
+
+        for (Module module : SL.getOptionalModules()) {
+
+            allModules[row][0] = module.getModuleCode();
+            allModules[row][1] = module.getFullName();
+            allModules[row][2] = module.getTimeTaught();
+            allModules[row][3] = module.getDepartmentCode();
+            allModules[row][4] = "NO";
+            if (SystemSecurity.getPrivilages() == 3) {
+                allModules[row][5] = "<html><B>DELETE</B></html>";
+            }
+            row++;
+        }
+
+        return allModules;
+    }
+
+    public void refresh() {
+        StudentSystem.reinstance();
+        table.setModel(new DefaultTableModel(getData(), columnNames));
+        revalidate();
+        repaint();
     }
 
     public void actionPerformed(ActionEvent event) {

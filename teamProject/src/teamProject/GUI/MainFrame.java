@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 import teamProject.SystemSecurity;
-import teamProject.Classes.Course;
 
 /** 
  * Team Project COM2008 year 20/21
@@ -56,6 +55,16 @@ public class MainFrame extends JFrame implements ActionListener {
 
     public void newFrame(SubFrame s) {
         subFrames.add(s);
+    }
+
+    public void removeFrame(SubFrame s) {
+        subFrames.remove(s);
+    }
+
+    public void refreshAll() {
+        for(SubFrame s : subFrames){
+            s.panel.refresh();
+        }
     }
 
     public void disposeOfSubFrames() {

@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 import teamProject.Classes.Module;
-import teamProject.Classes.StudyLevel;
+import teamProject.Classes.*;
 
 public class StudyLevelChooseModule extends SubFrame implements ActionListener{
 
@@ -20,21 +20,29 @@ public class StudyLevelChooseModule extends SubFrame implements ActionListener{
     JCheckBox core;
     StudyLevel SL;
     public StudyLevelChooseModule(MainFrame main, StudyLevel SL) throws HeadlessException {
-        super("Add Module", main, new JPanel());
+        super("Add Module", main, new RefreshablePanel());
         parent = main;
         this.SL = SL;
 
         setSize(220,120);
         
 
-        JPanel panel = new JPanel();
+        RefreshablePanel panel = new RefreshablePanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(Box.createVerticalGlue());
         Vector<String> notYetChoosen = new Vector<String>();
-        for(Module m : Module.instances.values()){
-            if(!SL.getCoreModules().contains(m) && !SL.getOptionalModules().contains(m)){
+        for (Module m : Module.instances.values()) {
+            boolean add = true;
+            for (StudyLevel SLS : Course.getInstance(SL.getCourseCode()).getDegreeLvlList()) {
+                if(SLS.getCoreModules().contains(m) || SLS.getOptionalModules().contains(m)){
+                    add = false;
+                }
+            }
+
+            if (add) {
                 notYetChoosen.add(m.getModuleCode());
             }
+
         }
         modules = new JComboBox<>(notYetChoosen);
         modules.setMaximumSize(new Dimension(0,30));
@@ -67,7 +75,8 @@ public class StudyLevelChooseModule extends SubFrame implements ActionListener{
         Module m = Module.getInstance((String)modules.getSelectedItem());
 
         SL.addModule(m, core.isSelected());
-        JOptionPane.showMessageDialog(null, "Module added successfully. Refresh page to see the changes");
+        JOptionPane.showMessageDialog(null, "Module added successfully");
+        main.refreshAll();
         dispose();
         
     }

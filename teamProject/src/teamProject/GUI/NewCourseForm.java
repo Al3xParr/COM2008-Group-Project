@@ -44,7 +44,7 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
     MainFrame parent;
 
     public NewCourseForm(MainFrame main) throws HeadlessException {
-        super("Add new Course", main, new JPanel());
+        super("Add new Course", main, new RefreshablePanel());
         parent = main;
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
@@ -52,7 +52,7 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
         setSize(screenSize.width / 3, screenSize.height / 3);
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
-        JPanel panel = new JPanel();
+        RefreshablePanel panel = new RefreshablePanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(Box.createVerticalGlue());
         courseTypes = new String[] { "1 year MSc", "BSc/BEng", "MComp/MEng" };
@@ -264,7 +264,7 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
                 JOptionPane.showMessageDialog(null, "Name cannot be empty");
                 return;
             }
-            if(!Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())){
+            if (Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())) {
                 JOptionPane.showMessageDialog(null, "Course code already taken");
                 return;
             }
@@ -272,7 +272,8 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
             Course.createNew(code, name, industry, null, mainDept, departments, 1);
 
             JOptionPane.showMessageDialog(null,
-                    "A Course added sucessfuly. Please refresh the application to see the result.");
+                    "A Course added sucessfuly");
+            main.refreshAll();
             dispose();
         }
         if (e.getActionCommand().equals("BSc")) {
@@ -280,20 +281,20 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
             String name = courseNameBSc.getText();
             Department mainDept = Department.getInstance((String) courseMainBSc.getSelectedItem());
             ArrayList<Department> departments = new ArrayList<>();
-            for(String depCode : selectedDepartments){
+            for (String depCode : selectedDepartments) {
                 departments.add(Department.getInstance(depCode));
             }
             if (!departments.contains(mainDept)) {
                 departments.add(mainDept);
             }
-            
+
             Boolean industry = courseYIIBSc.isSelected();
 
             if (name.length() < 1) {
                 JOptionPane.showMessageDialog(null, "Name cannot be empty");
                 return;
             }
-            if(!Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())){
+            if (Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())) {
                 JOptionPane.showMessageDialog(null, "Course code already taken");
                 return;
             }
@@ -301,7 +302,8 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
             Course.createNew(code, name, industry, null, mainDept, departments, 3);
 
             JOptionPane.showMessageDialog(null,
-                    "A Course added sucessfuly. Please refresh the application to see the result.");
+                    "A Course added sucessfuly");
+            main.refreshAll();
             dispose();
         }
         if (e.getActionCommand().equals("MEng")) {
@@ -312,25 +314,26 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
             for (String depCode : selectedDepartments) {
                 departments.add(Department.getInstance(depCode));
             }
-            if(!departments.contains(mainDept)){
+            if (!departments.contains(mainDept)) {
                 departments.add(mainDept);
             }
             Boolean industry = courseYIIMEng.isSelected();
-            Course equiv = Course.getInstance((String)courseEquivMSc.getSelectedItem());
+            Course equiv = Course.getInstance((String) courseEquivMSc.getSelectedItem());
 
             if (name.length() < 1) {
                 JOptionPane.showMessageDialog(null, "Name cannot be empty");
                 return;
             }
-            if(!Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())){
+            if (Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())) {
                 JOptionPane.showMessageDialog(null, "Course code already taken");
                 return;
             }
 
-            Course.createNew(code, name, industry,equiv, mainDept, departments, 4);
+            Course.createNew(code, name, industry, equiv, mainDept, departments, 4);
 
             JOptionPane.showMessageDialog(null,
-                    "A Course added sucessfuly. Please refresh the application to see the result.");
+                    "A Course added sucessfuly");
+            main.refreshAll();
             dispose();
         }
     }

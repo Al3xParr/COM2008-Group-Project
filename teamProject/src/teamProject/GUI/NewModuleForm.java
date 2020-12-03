@@ -23,14 +23,14 @@ public class NewModuleForm extends SubFrame implements ActionListener{
     JButton okButton = null;
 
     public NewModuleForm(MainFrame main) throws HeadlessException {
-        super("Add new Module", main, new JPanel());
+        super("Add new Module", main, new RefreshablePanel());
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
 
         setSize(650,115);
         setLocation(screenSize.width/4, screenSize.height/4);
 
-        JPanel panel = new JPanel();
+        RefreshablePanel panel = new RefreshablePanel();
         setContentPane(panel);
 
         JLabel codeNumLabel = new JLabel("Enter Number value for Module Code, ");
@@ -106,8 +106,9 @@ public class NewModuleForm extends SubFrame implements ActionListener{
         } else {
             Module.createNew(moduleNum, deptCode, fullName, time);
             JOptionPane.showMessageDialog(null, 
-                "A Module added sucessfuly. Please refresh the application to see the result.");
-                dispose();
+                    "A Module added sucessfuly");
+            main.refreshAll();
+            dispose();
         }
     }
 }

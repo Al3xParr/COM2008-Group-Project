@@ -10,7 +10,7 @@ import java.util.*;
 import java.awt.event.*;
 import java.awt.*;
 
-public class AccountsPanel extends JPanel implements ActionListener{
+public class AccountsPanel extends RefreshablePanel implements ActionListener{
     
     private static final long serialVersionUID = 1L;
     
@@ -91,7 +91,7 @@ public class AccountsPanel extends JPanel implements ActionListener{
                                 
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                if (col == 2){
+                if (col == 2 && row != -1){
                     String confirmStr = "Are you sure you want to delete " + accounts[row][0] + "?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
@@ -114,11 +114,7 @@ public class AccountsPanel extends JPanel implements ActionListener{
                         if (success){
                             if (SystemSecurity.getPrivilages() == 3){
                                 JOptionPane.showMessageDialog(null, "User Deleted");
-                                StudentSystem.reinstance();
-                                accounts = fillData();
-                                model = new DefaultTableModel(accounts, colNames);
-                                table.setModel(model);
-                                updateScreen();
+                                parent.refreshAll();
                             }else{
                                 JOptionPane.showMessageDialog(null, "You do not have the privileges required to do this");
                             }
@@ -134,7 +130,7 @@ public class AccountsPanel extends JPanel implements ActionListener{
 
 
 
-    public void updateScreen(){
+    public void updateScreen() {
         removeAll();
         setLayout(mainForm);
         add(Box.createVerticalGlue());
@@ -142,6 +138,14 @@ public class AccountsPanel extends JPanel implements ActionListener{
         add(scrollPane);
         revalidate();
         repaint();
+    }
+    
+    public void refresh(){
+        StudentSystem.reinstance();
+        accounts = fillData();
+        model = new DefaultTableModel(accounts, colNames);
+        table.setModel(model);
+        updateScreen();
     }
 
     public Object[][] fillData(){
@@ -183,7 +187,7 @@ public class AccountsPanel extends JPanel implements ActionListener{
     public void actionPerformed(ActionEvent event) {
 
         String[] types = { "Teacher", "Registrar", "Admin"};
-        JComboBox type = new JComboBox<String>(types);
+        JComboBox<String> type = new JComboBox<String>(types);
         JTextField username = new JTextField();
         JTextField pass = new JTextField();
         JTextField confirmpass = new JTextField();
@@ -214,11 +218,7 @@ public class AccountsPanel extends JPanel implements ActionListener{
                     }
 
                     JOptionPane.showMessageDialog(null, "New User Added");
-                    StudentSystem.reinstance();
-                    accounts = fillData();
-                    model = new DefaultTableModel(accounts, colNames);
-                    table.setModel(model);
-                    updateScreen();
+                    parent.refreshAll();
                 }else{
                     JOptionPane.showMessageDialog(null, "Please enter the same password");
                 }

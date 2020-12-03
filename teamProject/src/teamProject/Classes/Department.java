@@ -55,7 +55,9 @@ public class Department {
     public Boolean delete() {
         try (Database db = StudentSystem.connect()) {
             for (Course c : getCourseList()) {
-                c.delete();
+                if (c.getMainDep() == this) {
+                    c.delete();
+                }
             }
             return db.deleteDepartment(this);
         } catch (Exception e) {

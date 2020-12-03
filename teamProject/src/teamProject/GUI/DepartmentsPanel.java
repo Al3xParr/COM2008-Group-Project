@@ -10,7 +10,7 @@ import java.awt.*;
 import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 
-public class DepartmentsPanel extends JPanel implements ActionListener {
+public class DepartmentsPanel extends RefreshablePanel implements ActionListener {
     
     private static final long serialVersionUID = 1L;
     MainFrame parent;
@@ -85,7 +85,7 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
                 
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                if (col == 2){
+                if (col == 2 && row != -1){
                     String confirmStr = "Are you sure you want to delete " + data[row][0] + "?";
                     int dialogResult = JOptionPane.showConfirmDialog(null, confirmStr,"Warning", JOptionPane.YES_NO_OPTION);
                     if(dialogResult == JOptionPane.YES_OPTION){
@@ -93,11 +93,7 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
                         if (Department.getInstance(String.valueOf(data[row][0])).delete()){
                             if (SystemSecurity.getPrivilages() == 3){
                                 JOptionPane.showMessageDialog(null, "Department Deleted");
-                                StudentSystem.reinstance();
-                                data = fillData();
-                                model = new DefaultTableModel(data, colNames);
-                                table.setModel(model);
-                                updateScreen();
+                                parent.refreshAll();
                             }else{
                                 JOptionPane.showMessageDialog(null, "You do not have the privileges required to do this");
                             }
@@ -113,7 +109,7 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
     }
 
 
-    public void updateScreen(){
+    public void updateScreen() {
         removeAll();
         setLayout(mainForm);
         add(Box.createVerticalGlue());
@@ -121,6 +117,14 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
         add(scrollPane);
         revalidate();
         repaint();
+    }
+
+    public void refresh() {
+        StudentSystem.reinstance();
+        data = fillData();
+        model = new DefaultTableModel(data, colNames);
+        table.setModel(model);
+        updateScreen();
     }
 
     public Object[][] fillData(){
@@ -156,11 +160,7 @@ public class DepartmentsPanel extends JPanel implements ActionListener {
                 }else{
                     Department.createNew(code.getText(), name.getText());
                     JOptionPane.showMessageDialog(null, "Department Added");
-                    StudentSystem.reinstance();
-                    data = fillData();
-                    model = new DefaultTableModel(data, colNames);
-                    table.setModel(model);
-                    updateScreen();
+                    parent.refreshAll();
                 }
             }
         }else{

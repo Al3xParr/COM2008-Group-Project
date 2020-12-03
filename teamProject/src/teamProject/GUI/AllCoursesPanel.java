@@ -1,5 +1,6 @@
 package teamProject.GUI;
 
+import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 import teamProject.Classes.Course;
 
@@ -21,33 +22,22 @@ import java.util.*;
 /** GUI for all Courses
 */
 
-public class AllCoursesPanel extends JPanel implements ActionListener {
+public class AllCoursesPanel extends RefreshablePanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
+    String[] columnNames;
+    JTable table;
+    Collection<Course> courses;
 
     public AllCoursesPanel(MainFrame parent, Collection<Course> courses) {
         this.parent = parent;
+        this.courses = courses;
         JButton addCButton = new JButton("Add Course");
         addCButton.addActionListener(this);
 
-        int courseNumber = courses.size();
-        String[] columnNames = getColumnNames();
-        Object[][] allCourses = new Object[courseNumber][columnNames.length];
-        int row = 0;
-
-        for (Course course : courses) {
-
-            allCourses[row][0] = course.getCourseCode();
-            allCourses[row][1] = course.getFullName();
-            allCourses[row][2] = (course.getBachEquiv() == null) ? "NONE" : course.getBachEquiv().getFullName();
-            allCourses[row][3] = course.isYearInIndustry();
-            allCourses[row][4] = "<html><B>VIEW</B></html>";
-            if (SystemSecurity.getPrivilages() == 3) {
-                allCourses[row][5] = "<html><B>DELETE</B></html>";
-            }
-            row++;
-        }
+        columnNames = getColumnNames();
+        Object[][] allCourses = getData();
 
         BoxLayout form = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(form);
@@ -81,17 +71,10 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
 
         //Overides default data model behind JTable making it unedible
         final JTable table = new JTable();
-        table.setModel(new DefaultTableModel(allCourses, columnNames) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-
-        });
+        table.setModel(new DefaultTableModel(allCourses, columnNames));
         setColumnWidth(table);
 
+        table.setEnabled(false);
         table.setPreferredSize(new Dimension(700, 200));
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -118,7 +101,8 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
                     if (dialogResult == JOptionPane.YES_OPTION) {
                         if (Course.getInstance((String) (allCourses[row][0])).delete()) {
                             JOptionPane.showMessageDialog(null,
-                                    "Course Deleted, to see the changes please refresh the application.");
+                                    "Course Deleted");
+                            parent.refreshAll();
                         } else {
                             JOptionPane.showMessageDialog(null, "Course deletion failed");
                         }
@@ -129,11 +113,37 @@ public class AllCoursesPanel extends JPanel implements ActionListener {
         });
     }
 
+    private Object[][] getData() {
+        Object[][] allCourses = new Object[courses.size()][columnNames.length];
+        int row = 0;
+
+        for (Course course : courses) {
+
+            allCourses[row][0] = course.getCourseCode();
+            allCourses[row][1] = course.getFullName();
+            allCourses[row][2] = (course.getBachEquiv() == null) ? "NONE" : course.getBachEquiv().getFullName();
+            allCourses[row][3] = course.isYearInIndustry();
+            allCourses[row][4] = "<html><B>VIEW</B></html>";
+            if (SystemSecurity.getPrivilages() == 3) {
+                allCourses[row][5] = "<html><B>DELETE</B></html>";
+            }
+            row++;
+        }
+        return allCourses;
+    }
+
     public void setColumnWidth(JTable table) {
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
         table.getColumnModel().getColumn(3).setPreferredWidth(50);
+    }
+
+    public void refresh() {
+        StudentSystem.reinstance();
+        table.setModel(new DefaultTableModel(getData(), columnNames));
+        revalidate();
+        repaint();
     }
 
     public void actionPerformed(ActionEvent event) {

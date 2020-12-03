@@ -4,19 +4,25 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Calendar;
+import javax.swing.table.*;
 
-import teamProject.SystemSecurity;
+
+import teamProject.*;
 import teamProject.Classes.*;
 
-public class IndividualStudent extends JPanel implements ActionListener {
-    
+public class IndividualStudent extends RefreshablePanel implements ActionListener {
+
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
     int numGrades = 0;
     Student student = null;
     String courseCode;
     Course course = null;
+    ArrayList<StudyPeriod> studyPeriods;
+    String[] columnNames =
+            { "Label", "Start Date", "End Date", "Degree Level", "View Grades" };
+    JTable table;
+
 
     public IndividualStudent(MainFrame parent, Student student) {
         this.parent = parent;
@@ -29,26 +35,23 @@ public class IndividualStudent extends JPanel implements ActionListener {
         String email = student.getEmail();
         String tutor = student.getTutor();
         String courseName = student.getCourse().getFullName();
-        ArrayList<StudyPeriod> studyPeriods = student.getStudyPeriodList();
+        studyPeriods = student.getStudyPeriodList();
         courseCode = student.getCourse().getCourseCode();
         course = Course.getInstance(courseCode);
 
-        JLabel header = new JLabel(
-                "<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
+        JLabel header = new JLabel("<html><div style = 'text-align : center;'><<h2>Student: " + username + "</h2><br>");
         header.setHorizontalAlignment(SwingConstants.CENTER);
         add(header);
-        
+
         JLabel firstNameLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>First Name(s): " + firstNames + "</h3><br>");
         add(firstNameLabel);
         JLabel surNameLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Surname: " + surname + "</h3><br>");
         add(surNameLabel);
-        JLabel emailLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Email: " + email + "</h3><br>");
+        JLabel emailLabel = new JLabel("<html><div style = 'text-align : center;'><<h3>Email: " + email + "</h3><br>");
         add(emailLabel);
-        JLabel tutorLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Tutor: " + tutor + "</h3><br>");
+        JLabel tutorLabel = new JLabel("<html><div style = 'text-align : center;'><<h3>Tutor: " + tutor + "</h3><br>");
         add(tutorLabel);
         JLabel courseLabel = new JLabel(
                 "<html><div style = 'text-align : center;'><<h3>Course: " + courseName + "</h3>");
@@ -62,7 +65,7 @@ public class IndividualStudent extends JPanel implements ActionListener {
                 "<html><div style = 'text-align : center;'><<h3>Study Levels: </h3>");
         add(studyLevelLabel);
 
-        String [] colNames = {"Label", "Start Date", "End Date", "Degree Level", "View Grades"};
+        
         Object[][] allStudyPeriod = new Object[studyPeriods.size()][5];
 
         if (SystemSecurity.getPrivilages() == 1) {
@@ -76,20 +79,12 @@ public class IndividualStudent extends JPanel implements ActionListener {
         }
 
         //will use as a reference to use for the position in the table for each grade
-        int count = 0;
-        //populating the table of study periods
-        for (StudyPeriod studyPeriod: studyPeriods) {
-            allStudyPeriod[count][0] = studyPeriod.getLabel();
-            allStudyPeriod[count][1] = studyPeriod.getStartDate();
-            allStudyPeriod[count][2] = studyPeriod.getEndDate();
-            allStudyPeriod[count][3] = studyPeriod.getDegreeLvl().getDegreeLvl();
-            allStudyPeriod[count][4] = "<html><B>View Grades</B></html>";
-            count ++;
-        }
+        
 
-        final JTable table = new JTable(allStudyPeriod, colNames);
+        table = new JTable(allStudyPeriod, columnNames);
         table.setPreferredScrollableViewportSize(new Dimension(500, 200));
         table.setFillsViewportHeight(true);
+        table.setEnabled(false);
         JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -97,13 +92,13 @@ public class IndividualStudent extends JPanel implements ActionListener {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                if (col == 4){
+                if (col == 4 && row != -1) {
                     //TODO Create new study period panel - as an instance, use this students regID + the label
                     //Will probably have to cast to a String in order to work (look at the ViewStudents.java)
-                    String ref = regNum + (String)allStudyPeriod[row][0];
+                    String ref = regNum + (String) allStudyPeriod[row][0];
                     StudyPeriod period = StudyPeriod.getInstance(ref);
-                    new SubFrame("Study Period: "+ allStudyPeriod[row][0], parent, 
-                                new StudyPeriodPanel(parent, period));
+                    new SubFrame("Study Period: " + allStudyPeriod[row][0], parent,
+                            new StudyPeriodPanel(parent, period));
                 }
             }
         });
@@ -111,6 +106,29 @@ public class IndividualStudent extends JPanel implements ActionListener {
 
     public String getCourseCode() {
         return this.courseCode;
+    }
+
+    public Object[][] getData() {
+        int count = 0;
+        Object[][] allStudyPeriod = new Object[studyPeriods.size()][columnNames.length];
+        //populating the table of study periods
+        for (StudyPeriod studyPeriod : studyPeriods) {
+            allStudyPeriod[count][0] = studyPeriod.getLabel();
+            allStudyPeriod[count][1] = studyPeriod.getStartDate();
+            allStudyPeriod[count][2] = studyPeriod.getEndDate();
+            allStudyPeriod[count][3] = studyPeriod.getDegreeLvl().getDegreeLvl();
+            allStudyPeriod[count][4] = "<html><B>View Grades</B></html>";
+            count++;
+        }
+
+        return allStudyPeriod;
+    }
+    
+    public void refresh() {
+        StudentSystem.reinstance();
+        table.setModel(new DefaultTableModel(getData(), columnNames));
+        revalidate();
+        repaint();
     }
 
     public void actionPerformed(ActionEvent event) {
@@ -121,13 +139,15 @@ public class IndividualStudent extends JPanel implements ActionListener {
         }
         if (event.getActionCommand().equals("View Current Progress")) {
             JOptionPane.showMessageDialog(null, student.getStudentResults());
-        } 
+        }
         if (event.getActionCommand().equals("Progress Student")) {
             if (student.nextYear()) {
-                JOptionPane.showMessageDialog(null, "Student progressed onto next year");
+                JOptionPane.showMessageDialog(null, "Student Progression completed succesfully");
+                parent.refreshAll();
             } else {
-                JOptionPane.showMessageDialog(null, "Student progression failed");
+                JOptionPane.showMessageDialog(null, "Error, Registration not complete or marks not assigned");
             }
+
         }
     }
 }

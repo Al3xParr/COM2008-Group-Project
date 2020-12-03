@@ -14,12 +14,12 @@ public class ComboBoxList extends SubFrame implements ActionListener{
     NewCourseForm parent;
 
     public ComboBoxList(String title, MainFrame main, NewCourseForm parent, ArrayList<String> items, ArrayList<String> selected) {
-        super(title, main, new JPanel());
+        super(title, main, new RefreshablePanel());
         setSize(100, 300);
 
         this.parent = parent;
         
-        JPanel scrollIn = new JPanel();
+        RefreshablePanel scrollIn = new RefreshablePanel();
         scrollIn.setLayout(new BoxLayout(scrollIn, BoxLayout.PAGE_AXIS));
         
 

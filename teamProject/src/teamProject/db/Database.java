@@ -13,8 +13,6 @@ import java.nio.file.*;
 import java.io.IOException;
 import java.util.*;
 
-import com.mysql.cj.protocol.Resultset;
-
 import java.sql.Date;
 import teamProject.Classes.*;
 import teamProject.Classes.Module;
@@ -663,8 +661,8 @@ public class Database implements AutoCloseable {
 
     private void insertModuleCourseLink(Module m, String c, Boolean core, String lvl) throws SQLException {
 
-        String[] names = { "moduleCode", "courseCode" };
-        String[] values = { m.getModuleCode(), c };
+        String[] names = { "moduleCode", "courseCode" , "degreeLvl"};
+        String[] values = { m.getModuleCode(), c , lvl};
         if (!ValueSetCheck("ModulesToCourse", names, values)) {
             String insertLink = "INSERT INTO ModulesToCourse VALUES(?,?,?,?);";
             try (PreparedStatement insert = con.prepareStatement(insertLink)) {
@@ -1033,7 +1031,7 @@ public class Database implements AutoCloseable {
                                 .executeQuery("SELECT * FROM CourseToDepartment WHERE deptCode = '" + deptCode + "';");
                         ArrayList<Course> coursesList = new ArrayList<Course>();
                         while (coursesResults.next()) {
-                            coursesList.add(Course.getInstance(results.getString(1)));
+                            coursesList.add(Course.getInstance(coursesResults.getString(1)));
                         }
                         //finding the modules within that department
                         ResultSet modulesResults = stsm2

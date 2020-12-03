@@ -3,39 +3,27 @@ package teamProject.GUI;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import teamProject.Classes.*;
 import teamProject.*;
 import java.util.*;
 
-public class ViewStudents extends JPanel implements ActionListener {
+public class ViewStudents extends RefreshablePanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     MainFrame parent = null;
-
+    Collection<Student> students;
+    JTable table;
+    String[] columnNames = { "RegNum", "Username", "Title", "First names", "Surname", "Email", "Tutor", "Course",
+            "View" };
     public ViewStudents(MainFrame parent, Collection<Student> students) {
         this.parent = parent;
+        this.students = students;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        int numStudents = students.size();
-        String[] colNames = { "RegNum", "Username", "Title", "First names", "Surname", "Email", "Tutor", "Course",
-                "View" };
-        Object[][] allStudents = new Object[numStudents][9];
-
-        int count = 0;
-
-        for (Student student : students) {
-
-            allStudents[count][0] = student.getRegNum();
-            allStudents[count][1] = student.getUsername();
-            allStudents[count][2] = student.getTitle();
-            allStudents[count][3] = student.getForenames();
-            allStudents[count][4] = student.getSurname();
-            allStudents[count][5] = student.getEmail();
-            allStudents[count][6] = student.getTutor();
-            allStudents[count][7] = student.getCourse().getFullName();
-            allStudents[count][8] = "<html><B>View Student</B></html>";
-            count ++;
-        }
+        Object[][] allStudents = getData();
+        
 
         JLabel header = new JLabel(
                 "<html><div style = 'text-align : center;'><<h2>View all students:</h2><br><h3>To view a particular student, press the view button</h3></div>");
@@ -50,9 +38,10 @@ public class ViewStudents extends JPanel implements ActionListener {
             add(addStudentButton);
         }
 
-        final JTable table = setColumnWidth(new JTable(allStudents, colNames));
+        table = setColumnWidth(new JTable(allStudents, columnNames));
         table.setPreferredScrollableViewportSize(new Dimension(700, 200));
         table.setFillsViewportHeight(true);
+        table.setEnabled(false);
         JScrollPane scrollpane = new JScrollPane(table);
         add(scrollpane);
 
@@ -61,12 +50,41 @@ public class ViewStudents extends JPanel implements ActionListener {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 int row = table.rowAtPoint(evt.getPoint());
                 int col = table.columnAtPoint(evt.getPoint());
-                if (col == 8){
-                    new SubFrame("Student: "+ allStudents[row][1], parent, 
-                    new IndividualStudent(parent, Student.getByUsername((String)allStudents[row][1])));
+                if (col == 8 && row != -1) {
+                    new SubFrame("Student: " + allStudents[row][1], parent,
+                            new IndividualStudent(parent, Student.getByUsername((String) allStudents[row][1])));
                 }
             }
         });
+    }
+    
+    private Object[][] getData() {
+        Object[][] allStudents = new Object[students.size()][columnNames.length];
+
+        int count = 0;
+
+        for (Student student : students) {
+
+            allStudents[count][0] = student.getRegNum();
+            allStudents[count][1] = student.getUsername();
+            allStudents[count][2] = student.getTitle();
+            allStudents[count][3] = student.getForenames();
+            allStudents[count][4] = student.getSurname();
+            allStudents[count][5] = student.getEmail();
+            allStudents[count][6] = student.getTutor();
+            allStudents[count][7] = student.getCourse().getFullName();
+            allStudents[count][8] = "<html><B>View Student</B></html>";
+            count++;
+        }
+
+        return allStudents;
+    }
+    
+    public void refresh() {
+        StudentSystem.reinstance();
+        table.setModel(new DefaultTableModel(getData(), columnNames));
+        revalidate();
+        repaint();
     }
 
     public JTable setColumnWidth(JTable table) {

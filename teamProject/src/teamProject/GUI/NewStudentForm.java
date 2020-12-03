@@ -10,7 +10,6 @@ import java.awt.event.*;
 import java.text.DateFormat;
 
 import teamProject.Classes.*;
-import teamProject.Classes.Module;
 
 
 public class NewStudentForm extends SubFrame implements ActionListener {
@@ -31,12 +30,12 @@ public class NewStudentForm extends SubFrame implements ActionListener {
     DateFormat df;
 
     public NewStudentForm(MainFrame main) throws HeadlessException {
-        super("Add Student", main, new JPanel());
+        super("Add Student", main, new RefreshablePanel());
         parent = main;
 
         setSize(300, 300);
 
-        JPanel panel = new JPanel();
+        RefreshablePanel panel = new RefreshablePanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(Box.createVerticalGlue());
 
@@ -141,7 +140,8 @@ public class NewStudentForm extends SubFrame implements ActionListener {
         if(error.equals("")){
             Student.createNew(username, password, title, surname, forenames, tutor, course, degreeLvl, startDate,
                     endDate);
-            JOptionPane.showMessageDialog(null, "Student added successfully. Refresh page to see the changes");
+            JOptionPane.showMessageDialog(null, "Student added successfully");
+            main.refreshAll();
             dispose();
         }else{
             JOptionPane.showMessageDialog(null, error);
