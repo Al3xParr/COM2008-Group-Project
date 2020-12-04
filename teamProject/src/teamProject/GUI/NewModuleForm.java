@@ -20,29 +20,20 @@ public class NewModuleForm extends SubFrame implements ActionListener {
     JTextField modNameField = null;
     JComboBox<String> deptBox = null;
     JComboBox<String> timeBox = null;
-    JButton okButton = null;
 
     public NewModuleForm(MainFrame main) throws HeadlessException {
         super("Add new Module", main, new RefreshablePanel());
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
 
-        setSize(650, 115);
         setLocation(screenSize.width / 4, screenSize.height / 4);
 
         RefreshablePanel panel = new RefreshablePanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.add(Box.createVerticalGlue());
+        setSize(400, 215);
 
-        JLabel codeNumLabel = new JLabel("Enter Number value for Module Code, ");
-        JLabel fullNameLabel = new JLabel("Full Module Name, ");
-        JLabel timeLabel = new JLabel("Choose the Time Period, ");
-        JLabel depLabel = new JLabel("and the Department.");
-
-        panel.add(codeNumLabel);
-        panel.add(fullNameLabel);
-        panel.add(timeLabel);
-        panel.add(depLabel);
-
-        okButton = new JButton("ok");
+        modNameField = new JTextField(15);
 
         MaskFormatter formatter = null;
 
@@ -52,21 +43,14 @@ public class NewModuleForm extends SubFrame implements ActionListener {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
+        
         modCodeField.setColumns(4);
-
-        panel.add(modCodeField);
-
-        modNameField = new JTextField(15);
-        panel.add(modNameField);
 
         timeBox = new JComboBox<String>();
         timeBox.addItem("AUTUMN");
         timeBox.addItem("SPRING");
         timeBox.addItem("ALL YEAR");
         timeBox.addItem("SUMMER");
-
-        panel.add(timeBox);
 
         Collection<Department> departments = Department.allInstances();
         int deptNumber = departments.size();
@@ -78,10 +62,34 @@ public class NewModuleForm extends SubFrame implements ActionListener {
             i++;
         }
         deptBox = new JComboBox<String>(allDeptCodes);
-        panel.add(deptBox);
-        panel.add(okButton);
+
+        Dimension maxSize = new Dimension(90, 70);
+        modNameField.setMaximumSize(maxSize);
+        modCodeField.setMaximumSize(maxSize);
+        timeBox.setMaximumSize(maxSize);
+        deptBox.setMaximumSize(maxSize);
+
+        panel.add(getFormField("Module Code Number:                              ",modCodeField));
+        panel.add(getFormField("Full Module Name:   ",modNameField));
+        panel.add(getFormField("Time of Study:                                 ",timeBox));
+        panel.add(getFormField("Supervising Department:                      ",deptBox));
+
+        JButton button = new JButton("Confirm");
+        button.addActionListener(this);
+        panel.add(getFormField("", button));
+        panel.add(Box.createVerticalGlue());
         setContentPane(panel);
-        okButton.addActionListener(this);
+    }
+
+    private JPanel getFormField(String label, JComponent field) {
+        JPanel res = new JPanel();
+        res.setLayout(new BoxLayout(res, BoxLayout.LINE_AXIS));
+        res.add(Box.createHorizontalGlue());
+        res.add(new JLabel(label));
+        res.add(Box.createRigidArea(new Dimension(10, 0)));
+        res.add(field);
+        res.add(Box.createHorizontalGlue());
+        return res;
     }
 
     public void actionPerformed(ActionEvent e) {
