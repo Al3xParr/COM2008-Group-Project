@@ -73,7 +73,7 @@ public class ViewStudents extends RefreshablePanel implements ActionListener {
             allStudents[count][5] = student.getEmail();
             allStudents[count][6] = student.getTutor();
             allStudents[count][7] = student.getCourse().getFullName();
-            allStudents[count][8] = "<html><B>View Student</B></html>";
+            allStudents[count][8] = "<html><B>View</B></html>";
             count++;
         }
 
@@ -81,6 +81,11 @@ public class ViewStudents extends RefreshablePanel implements ActionListener {
     }
     
     public void refresh() {
+        Collection<Student> updated = new ArrayList<Student>();
+        for (Student student : students) {
+            updated.add(Student.getInstance(student.getRegNum()));
+        }
+        students = updated;
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

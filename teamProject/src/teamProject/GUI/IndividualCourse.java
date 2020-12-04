@@ -88,6 +88,7 @@ public class IndividualCourse extends RefreshablePanel {
     }
 
     public void refresh() {
+        course = Course.getInstance(course.getCourseCode());
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

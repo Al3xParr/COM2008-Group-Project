@@ -20,7 +20,6 @@ public class Grade {
         this.resitMark = resitMark;
     }
 
-
     public Module getModule() {
         return this.module;
     }
@@ -44,5 +43,5 @@ public class Grade {
     public void setResitMark(Double resitMark) {
         this.resitMark = resitMark;
     }
-            
+
 }

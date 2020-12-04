@@ -62,11 +62,11 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
         add(courseButton);
 
         JLabel studyLevelLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Study Levels: </h3>");
+                "<html><div style = 'text-align : center;'><<h3>Study Periods: </h3>");
         add(studyLevelLabel);
 
         
-        Object[][] allStudyPeriod = new Object[studyPeriods.size()][5];
+        Object[][] allStudyPeriod = getData();
 
         if (SystemSecurity.getPrivilages() == 1) {
             JButton gradeButton = new JButton("View Current Progress");
@@ -123,6 +123,7 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
     }
     
     public void refresh() {
+        student = Student.getInstance(student.getRegNum());
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

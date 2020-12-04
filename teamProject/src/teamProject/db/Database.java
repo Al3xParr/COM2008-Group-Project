@@ -111,7 +111,7 @@ public class Database implements AutoCloseable {
 
             ResultSet results = stsm.executeQuery("SELECT TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES "
                     + "WHERE table_schema = (SELECT DATABASE());");
- 
+
             while (results.next()) {
                 tables.add(results.getString("TABLE_NAME"));
             }
@@ -126,7 +126,8 @@ public class Database implements AutoCloseable {
     }
 
     private Set<String> getColumnNames(String tableName) {
-        Set<String> columns = new HashSet<String>();;
+        Set<String> columns = new HashSet<String>();
+        ;
         if (getTableNames().contains(tableName)) {
             try (Statement stsm = con.createStatement()) {
                 ResultSet results = stsm.executeQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
@@ -204,22 +205,22 @@ public class Database implements AutoCloseable {
         return ans;
     }
 
-    public int countEmails(String like){
-        String sublike=like+"%@university.com";
+    public int countEmails(String like) {
+        String sublike = like + "%@university.com";
         String query = "SELECT email FROM Students WHERE email LIKE ?;";
         int res = 0;
-        try(PreparedStatement stsm = con.prepareStatement(query)){
+        try (PreparedStatement stsm = con.prepareStatement(query)) {
             stsm.clearParameters();
             stsm.setString(1, sublike);
             ResultSet set = stsm.executeQuery();
             while (set.next()) {
                 String num = set.getString(1);
-                num = num.substring(like.length(),num.indexOf('@', like.length()));
+                num = num.substring(like.length(), num.indexOf('@', like.length()));
                 int number = Integer.parseInt(num);
                 if (number > res)
                     res = number;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return res;
@@ -408,7 +409,7 @@ public class Database implements AutoCloseable {
             con.setAutoCommit(false);
             try {
                 for (Module m : newStudyLevel.getCoreModules()) {
-                    insertModuleCourseLink(m, newStudyLevel.getCourseCode(),true, newStudyLevel.getDegreeLvl());
+                    insertModuleCourseLink(m, newStudyLevel.getCourseCode(), true, newStudyLevel.getDegreeLvl());
                 }
                 for (Module m : newStudyLevel.getOptionalModules()) {
                     insertModuleCourseLink(m, newStudyLevel.getCourseCode(), false, newStudyLevel.getDegreeLvl());
@@ -533,21 +534,21 @@ public class Database implements AutoCloseable {
                 insert.setString(7, newStudent.getCourse().getCourseCode());
                 insert.setString(8, newStudent.getDegreeLvl());
                 insert.executeUpdate();
-                try(PreparedStatement stsm = con.prepareStatement("SELECT regNum FROM Students WHERE username =?;")){
+                try (PreparedStatement stsm = con.prepareStatement("SELECT regNum FROM Students WHERE username =?;")) {
                     stsm.clearParameters();
-                    stsm.setString(1,newStudent.getUsername());
+                    stsm.setString(1, newStudent.getUsername());
                     ResultSet set = stsm.executeQuery();
-                    if(set.next()){
+                    if (set.next()) {
                         newRegNum = set.getInt(1);
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     throw e;
                 }
                 con.commit();
             } catch (SQLException e) {
-                try{
+                try {
                     con.rollback();
-                }catch(Exception es){
+                } catch (Exception es) {
                     es.printStackTrace();
                 }
                 throw e;
@@ -598,7 +599,6 @@ public class Database implements AutoCloseable {
                     insertCourseDepartLink(c, d);
                 }
 
-                
             } catch (Exception e) {
                 throw e;
             }
@@ -661,8 +661,8 @@ public class Database implements AutoCloseable {
 
     private void insertModuleCourseLink(Module m, String c, Boolean core, String lvl) throws SQLException {
 
-        String[] names = { "moduleCode", "courseCode" , "degreeLvl"};
-        String[] values = { m.getModuleCode(), c , lvl};
+        String[] names = { "moduleCode", "courseCode", "degreeLvl" };
+        String[] values = { m.getModuleCode(), c, lvl };
         if (!ValueSetCheck("ModulesToCourse", names, values)) {
             String insertLink = "INSERT INTO ModulesToCourse VALUES(?,?,?,?);";
             try (PreparedStatement insert = con.prepareStatement(insertLink)) {
@@ -709,16 +709,16 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
-    public Boolean changeStudentProgress(String to, Student s){
+    public Boolean changeStudentProgress(String to, Student s) {
         boolean succes = false;
         String update = "UPDATE Students SET degreeLvl = ? WHERE regNum = ?;";
         try (PreparedStatement stsm = con.prepareStatement(update)) {
             stsm.clearParameters();
-            stsm.setString(1,to);
+            stsm.setString(1, to);
             stsm.setInt(2, s.getRegNum());
             stsm.executeUpdate();
             succes = true;
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return succes;
@@ -914,7 +914,7 @@ public class Database implements AutoCloseable {
         return succes;
     }
 
-    public boolean disconnectModule(Module m,StudyLevel s){
+    public boolean disconnectModule(Module m, StudyLevel s) {
         boolean succes = false;
         String deleteLink = "DELETE FROM ModulesToCourse WHERE moduleCode = ? AND degreeLvl = ? AND courseCode = ?;";
         try (PreparedStatement delete = con.prepareStatement(deleteLink)) {
@@ -966,7 +966,7 @@ public class Database implements AutoCloseable {
                     String timeTaught = results.getString(4);
                     new Module(moduleCode, departmentCode, fullName, timeTaught);
                 }
-            
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1082,7 +1082,7 @@ public class Database implements AutoCloseable {
                                             + degreeLvl + "' AND courseCode = '" + courseCode + "' AND core = False;");
                             while (optionalModuleList.next()) {
                                 String moduleCode = optionalModuleList.getString(1);
-                                if(!moduleCode.equals("")){
+                                if (!moduleCode.equals("")) {
                                     optionalModules.add(Module.getInstance(moduleCode));
                                 }
                             }
@@ -1123,8 +1123,13 @@ public class Database implements AutoCloseable {
                     ResultSet gradesResult = stsm2.executeQuery();
                     ArrayList<Grade> gradesList = new ArrayList<>();
                     while (gradesResult.next()) {
-                        Grade g = new Grade(Module.getInstance(gradesResult.getString(1)), gradesResult.getDouble(2),
-                                gradesResult.getDouble(3));
+                        Double mark = gradesResult.getDouble(2);
+                        if (gradesResult.wasNull())
+                            mark = null;
+                        Double remark = gradesResult.getDouble(3);
+                        if (gradesResult.wasNull())
+                            remark = null;
+                        Grade g = new Grade(Module.getInstance(gradesResult.getString(1)), mark, remark);
                         gradesList.add(g);
                     }
                     new StudyPeriod(regNum, label, startDate, endDate, StudyLevel.getInstance(degreeLvl + courseCode),
@@ -1168,8 +1173,8 @@ public class Database implements AutoCloseable {
                     course.setDepartmentList(otherDepartments);
 
                     //NEW CODE FOR LINKING THE STUDY LEVEL TO THE COURSES
-                    ResultSet studyLevelResult = stsm2
-                    .executeQuery("SELECT DISTINCT degreeLvl FROM ModulesToCourse WHERE courseCode = '" + courseCode + "'");
+                    ResultSet studyLevelResult = stsm2.executeQuery(
+                            "SELECT DISTINCT degreeLvl FROM ModulesToCourse WHERE courseCode = '" + courseCode + "'");
                     ArrayList<StudyLevel> studyLevels = new ArrayList<StudyLevel>();
                     while (studyLevelResult.next()) {
                         studyLevels.add(StudyLevel.getInstance(studyLevelResult.getString(1) + courseCode));
@@ -1269,7 +1274,7 @@ public class Database implements AutoCloseable {
                         studyPeriodList.add(StudyPeriod.getInstance(regNumber + label));
                     }
                     new Student(username, passwordHash, salt, regNumber, title, surname, forenames, email, tutor,
-                            course, studyPeriodList,degreeLvl);
+                            course, studyPeriodList, degreeLvl);
 
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -139,6 +139,11 @@ public class AllCoursesPanel extends RefreshablePanel implements ActionListener 
     }
 
     public void refresh() {
+        Collection<Course> updated = new ArrayList<Course>();
+        for (Course c : courses) {
+            updated.add(Course.getInstance(c.getCourseCode()));
+        }
+        courses= updated;
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

@@ -149,6 +149,7 @@ public class StudyLevelPanel extends RefreshablePanel implements ActionListener 
     }
 
     public void refresh() {
+        SL = StudyLevel.getInstance(SL.getDegreeLvl() + SL.getCourseCode());
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

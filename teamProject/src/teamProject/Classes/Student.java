@@ -65,7 +65,7 @@ public class Student extends User {
         news.setRegNum(regNum);
         StudyPeriod.createNew(regNum, "A", startDate, endDate,
                 StudyLevel.getInstance(degreeLvl + course.getCourseCode()));
-        
+
         return news;
     }
 
@@ -126,6 +126,9 @@ public class Student extends User {
             progress();
         }
         if (isRegistrationComplete() && areMarksAssigned()) {
+            if (degreeLvl.equals("G"))
+                return true;
+
             if (getCourse().getDegreeLvlList().size() == 1) {
                 StudyPeriod last = getCurrentStudyPeriod();
                 if (last.isFail()) {
@@ -416,7 +419,7 @@ public class Student extends User {
 
     public void setRegNum(int regNum) {
         instances.remove(this.regNum);
-        instances.put(regNum,this);
+        instances.put(regNum, this);
         this.regNum = regNum;
     }
 

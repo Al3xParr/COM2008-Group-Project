@@ -48,6 +48,10 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
             add(removeButton);
         }
 
+        JButton resultButton = new JButton("See results");
+        resultButton.addActionListener(this);
+        add(resultButton);
+
         columnNames = getColumnNames();
         Object[][] gradesTable = getData();
 
@@ -83,10 +87,12 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
                             if (markType.getItemAt(markType.getSelectedIndex()).equals("Mark")) {
                                 studyPeriod.awardMark(module, (Double) gradeInp.getValue(), false);
                                 JOptionPane.showMessageDialog(null, "Mark Updated");
+                                parent.refreshAll();
 
                             } else {
                                 studyPeriod.awardMark(module, (Double) gradeInp.getValue(), true);
                                 JOptionPane.showMessageDialog(null, "Resit Mark Updated");
+                                parent.refreshAll();
                             }
                             parent.refreshAll();
                         }
@@ -130,8 +136,8 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
         for (Grade grade : grades) {
             gradesTable[count][0] = grade.getModule().getModuleCode();
             gradesTable[count][1] = grade.getModule().getFullName();
-            gradesTable[count][2] = (grade.getMark() == null) ? grade.getMark() : "NONE";
-            gradesTable[count][3] = (grade.getResitMark() == null) ? grade.getResitMark() : "NONE";
+            gradesTable[count][2] = grade.getMark();
+            gradesTable[count][3] = grade.getResitMark();
             if (SystemSecurity.getPrivilages() == 1) {
                 gradesTable[count][4] = "<html><B>Edit Grades</B></html>";
             }
@@ -143,6 +149,8 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
     }
 
     public void refresh() {
+        studyPeriod = StudyPeriod.getInstance(studyPeriod.getRegNum() + studyPeriod.getLabel());
+        grades = studyPeriod.getGradesList();
         table.setModel(new DefaultTableModel(getData(),columnNames));
         revalidate();
         repaint();
@@ -190,6 +198,9 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
                 System.out.println("Successfully deleted");
                 parent.refreshAll();
             }
+        }
+        if (event.getActionCommand().equals("See results")) {
+            JOptionPane.showMessageDialog(null, studyPeriod.studyPeriodResults());
         }
     }
 }

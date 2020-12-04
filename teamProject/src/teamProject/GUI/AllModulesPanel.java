@@ -134,6 +134,11 @@ public class AllModulesPanel extends RefreshablePanel implements ActionListener 
     
     @Override
     public void refresh() {
+        Collection<Module> updated = new ArrayList<Module>();
+        for (Module m : modules) {
+            updated.add(Module.getInstance(m.getModuleCode()));
+        }
+        modules = updated;
         table.setModel(new DefaultTableModel(getData(), columnNames));
         revalidate();
         repaint();

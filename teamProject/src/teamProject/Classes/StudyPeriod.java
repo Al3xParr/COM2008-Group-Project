@@ -180,7 +180,7 @@ public class StudyPeriod {
 
     public Double getAverageMark() {
         
-        if(gradesList.isEmpty() && areMarksAssigned()){
+        if(!gradesList.isEmpty() && areMarksAssigned()){
             Double sum = 0.0;
             for (Grade g : gradesList) {
 
