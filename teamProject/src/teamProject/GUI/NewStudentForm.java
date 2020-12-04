@@ -39,7 +39,7 @@ public class NewStudentForm extends SubFrame implements ActionListener {
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(Box.createVerticalGlue());
 
-        Dimension maxSize = new Dimension(120, 30);
+        Dimension maxSize = new Dimension(130, 30);
 
         usernameField = new JTextField(15);
         usernameField.setMaximumSize(maxSize);

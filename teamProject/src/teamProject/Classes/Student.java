@@ -124,6 +124,7 @@ public class Student extends User {
     public boolean nextYear() {
         if (degreeLvl.equals("P")) {
             progress();
+            return true;
         }
         if (isRegistrationComplete() && areMarksAssigned()) {
             if (degreeLvl.equals("G"))
