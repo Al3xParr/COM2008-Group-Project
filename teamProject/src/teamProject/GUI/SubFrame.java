@@ -8,11 +8,6 @@ package teamProject.GUI;
  * @author Zbigniew Lisak 
  */
 
-import teamProject.StudentSystem;
-import teamProject.SystemSecurity;
-import teamProject.Classes.Module;
-import teamProject.db.Database;
-
 import java.awt.*;
 import javax.swing.*;
 
