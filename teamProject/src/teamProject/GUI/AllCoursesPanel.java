@@ -28,6 +28,7 @@ public class AllCoursesPanel extends RefreshablePanel implements ActionListener 
     String[] columnNames;
     JTable table;
     Collection<Course> courses;
+    Object[][] allCourses;
 
     public AllCoursesPanel(MainFrame parent, Collection<Course> courses) {
         this.parent = parent;
@@ -36,7 +37,7 @@ public class AllCoursesPanel extends RefreshablePanel implements ActionListener 
         addCButton.addActionListener(this);
 
         columnNames = getColumnNames();
-        Object[][] allCourses = getData();
+        allCourses = getData();
 
         BoxLayout form = new BoxLayout(this, BoxLayout.PAGE_AXIS);
         setLayout(form);
@@ -144,7 +145,8 @@ public class AllCoursesPanel extends RefreshablePanel implements ActionListener 
             updated.add(Course.getInstance(c.getCourseCode()));
         }
         courses= updated;
-        table.setModel(new DefaultTableModel(getData(), columnNames));
+        allCourses = getData();
+        table.setModel(new DefaultTableModel(allCourses, columnNames));
         revalidate();
         repaint();
     }

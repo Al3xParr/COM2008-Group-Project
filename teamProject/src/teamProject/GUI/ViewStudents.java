@@ -17,12 +17,14 @@ public class ViewStudents extends RefreshablePanel implements ActionListener {
     JTable table;
     String[] columnNames = { "RegNum", "Username", "Title", "First names", "Surname", "Email", "Tutor", "Course",
             "View" };
+    Object[][] allStudents;
+
     public ViewStudents(MainFrame parent, Collection<Student> students) {
         this.parent = parent;
         this.students = students;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        Object[][] allStudents = getData();
+        allStudents = getData();
         
 
         JLabel header = new JLabel(
@@ -86,7 +88,8 @@ public class ViewStudents extends RefreshablePanel implements ActionListener {
             updated.add(Student.getInstance(student.getRegNum()));
         }
         students = updated;
-        table.setModel(new DefaultTableModel(getData(), columnNames));
+        allStudents = getData();
+        table.setModel(new DefaultTableModel(allStudents, columnNames));
         revalidate();
         repaint();
     }

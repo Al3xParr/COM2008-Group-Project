@@ -27,6 +27,8 @@ public class StudyLevelPanel extends RefreshablePanel implements ActionListener 
     JTable table;
     String[] columnNames;
 
+    Object[][] allModules;
+
     public StudyLevelPanel(MainFrame parent, StudyLevel SL) {
         this.parent = parent;
         this.SL = SL;
@@ -35,7 +37,7 @@ public class StudyLevelPanel extends RefreshablePanel implements ActionListener 
         
         columnNames = getColumnNames();
         
-        Object[][] allModules = getData();
+        allModules = getData();
 
         BoxLayout form = new BoxLayout(this,BoxLayout.PAGE_AXIS);
         setLayout(form);
@@ -150,7 +152,8 @@ public class StudyLevelPanel extends RefreshablePanel implements ActionListener 
 
     public void refresh() {
         SL = StudyLevel.getInstance(SL.getDegreeLvl() + SL.getCourseCode());
-        table.setModel(new DefaultTableModel(getData(), columnNames));
+        allModules = getData();
+        table.setModel(new DefaultTableModel(allModules, columnNames));
         revalidate();
         repaint();
     }

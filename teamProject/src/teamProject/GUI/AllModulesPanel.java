@@ -139,7 +139,8 @@ public class AllModulesPanel extends RefreshablePanel implements ActionListener 
             updated.add(Module.getInstance(m.getModuleCode()));
         }
         modules = updated;
-        table.setModel(new DefaultTableModel(getData(), columnNames));
+        allModules = getData();
+        table.setModel(new DefaultTableModel(allModules, columnNames));
         revalidate();
         repaint();
     }

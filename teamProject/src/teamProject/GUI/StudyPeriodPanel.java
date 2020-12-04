@@ -20,6 +20,7 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
     ArrayList<Grade> grades = null;
     String[] columnNames;
     JTable table;
+    DefaultTableModel model;
 
     public StudyPeriodPanel(MainFrame parent, StudyPeriod studyPeriod) {
         this.parent = parent;
@@ -54,8 +55,8 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
 
         columnNames = getColumnNames();
         Object[][] gradesTable = getData();
-
-        table = new JTable(gradesTable, columnNames);
+        model = new DefaultTableModel(gradesTable, columnNames);
+        table = new JTable(model);
         table.setPreferredScrollableViewportSize(new Dimension(300, 150));
         table.setFillsViewportHeight(true);
         table.setEnabled(false);
@@ -151,7 +152,7 @@ public class StudyPeriodPanel extends RefreshablePanel implements ActionListener
     public void refresh() {
         studyPeriod = StudyPeriod.getInstance(studyPeriod.getRegNum() + studyPeriod.getLabel());
         grades = studyPeriod.getGradesList();
-        table.setModel(new DefaultTableModel(getData(),columnNames));
+        model.setDataVector(getData(),columnNames);
         revalidate();
         repaint();
     }

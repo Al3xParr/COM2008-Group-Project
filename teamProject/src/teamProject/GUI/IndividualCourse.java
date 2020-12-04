@@ -17,9 +17,11 @@ public class IndividualCourse extends RefreshablePanel {
     String otherDepString;
 
     JTable table;
-    String[] columnNames = {"Degree Level", "View Modules"};
+    DefaultTableModel model;
+    String[] columnNames = { "Degree Level", "View Modules" };
     ArrayList<StudyLevel> degreeLvls;
 
+    Object[][] allDegreeLvl;
 
     public IndividualCourse(MainFrame parent, Course course) {
 
@@ -49,9 +51,9 @@ public class IndividualCourse extends RefreshablePanel {
         JLabel degreeLvlLabel = new JLabel("<html><div style = 'text-align : center;'><<h3>Study Levels: </h3>");
         add(degreeLvlLabel);
 
-        Object[][] allDegreeLvl = getData();
-        
-        table = new JTable(allDegreeLvl, columnNames);
+        allDegreeLvl = getData();
+        model = new DefaultTableModel(allDegreeLvl, columnNames);
+        table = new JTable(model);
         table.setPreferredScrollableViewportSize(new Dimension(200, 100));
         table.setFillsViewportHeight(true);
         table.setEnabled(false);
@@ -71,7 +73,7 @@ public class IndividualCourse extends RefreshablePanel {
             }
         });
     }
-    
+
     private Object[][] getData() {
         Object[][] allDegreeLvl = new Object[degreeLvls.size()][columnNames.length];
 
@@ -89,7 +91,8 @@ public class IndividualCourse extends RefreshablePanel {
 
     public void refresh() {
         course = Course.getInstance(course.getCourseCode());
-        table.setModel(new DefaultTableModel(getData(), columnNames));
+        allDegreeLvl = getData();
+        model.setDataVector(allDegreeLvl, columnNames);
         revalidate();
         repaint();
     }

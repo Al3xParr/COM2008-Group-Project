@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.util.ArrayList;
 import javax.swing.table.*;
 
-
 import teamProject.*;
 import teamProject.Classes.*;
 
@@ -19,10 +18,9 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
     String courseCode;
     Course course = null;
     ArrayList<StudyPeriod> studyPeriods;
-    String[] columnNames =
-            { "Label", "Start Date", "End Date", "Degree Level", "View Grades" };
+    String[] columnNames = { "Label", "Start Date", "End Date", "Degree Level", "View Grades" };
     JTable table;
-
+    Object[][] allStudyPeriod;
 
     public IndividualStudent(MainFrame parent, Student student) {
         this.parent = parent;
@@ -61,12 +59,10 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
         courseButton.addActionListener(this);
         add(courseButton);
 
-        JLabel studyLevelLabel = new JLabel(
-                "<html><div style = 'text-align : center;'><<h3>Study Periods: </h3>");
+        JLabel studyLevelLabel = new JLabel("<html><div style = 'text-align : center;'><<h3>Study Periods: </h3>");
         add(studyLevelLabel);
 
-        
-        Object[][] allStudyPeriod = getData();
+        allStudyPeriod = getData();
 
         if (SystemSecurity.getPrivilages() == 1) {
             JButton gradeButton = new JButton("View Current Progress");
@@ -79,7 +75,6 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
         }
 
         //will use as a reference to use for the position in the table for each grade
-        
 
         table = new JTable(allStudyPeriod, columnNames);
         table.setPreferredScrollableViewportSize(new Dimension(500, 200));
@@ -121,10 +116,12 @@ public class IndividualStudent extends RefreshablePanel implements ActionListene
 
         return allStudyPeriod;
     }
-    
+
     public void refresh() {
         student = Student.getInstance(student.getRegNum());
-        table.setModel(new DefaultTableModel(getData(), columnNames));
+        studyPeriods = student.getStudyPeriodList();
+        allStudyPeriod = getData();
+        table.setModel(new DefaultTableModel(allStudyPeriod, columnNames));
         revalidate();
         repaint();
     }
