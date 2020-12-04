@@ -26,6 +26,7 @@ public class IndividualCourse extends RefreshablePanel {
     public IndividualCourse(MainFrame parent, Course course) {
 
         this.parent = parent;
+        this.course = course;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         String courseCode = course.getCourseCode();
         String fullName = course.getFullName();

@@ -28,7 +28,7 @@ public class SubFrame extends JFrame {
         main.removeFrame((SubFrame) windowEvent.getSource());
       }
     });
-    setSize(screenSize.width / 2, screenSize.height / 2);
+    setSize((int)(screenSize.width / 1.75), (int)(screenSize.height / 1.75));
     setLocation(screenSize.width / 4, screenSize.height / 4);
     
     setContentPane(panel);
