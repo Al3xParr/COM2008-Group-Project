@@ -22,13 +22,13 @@ public class StudentSystem {
     final static String user = "team044";
     final static String pass = "872345c0";
 
-    public static void reinstance(){
+    public static void reinstance() {
         clearHashMaps();
 
         try (Database db = connect()) {
             db.instantiateUsers();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -57,18 +57,15 @@ public class StudentSystem {
     }
 
     public static void main(String[] args) {
-
+        /*
         try (Database db = connect()) {
-            //DO STUFF HERE
-
-            //db.resetDB();
-            //db.populateDB();
-            //db.instantiateUsers();
-            new MainFrame();
-
+            
+            db.resetDB();
+            db.populateDB();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        */
+        new MainFrame();
     }
 }

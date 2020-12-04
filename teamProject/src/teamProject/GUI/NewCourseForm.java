@@ -1,5 +1,13 @@
 package teamProject.GUI;
 
+/**
+ * Team Project COM2008 year 20/21
+ * @author Nathan Mitchell
+ * @author Alex Parr
+ * @author Julia Jablonska
+ * @author Zbigniew Lisak 
+ */
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -213,7 +221,9 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
 
         Vector<String> courses = new Vector<>();
         for (Course c : Course.instances.values()) {
-            courses.add(c.getCourseCode());
+            if(c.getDegreeLvlList().size() == 3){
+                courses.add(c.getCourseCode());
+            }
         }
         courseEquivMSc = new JComboBox<>(courses);
         courseEquivMSc.setMaximumSize(maxSize);
@@ -326,6 +336,10 @@ public class NewCourseForm extends SubFrame implements ActionListener, ItemListe
             }
             if (Course.checkPrimaryKeyExists(code + mainDept.getDeptCode())) {
                 JOptionPane.showMessageDialog(null, "Course code already taken");
+                return;
+            }
+            if (equiv == null) {
+                JOptionPane.showMessageDialog(null, "Add Bachelor Equivalent");
                 return;
             }
 

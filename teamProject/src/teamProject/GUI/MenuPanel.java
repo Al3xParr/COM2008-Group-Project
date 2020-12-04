@@ -195,7 +195,7 @@ public class MenuPanel extends JPanel implements ActionListener {
             parent.changeLogIn();
         }
         if (command.equals("Refresh")) {
-            parent.disposeOfSubFrames();
+            parent.refreshAll();
             SystemSecurity.getAccessibleData(SystemSecurity.getCurrentUser().getUsername());
         }
 

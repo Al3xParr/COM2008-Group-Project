@@ -1,5 +1,13 @@
 package teamProject.GUI;
 
+/**
+ * Team Project COM2008 year 20/21
+ * @author Nathan Mitchell
+ * @author Alex Parr
+ * @author Julia Jablonska
+ * @author Zbigniew Lisak 
+ */
+
 import javax.swing.*;
 
 public class RefreshablePanel extends JPanel {
@@ -11,6 +19,6 @@ public class RefreshablePanel extends JPanel {
     }
 
     public void refresh() {
-        System.out.println("Sth is wrong refresh of RefreshablePanel called");
+        
     }
 }

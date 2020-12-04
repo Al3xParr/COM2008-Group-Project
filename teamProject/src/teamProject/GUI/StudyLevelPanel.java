@@ -1,5 +1,13 @@
 package teamProject.GUI;
 
+/**
+ * Team Project COM2008 year 20/21
+ * @author Nathan Mitchell
+ * @author Alex Parr
+ * @author Julia Jablonska
+ * @author Zbigniew Lisak 
+ */
+
 import teamProject.SystemSecurity;
 import teamProject.Classes.Module;
 import teamProject.Classes.StudyLevel;

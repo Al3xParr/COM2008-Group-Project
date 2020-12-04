@@ -1,3 +1,10 @@
+/**
+ * Team Project COM2008 year 20/21
+ * @author Nathan Mitchell
+ * @author Alex Parr
+ * @author Julia Jablonska
+ * @author Zbigniew Lisak 
+ */
 /*"PasswordHash" is the password for all accounts*/
 INSERT INTO Departments VALUES("","");
 INSERT INTO Modules VALUES("","","","");

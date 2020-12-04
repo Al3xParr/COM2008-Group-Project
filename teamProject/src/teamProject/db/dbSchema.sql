@@ -1,3 +1,10 @@
+/**
+ * Team Project COM2008 year 20/21
+ * @author Nathan Mitchell
+ * @author Alex Parr
+ * @author Julia Jablonska
+ * @author Zbigniew Lisak 
+ */
 DROP TABLE IF EXISTS Grades;
 DROP TABLE IF EXISTS StudyPeriods;
 DROP TABLE IF EXISTS ModulesToCourse;

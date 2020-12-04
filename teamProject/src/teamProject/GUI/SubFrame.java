@@ -1,5 +1,13 @@
 package teamProject.GUI;
 
+/**
+ * Team Project COM2008 year 20/21
+ * @author Nathan Mitchell
+ * @author Alex Parr
+ * @author Julia Jablonska
+ * @author Zbigniew Lisak 
+ */
+
 import teamProject.StudentSystem;
 import teamProject.SystemSecurity;
 import teamProject.Classes.Module;
@@ -47,18 +55,4 @@ public class SubFrame extends JFrame {
     super.setContentPane(scroll);
   }
 
-  public static void main(String[] args) {
-
-    try (Database db = StudentSystem.connect()) {
-      db.resetDB();
-      db.populateDB();
-      db.instantiateUsers();
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
-    SystemSecurity.login("user5", "passwordHash");
-    MainFrame main = new MainFrame();
-    new SubFrame("Test", main, new AllModulesPanel(main, Module.allInstances()));
-
-  }
 }

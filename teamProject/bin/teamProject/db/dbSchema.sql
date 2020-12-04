@@ -1,3 +1,10 @@
+/**
+ * Team Project COM2008 year 20/21
+ * @author Nathan Mitchell
+ * @author Alex Parr
+ * @author Julia Jablonska
+ * @author Zbigniew Lisak 
+ */
 DROP TABLE IF EXISTS Grades;
 DROP TABLE IF EXISTS StudyPeriods;
 DROP TABLE IF EXISTS ModulesToCourse;
@@ -37,7 +44,7 @@ CREATE TABLE Students(
     degreeLvl CHAR(1),
     PRIMARY KEY (regNum),
     FOREIGN KEY (username) REFERENCES Accounts(username) ON DELETE CASCADE,
-    FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE SET NULL
+    FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE CASCADE
 );
 
 CREATE TABLE Departments(
@@ -67,8 +74,9 @@ CREATE TABLE ModulesToCourse(
     moduleCode CHAR(7) NOT NULL,
     courseCode CHAR(6) NOT NULL,
     core BOOLEAN NOT NULL,
-    degreeLvl TINYINT NOT NULL,
+    degreeLvl CHAR(1) NOT NULL,
     CONSTRAINT id PRIMARY KEY (moduleCode, courseCode, degreeLvl),
+
     FOREIGN KEY (moduleCode) REFERENCES Modules(moduleCode) ON DELETE CASCADE,
     FOREIGN KEY (courseCode) REFERENCES Course(courseCode) ON DELETE CASCADE
 );
